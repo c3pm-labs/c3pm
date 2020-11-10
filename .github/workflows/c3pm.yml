@@ -1,0 +1,37 @@
+name: c3pm CI
+
+on:
+  pull_request:
+    paths:
+      - 'cli/**'
+      - .github/workflows/c3pm.yml
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Go
+      uses: actions/setup-go@v2.0.3
+    - name: Build project
+      working-directory: ./
+      run: go build
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Go
+        uses: actions/setup-go@v2.0.3
+      - name: Test project
+        working-directory: ./
+        run: go test ./...
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Lint project
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.28
+          args: -E bodyclose -E gofmt
+          working-directory: ./
