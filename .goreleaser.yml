@@ -19,10 +19,10 @@ archives:
     386: i386
     amd64: x86_64
 brews:
-- name: cli
+- name: c3pm
   tap:
     owner: Codelax
-    name: c3pm-tap
+    name: homebrew-c3pm
 nfpms:
 - homepage:
   maintainer: Codelax <Codelax@protonmail.com>
