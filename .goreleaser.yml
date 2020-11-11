@@ -1,0 +1,50 @@
+before:
+  hooks:
+    - go mod download
+builds:
+- env:
+  - CGO_ENABLED=0
+  binary: ctpm
+  goos:
+    - darwin
+    - linux
+  goarch:
+    - amd64
+    - 386
+archives:
+- replacements:
+    darwin: Darwin
+    linux: Linux
+    windows: Windows
+    386: i386
+    amd64: x86_64
+brews:
+- name: cli
+  tap:
+    owner: Codelax
+    name: c3pm-tap
+nfpms:
+- replacements:
+    amd64: 64-bit
+    386: 32-bit
+    darwin: macOS
+    linux: Linux
+  homepage:
+  maintainer: Codelax <Codelax@protonmail.com>
+  formats:
+    - deb
+    - rpm
+  bindir: /usr/local/bin
+  dependencies:
+    - cmake
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-SNAPSHOT"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^docs:'
+    - '^test:'
+    - '^meta:'
