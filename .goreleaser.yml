@@ -24,12 +24,7 @@ brews:
     owner: Codelax
     name: c3pm-tap
 nfpms:
-- replacements:
-    amd64: 64-bit
-    386: 32-bit
-    darwin: macOS
-    linux: Linux
-  homepage:
+- homepage:
   maintainer: Codelax <Codelax@protonmail.com>
   formats:
     - deb
