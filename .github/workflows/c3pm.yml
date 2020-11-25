@@ -3,7 +3,7 @@ name: c3pm CI
 on:
   pull_request:
     paths:
-      - 'cli/**'
+      - './**'
       - .github/workflows/c3pm.yml
 
 jobs:
