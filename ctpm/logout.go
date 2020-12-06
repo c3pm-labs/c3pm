@@ -1,7 +1,7 @@
 package ctpm
 
 import (
-	"github.com/gabrielcolson/c3pm/cli/config"
+	"github.com/c3pm-labs/c3pm/config"
 	"os"
 )
 

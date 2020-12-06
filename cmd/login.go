@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"github.com/gabrielcolson/c3pm/cli/api"
-	"github.com/gabrielcolson/c3pm/cli/cmd/input"
-	"github.com/gabrielcolson/c3pm/cli/ctpm"
+	"github.com/c3pm-labs/c3pm/api"
+	"github.com/c3pm-labs/c3pm/cmd/input"
+	"github.com/c3pm-labs/c3pm/ctpm"
 	"net/http"
 )
 

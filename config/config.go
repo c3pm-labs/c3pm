@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/gabrielcolson/c3pm/cli/config/manifest"
+	"github.com/c3pm-labs/c3pm/config/manifest"
 	"os"
 	"path"
 	"path/filepath"

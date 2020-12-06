@@ -2,8 +2,8 @@ package ctpm_test
 
 import (
 	"encoding/json"
-	"github.com/gabrielcolson/c3pm/cli/api"
-	"github.com/gabrielcolson/c3pm/cli/ctpm"
+	"github.com/c3pm-labs/c3pm/api"
+	"github.com/c3pm-labs/c3pm/ctpm"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"io/ioutil"

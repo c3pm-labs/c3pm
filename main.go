@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/alecthomas/kong"
-	"github.com/gabrielcolson/c3pm/cli/cmd"
+	"github.com/c3pm-labs/c3pm/cmd"
 )
 
 const version = "0.0.1"

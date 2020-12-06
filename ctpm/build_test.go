@@ -2,9 +2,9 @@ package ctpm_test
 
 import (
 	"bytes"
-	"github.com/gabrielcolson/c3pm/cli/config"
-	"github.com/gabrielcolson/c3pm/cli/config/manifest"
-	"github.com/gabrielcolson/c3pm/cli/ctpm"
+	"github.com/c3pm-labs/c3pm/config"
+	"github.com/c3pm-labs/c3pm/config/manifest"
+	"github.com/c3pm-labs/c3pm/ctpm"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"io/ioutil"

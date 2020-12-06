@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/gabrielcolson/c3pm/cli/cmd/input"
-	"github.com/gabrielcolson/c3pm/cli/config"
-	"github.com/gabrielcolson/c3pm/cli/ctpm"
+	"github.com/c3pm-labs/c3pm/cmd/input"
+	"github.com/c3pm-labs/c3pm/config"
+	"github.com/c3pm-labs/c3pm/ctpm"
 	"path/filepath"
 )
 

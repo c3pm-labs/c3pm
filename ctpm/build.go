@@ -2,9 +2,9 @@ package ctpm
 
 import (
 	"fmt"
-	"github.com/gabrielcolson/c3pm/cli/cmake"
-	"github.com/gabrielcolson/c3pm/cli/cmakegen"
-	"github.com/gabrielcolson/c3pm/cli/config"
+	"github.com/c3pm-labs/c3pm/cmake"
+	"github.com/c3pm-labs/c3pm/cmakegen"
+	"github.com/c3pm-labs/c3pm/config"
 	"path/filepath"
 )
 

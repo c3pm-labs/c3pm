@@ -1,6 +1,6 @@
 package cmd
 
-import "github.com/gabrielcolson/c3pm/cli/ctpm"
+import "github.com/c3pm-labs/c3pm/ctpm"
 
 type LogoutCmd struct{}
 
