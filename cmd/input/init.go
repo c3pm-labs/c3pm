@@ -3,7 +3,7 @@ package input
 import (
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/Masterminds/semver/v3"
-	"github.com/gabrielcolson/c3pm/cli/config/manifest"
+	"github.com/c3pm-labs/c3pm/config/manifest"
 )
 
 var InitSurvey = []*survey.Question{

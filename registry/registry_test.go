@@ -2,7 +2,7 @@ package registry_test
 
 import (
 	"github.com/Masterminds/semver/v3"
-	"github.com/gabrielcolson/c3pm/cli/registry"
+	"github.com/c3pm-labs/c3pm/registry"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/ghttp"

@@ -1,7 +1,7 @@
 package ctpm_test
 
 import (
-	"github.com/gabrielcolson/c3pm/cli/ctpm"
+	"github.com/c3pm-labs/c3pm/ctpm"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"os"

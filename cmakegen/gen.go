@@ -3,8 +3,8 @@ package cmakegen
 import (
 	"fmt"
 	"github.com/bmatcuk/doublestar"
-	"github.com/gabrielcolson/c3pm/cli/config"
-	"github.com/gabrielcolson/c3pm/cli/config/manifest"
+	"github.com/c3pm-labs/c3pm/config"
+	"github.com/c3pm-labs/c3pm/config/manifest"
 	"io/ioutil"
 	"os"
 	"path/filepath"
