@@ -2,8 +2,6 @@ name: c3pm CI
 
 on:
   pull_request:
-    paths:
-      - .github/workflows/c3pm.yml
 
 jobs:
   build:
