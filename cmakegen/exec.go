@@ -3,6 +3,7 @@ package cmakegen
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"text/template"
 )
 
@@ -14,7 +15,7 @@ set(CMAKE_CXX_STANDARD {{.LanguageStandard}})
 add_executable({{.ProjectName}})
 
 target_sources({{.ProjectName}} PRIVATE {{.Sources}} {{.Includes}})
-{{$home:=.Home}}
+{{$c3pmGlobalDir:=.C3pmGlobalDir}}
 
 target_include_directories(
 	{{.ProjectName}} PRIVATE {{.IncludeDirs}}
@@ -22,24 +23,29 @@ target_include_directories(
 		{{$name:=.Name}}
 		{{$version:=.Version}}
 		{{ range .ExportedIncludeDirs }}
-			{{$home}}/.c3pm/cache/{{$name}}/{{$version}}/{{.}}
+			{{$c3pmGlobalDir}}/cache/{{$name}}/{{$version}}/{{.}}
 		{{ end }}
 	{{end}}
 )
+{{range .Dependencies}}
+find_library({{ .Name | ToUpper}} {{.Name}} "{{$c3pmGlobalDir}}/cache/{{.Name}}/{{.Version}}/lib")
+{{end}}
 
 target_link_libraries(
 	{{.ProjectName}}
 	PUBLIC
-	{{ range .Dependencies }}
-		-L{{$home}}/.c3pm/cache/{{.Name}}/{{.Version}}/lib
-		{{ range .Targets }} -l{{.}} {{end}}
+	{{range .Dependencies}}
+	{{"${"}}{{.Name|ToUpper}}{{"}"}}
 	{{end}}
 )
 `
 
 func executable(v CMakeVars) (string, error) {
+	funcMap := template.FuncMap{
+		"ToUpper": strings.ToUpper,
+	}
 	cmake := bytes.NewBuffer([]byte{})
-	tmpl, err := template.New("cmakeExecutable").Parse(addPlatformSpecificCmake(executableTemplate, v))
+	tmpl, err := template.New("cmakeExecutable").Funcs(funcMap).Parse(addPlatformSpecificCmake(executableTemplate, v))
 	if err != nil {
 		return "", fmt.Errorf("could not parse cmake template: %w", err)
 	}
