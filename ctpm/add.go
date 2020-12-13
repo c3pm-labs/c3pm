@@ -147,7 +147,7 @@ func installPackage(pkgDir string) error {
 	return pc.Manifest.Save(filepath.Join(config.LibCachePath(pc.Manifest.Name, pc.Manifest.Version.String()), "c3pm.yml"))
 }
 
-const depRegexString = `^[a-z0-9_]*(@.*)?$`
+const depRegexString = `^[\-a-z0-9_]*(@.*)?$`
 
 var depRegex *regexp.Regexp
 
