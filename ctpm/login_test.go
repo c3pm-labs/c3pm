@@ -44,7 +44,7 @@ var _ = Describe("Login", func() {
 			Ω(err).To(BeNil())
 		}))
 		defer server.Close()
-		apiClient := api.API{Client: server.Client()}
+		apiClient := api.New(server.Client(), "")
 
 		err := os.MkdirAll(c3pmHomeDir, os.ModePerm)
 		Ω(err).To(BeNil())

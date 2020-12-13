@@ -17,7 +17,7 @@ func (p *PublishCmd) Run() error {
 	if err != nil {
 		return fmt.Errorf("not logged in: %w", err)
 	}
-	client := api.API{Client: &http.Client{}, Token: token}
+	client := api.New(&http.Client{}, token)
 	pc, err := config.Load(".")
 	if err != nil {
 		return fmt.Errorf("failed to read c3pm.yml: %w", err)

@@ -57,6 +57,9 @@ func buildTarFile(files []string) bytes.Buffer {
 	return buf
 }
 
+// Upload is a wrapper function around C3PM's publish endpoint.
+// It takes an array of file paths, creates a tar file containing
+// them, then uploads it to the API.
 func (c API) Upload(files []string) error {
 	buf := buildTarFile(files)
 	return c.send("POST", "/auth/publish", &buf)

@@ -11,9 +11,18 @@ import (
 	"os"
 )
 
+// API represents a connection to c3pm's backend, used for authentication and publishing purposes
 type API struct {
 	Client *http.Client
 	Token  string
+}
+
+// New builds a new API object
+func New(c *http.Client, t string) API {
+	return API{
+		Client: c,
+		Token:  t,
+	}
 }
 
 func (c API) newRequest(method string, path string, body io.Reader) (*http.Request, error) {

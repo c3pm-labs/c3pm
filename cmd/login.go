@@ -15,6 +15,6 @@ func (l *LoginCmd) Run() error {
 	if err != nil {
 		return err
 	}
-	client := api.API{Client: &http.Client{}}
+	client := api.New(&http.Client{}, "")
 	return ctpm.Login(client, payload.Login, payload.Password)
 }
