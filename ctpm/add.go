@@ -8,6 +8,7 @@ import (
 	"github.com/c3pm-labs/c3pm/cmake"
 	"github.com/c3pm-labs/c3pm/config"
 	"github.com/c3pm-labs/c3pm/config/manifest"
+	"github.com/c3pm-labs/c3pm/env"
 	"github.com/c3pm-labs/c3pm/registry"
 	"io"
 	"io/ioutil"
@@ -29,8 +30,6 @@ func Add(pc *config.ProjectConfig, opts AddOptions) error {
 	return nil
 }
 
-const DefaultRegistryUrl = "http://localhost:4444/v1"
-
 type AddOptions struct {
 	Force       bool
 	RegistryURL string
@@ -40,7 +39,7 @@ type AddOptions struct {
 
 func buildOptions(opts AddOptions) AddOptions {
 	if opts.RegistryURL == "" {
-		opts.RegistryURL = DefaultRegistryUrl
+		opts.RegistryURL = env.REGISTRY_ENDPOINT
 	}
 	return opts
 }

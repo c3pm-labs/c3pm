@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/c3pm-labs/c3pm/env"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -28,7 +29,7 @@ func New(c *http.Client, t string) API {
 func (c API) newRequest(method string, path string, body io.Reader) (*http.Request, error) {
 	var host string
 	if customEndpoint := os.Getenv("C3PM_API_ENDPOINT"); customEndpoint == "" {
-		host = "https://c3pm.herokuapp.com/v1"
+		host = env.API_ENDPOINT
 	} else {
 		host = customEndpoint
 	}
