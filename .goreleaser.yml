@@ -21,7 +21,7 @@ archives:
 brews:
 - name: c3pm
   tap:
-    owner: Codelax
+    owner: c3pm-labs
     name: homebrew-c3pm
 nfpms:
 - homepage: c3pm.io
