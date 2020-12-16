@@ -1,20 +1,14 @@
 package manifest
 
 import (
+	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"testing"
 )
 
-func TestC3pmVersionFromString(t *testing.T) {
-	g := NewGomegaWithT(t)
-	v, err := C3pmVersionFromString("v1")
-	g.Expect(err).To(BeNil())
-	g.Expect(v).To(Equal(C3pmVersion1))
-}
-
-func TestC3pmVersion_String(t *testing.T) {
-	g := NewGomegaWithT(t)
-	v, err := C3pmVersionFromString("v1")
-	g.Expect(err).To(BeNil())
-	g.Expect(v.String()).To(Equal("v1"))
-}
+var _ = Describe("c3pm version Test", func() {
+	It("Check C3PM version from string", func() {
+		v, err := C3pmVersionFromString("v1")
+		Ω(err).To(BeNil())
+		Ω(v).To(Equal(C3pmVersion1))
+	})
+})
