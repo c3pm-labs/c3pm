@@ -11,8 +11,11 @@ import (
 func Build(pc *config.ProjectConfig) error {
 	cmakeVariables := map[string]string{
 		"CMAKE_LIBRARY_OUTPUT_DIRECTORY": pc.ProjectRoot,
+		"CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE": pc.ProjectRoot,
 		"CMAKE_ARCHIVE_OUTPUT_DIRECTORY": pc.ProjectRoot,
+		"CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE": pc.ProjectRoot,
 		"CMAKE_RUNTIME_OUTPUT_DIRECTORY": pc.ProjectRoot,
+		"CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE": pc.ProjectRoot,
 		"CMAKE_INSTALL_PREFIX":           filepath.ToSlash(filepath.Join(config.GlobalC3pmDirPath(), "cache", pc.Manifest.Name, pc.Manifest.Version.String())),
 		"CMAKE_BUILD_TYPE":               "Release",
 		// Useful for Windows build
