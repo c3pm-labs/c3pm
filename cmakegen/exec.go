@@ -14,18 +14,21 @@ set(CMAKE_CXX_STANDARD {{.LanguageStandard}})
 
 add_executable({{.ProjectName}})
 
-target_sources({{.ProjectName}} PRIVATE {{.Sources}} {{.Includes}})
+target_sources({{.ProjectName}} PRIVATE
+	{{.Sources -}}
+	{{.Includes}}
+)
 {{$c3pmGlobalDir:=.C3pmGlobalDir}}
 
 target_include_directories(
-	{{.ProjectName}} PRIVATE {{.IncludeDirs}}
-	{{ range .Dependencies }}
-		{{$name:=.Name}}
-		{{$version:=.Version}}
-		{{ range .ExportedIncludeDirs }}
-			{{$c3pmGlobalDir}}/cache/{{$name}}/{{$version}}/{{.}}
-		{{ end }}
-	{{end}}
+	{{- .ProjectName}} PRIVATE {{.IncludeDirs}}
+	{{- range .Dependencies }}
+		{{- $name:=.Name }}
+		{{- $version:=.Version}}
+		{{- range .ExportedIncludeDirs }}
+	{{ $c3pmGlobalDir }}/cache/{{$name}}/{{$version}}/{{.}}
+		{{- end }}
+	{{- end }}
 )
 {{range .Dependencies}}
 find_library({{ .Name | ToUpper}} {{.Name}} "{{$c3pmGlobalDir}}/cache/{{.Name}}/{{.Version}}/lib")
@@ -36,7 +39,7 @@ target_link_libraries(
 	PUBLIC
 	{{range .Dependencies}}
 	{{"${"}}{{.Name|ToUpper}}{{"}"}}
-	{{end}}
+	{{- end}}
 )
 `
 
