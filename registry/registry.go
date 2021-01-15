@@ -17,7 +17,7 @@ type Options struct {
 }
 
 type ListRegistryResponse struct {
-	Name string
+	Name     string
 	Contents []struct {
 		Key string `xml:"Key"`
 	} `xml:"Contents"`
