@@ -20,7 +20,7 @@ func (a *AddCmd) Run() error {
 	}
 	err = ctpm.Add(pc, ctpm.AddOptions{Force: a.Force, RegistryURL: a.RegistryURL, Dependencies: a.Dependencies})
 	if err != nil {
-		return fmt.Errorf("Failed to add dependencies: %w", err)
+		return fmt.Errorf("failed to add dependencies: %w", err)
 	}
 	return nil
 }
