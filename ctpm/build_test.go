@@ -2,15 +2,16 @@ package ctpm_test
 
 import (
 	"bytes"
+	"io/ioutil"
+	"os"
+	"os/exec"
+	"path/filepath"
+
 	"github.com/c3pm-labs/c3pm/config"
 	"github.com/c3pm-labs/c3pm/config/manifest"
 	"github.com/c3pm-labs/c3pm/ctpm"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"io/ioutil"
-	"os"
-	"os/exec"
-	"path/filepath"
 )
 
 var execSrc = `#include <iostream>

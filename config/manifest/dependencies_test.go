@@ -1,16 +1,16 @@
 package manifest
 
 import (
-	"testing"
-
+	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-func TestDependencies_Map(t *testing.T) {
-	g := NewGomegaWithT(t)
-	var m = make(map[string]string)
-	m["boost"] = "1.2.3"
-	d, err := DependenciesFromMap(m)
-	g.Expect(err).To(BeNil())
-	g.Expect(d).To(Equal(Dependencies(m)))
-}
+var _ = Describe("dependencies", func() {
+	It("test dependencies map", func() {
+		var m = make(map[string]string)
+		m["boost"] = "1.2.3"
+		d, err := DependenciesFromMap(m)
+		Ω(err).To(BeNil())
+		Ω(d).To(Equal(Dependencies(m)))
+	})
+})

@@ -1,6 +1,7 @@
 package registry_test
 
 import (
+	"encoding/xml"
 	"github.com/Masterminds/semver/v3"
 	"github.com/c3pm-labs/c3pm/registry"
 	. "github.com/onsi/ginkgo"
@@ -16,18 +17,24 @@ var _ = Describe("Add", func() {
 		BeforeEach(func() {
 			server = ghttp.NewServer()
 			options.RegistryURL = server.URL()
+			versions := registry.ListRegistryResponse{
+				Name: "versions",
+				Contents: []struct {
+					Key string `xml:"Key"`
+				}{{Key: "0.0.1"}, {Key: "1.0.0"}},
+			}
+			data, err := xml.Marshal(versions)
+			Ω(err).ShouldNot(HaveOccurred())
 			server.AppendHandlers(
 				ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/", "pkg=boost"),
-					ghttp.RespondWithJSONEncoded(200, []string{"0.0.1", "1.0.0"}),
+					ghttp.VerifyRequest("GET", "/", "prefix=boost&typeList=2"),
+					ghttp.RespondWith(200, data),
 				),
 			)
 		})
 		It("fetches the right version", func() {
 			version, err := registry.GetLastVersion("boost", options)
-			if err != nil {
-				Fail(err.Error())
-			}
+			Ω(err).ShouldNot(HaveOccurred())
 			Ω(server.ReceivedRequests()).Should(HaveLen(1))
 			Ω(version).Should(Equal(semver.MustParse("1.0.0")))
 		})
