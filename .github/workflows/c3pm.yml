@@ -23,7 +23,7 @@ jobs:
         run: go get github.com/onsi/ginkgo/ginkgo
       - name: Test project
         working-directory: ./
-        run: ginkgo -v -r
+        run: ~/go/bin/ginkgo -v -r
   lint:
     runs-on: ubuntu-latest
     steps:
