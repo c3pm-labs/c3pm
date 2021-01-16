@@ -6,6 +6,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"net/http/httptest"
+	"os"
 )
 
 var _ = Describe("Upload", func() {
@@ -33,9 +34,13 @@ var _ = Describe("Upload", func() {
 		BeforeEach(func() {
 			srv = httptest.NewServer(apitest.MockServer())
 			client = api.New(srv.Client(), "xxx")
+			err := os.Setenv("C3PM_API_ENDPOINT", srv.URL)
+			Ω(err).ShouldNot(HaveOccurred())
 		})
 		AfterEach(func() {
 			srv.Close()
+			err := os.Unsetenv("C3PM_API_ENDPOINT")
+			Ω(err).ShouldNot(HaveOccurred())
 		})
 
 		It("uploads the file correctly", func() {

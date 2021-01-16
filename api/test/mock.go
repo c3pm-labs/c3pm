@@ -5,7 +5,7 @@ import "net/http"
 
 func createServer(code int) http.Handler {
 	sm := http.NewServeMux()
-	sm.HandleFunc("/auth/publish", func(w http.ResponseWriter, r *http.Request) {
+	sm.HandleFunc("/packages/publish", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(code)
 	})
 	sm.HandleFunc("/auth/login", func(w http.ResponseWriter, r *http.Request) {
