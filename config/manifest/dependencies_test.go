@@ -10,7 +10,8 @@ var _ = Describe("dependencies", func() {
 		var m = make(map[string]string)
 		m["boost"] = "1.2.3"
 		d, err := DependenciesFromMap(m)
-		Ω(err).To(BeNil())
+		Ω(err).ShouldNot(HaveOccurred())
+
 		Ω(d).To(Equal(Dependencies(m)))
 	})
 })
