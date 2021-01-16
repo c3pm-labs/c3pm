@@ -62,5 +62,5 @@ func buildTarFile(files []string) bytes.Buffer {
 // them, then uploads it to the API.
 func (c API) Upload(files []string) error {
 	buf := buildTarFile(files)
-	return c.send("POST", "/auth/publish", &buf)
+	return c.send("POST", "/packages/publish", &buf)
 }

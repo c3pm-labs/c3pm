@@ -1,18 +1,26 @@
 package registry
 
 import (
-	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"github.com/Masterminds/semver/v3"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
 	"sort"
 )
 
 type Options struct {
 	RegistryURL string
+}
+
+type ListRegistryResponse struct {
+	Name     string
+	Contents []struct {
+		Key string `xml:"Key"`
+	} `xml:"Contents"`
 }
 
 func GetLastVersion(dependency string, options Options) (*semver.Version, error) {
@@ -22,29 +30,31 @@ func GetLastVersion(dependency string, options Options) (*semver.Version, error)
 		return nil, fmt.Errorf("error creating version query: %w", err)
 	}
 	q := req.URL.Query()
-	q.Add("pkg", dependency)
+	q.Add("typeList", "2")
+	q.Add("prefix", dependency)
 	req.URL.RawQuery = q.Encode()
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching versions: %w", err)
 	}
 	defer resp.Body.Close()
-	var versions []string
+	var registryResponse ListRegistryResponse
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("error reading body: %w", err)
 	}
-	err = json.Unmarshal(body, &versions)
+	err = xml.Unmarshal(body, &registryResponse)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshaling versions: %w", err)
 	}
-	if len(versions) == 0 {
+	if len(registryResponse.Contents) == 0 {
 		fmt.Printf("%s: package not found\n", dependency)
 		os.Exit(1)
 	}
-	vs := make([]*semver.Version, len(versions))
-	for i, r := range versions {
-		v, err := semver.NewVersion(r)
+	vs := make([]*semver.Version, len(registryResponse.Contents))
+	for i, r := range registryResponse.Contents {
+		version := filepath.Base(r.Key)
+		v, err := semver.NewVersion(version)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing version %s: %w", r, err)
 		}
