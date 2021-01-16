@@ -24,6 +24,8 @@ var _ = Describe("Authentication configuration", func() {
 
 	AfterEach(func() {
 		_ = os.RemoveAll(TargetDir)
+		err := os.Unsetenv("C3PM_USER_DIR")
+		Ω(err).ShouldNot(HaveOccurred())
 	})
 	Context("TokenStrict", func() {
 		It("gets the correct token", func() {

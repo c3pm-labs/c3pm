@@ -98,6 +98,16 @@ var _ = Describe("Config utils", func() {
 		})
 	})
 	Context("Global directory", func() {
+		var (
+			OriginalHomeDir = os.Getenv("HOME")
+		)
+		AfterEach(func() {
+			err := os.Setenv("HOME", OriginalHomeDir)
+			Ω(err).ShouldNot(HaveOccurred())
+			err = os.Unsetenv("C3PM_USER_DIR")
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+
 		Describe("Root global directory", func() {
 			It("gets from HOME", func() {
 				err := os.Setenv("HOME", ".")
