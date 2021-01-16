@@ -40,7 +40,7 @@ func (v *C3pmVersion) UnmarshalYAML(unmarshal func(interface{}) error) error {
 }
 
 func (v C3pmVersion) String() string {
-	return ("v" + strconv.FormatUint(uint64(v), 10))
+	return "v" + strconv.FormatUint(uint64(v), 10)
 }
 
 func (v C3pmVersion) MarshalYAML() (interface{}, error) {

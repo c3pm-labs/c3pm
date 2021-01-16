@@ -6,6 +6,7 @@ import (
 	"path"
 )
 
+// TokenStrict gets the authentication token from the auth file.
 func TokenStrict() (string, error) {
 	content, err := ioutil.ReadFile(AuthFilePath())
 	if err != nil {
@@ -20,6 +21,7 @@ func Token() string {
 	return token
 }
 
+//AuthFilePath returns the path to the global auth file.
 func AuthFilePath() string {
 	return path.Join(GlobalC3pmDirPath(), "auth.cfg")
 }

@@ -1,3 +1,5 @@
+//The manifest package handles loading and writing of the C3PM manifest file (usually c3pm.yml).
+//It also stores the various types supported by the manifest, as well as utility functions to use them.
 package manifest
 
 import (
