@@ -19,7 +19,7 @@ func TestCmakeGen(t *testing.T) {
 	if err != nil {
 		t.Fatal("Failed to get testsArtifacts absolute path")
 	}
-	RunSpecs(t, "Registery Suite")
+	RunSpecs(t, "CMakeGen Suite")
 	err = os.RemoveAll(path)
 	if err != nil {
 		t.Fatal("Failed to clean test artifacts\n")

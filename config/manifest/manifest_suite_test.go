@@ -25,7 +25,3 @@ func TestCmakeGen(t *testing.T) {
 		t.Fatal("Failed to clean test artifacts\n")
 	}
 }
-
-func getTestFolder(path string) string {
-	return filepath.Join("testsArtifacts/", path)
-}

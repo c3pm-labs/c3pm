@@ -1,8 +1,10 @@
 package ctpm_test
 
 import (
+	"bytes"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/c3pm-labs/c3pm/config"
@@ -48,24 +50,24 @@ var _ = Describe("Build", func() {
 			Ω(err).To(BeNil())
 			Ω(fi.Size()).To(BeNumerically(">", 0))
 		})
-		// It("Generate makefiles", func() {
-		// 	fi, err := os.Stat(".c3pm/build/Makefile")
-		// 	Ω(err).To(BeNil())
-		// 	Ω(fi.Size()).To(BeNumerically(">", 0))
-		// })
-		// It("build m", func() {
-		// 	fi, err := os.Stat("buildTest")
-		// 	Ω(err).To(BeNil())
-		// 	Ω(fi.Size()).To(BeNumerically(">", 0))
-		// 	buf := bytes.NewBuffer([]byte{})
-		// 	cmd := exec.Command("./buildTest")
-		// 	cmd.Stdout = buf
-		// 	err = cmd.Start()
-		// 	Ω(err).To(BeNil())
-		// 	err = cmd.Wait()
-		// 	Ω(err).To(BeNil())
-		// 	Ω(buf.String()).To(Equal("Build test\n"))
-		// })
+		It("Generate makefiles", func() {
+			fi, err := os.Stat(".c3pm/build/Makefile")
+			Ω(err).To(BeNil())
+			Ω(fi.Size()).To(BeNumerically(">", 0))
+		})
+		It("build m", func() {
+			fi, err := os.Stat("buildTest")
+			Ω(err).To(BeNil())
+			Ω(fi.Size()).To(BeNumerically(">", 0))
+			buf := bytes.NewBuffer([]byte{})
+			cmd := exec.Command("./buildTest")
+			cmd.Stdout = buf
+			err = cmd.Start()
+			Ω(err).To(BeNil())
+			err = cmd.Wait()
+			Ω(err).To(BeNil())
+			Ω(buf.String()).To(Equal("Build test\n"))
+		})
 
 		_ = os.Chdir(oldPath)
 	})
