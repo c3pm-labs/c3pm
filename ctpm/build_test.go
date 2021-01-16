@@ -43,6 +43,7 @@ var _ = Describe("Build", func() {
 			err = ioutil.WriteFile("main.cpp", []byte(execSrc), 0644)
 			Ω(err).To(BeNil())
 			err = ctpm.Build(pc)
+			Ω(err).To(BeNil())
 		})
 
 		It("Generate cmake scripts", func() {
