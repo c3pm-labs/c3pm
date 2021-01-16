@@ -18,7 +18,7 @@ var _ = Describe("Add", func() {
 			options.RegistryURL = server.URL()
 			server.AppendHandlers(
 				ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/", "pkg=boost"),
+					ghttp.VerifyRequest("GET", "/", "prefix=boost&typeList=2"),
 					ghttp.RespondWithJSONEncoded(200, []string{"0.0.1", "1.0.0"}),
 				),
 			)
