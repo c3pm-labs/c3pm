@@ -1,4 +1,4 @@
-// Package Cmake handles interaction with the CMake Command Line Interface.
+// Package CMake handles interaction with the CMake Command Line Interface.
 // CMake is used internally by C3PM to manage the build and installation phases of using a C3PM project.
 //
 // More information about what the CMake CLI does can be found on CMake's website: https://cmake.org/cmake/help/latest/manual/cmake.1.html
@@ -10,7 +10,7 @@ import (
 	"os/exec"
 )
 
-func executeCmakeCLI(args ...string) error {
+func executeCMakeCLI(args ...string) error {
 	cmd := exec.Command("cmake", args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -36,19 +36,19 @@ func GenerateBuildFiles(sourceDir, buildDir string, variables map[string]string)
 	for key, value := range variables {
 		args = append(args, fmt.Sprintf("-D%s=%s", key, value))
 	}
-	return executeCmakeCLI(args...)
+	return executeCMakeCLI(args...)
 }
 
 //Build runs the CMake CLI to build a C3PM project
 //
 //See CMake's documentation for more information: https://cmake.org/cmake/help/latest/manual/cmake.1.html#build-a-project
 func Build(buildDir string) error {
-	return executeCmakeCLI("--build", buildDir, "--config", "Release")
+	return executeCMakeCLI("--build", buildDir, "--config", "Release")
 }
 
 //Install runs the CMake CLI to install a project.
 //
 //See CMake's documentation for more information: https://cmake.org/cmake/help/latest/manual/cmake.1.html#install-a-project
 func Install(buildDir string) error {
-	return executeCmakeCLI("--install", buildDir)
+	return executeCMakeCLI("--install", buildDir)
 }

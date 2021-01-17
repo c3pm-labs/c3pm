@@ -38,7 +38,7 @@ func removeCommand(cmake string, command string) string {
 
 func library(v CMakeVars) (string, error) {
 	cmake := bytes.NewBuffer([]byte{})
-	tmpl, err := template.New("cmakeExecutable").Parse(addPlatformSpecificCmake(libraryTemplate, v))
+	tmpl, err := template.New("cmakeExecutable").Parse(addPlatformSpecificCMake(libraryTemplate, v))
 	if err != nil {
 		return "", fmt.Errorf("could not parse cmake template: %w", err)
 	}

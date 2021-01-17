@@ -23,5 +23,5 @@ func Token() string {
 
 //AuthFilePath returns the path to the global auth file.
 func AuthFilePath() string {
-	return path.Join(GlobalC3pmDirPath(), "auth.cfg")
+	return path.Join(GlobalC3PMDirPath(), "auth.cfg")
 }

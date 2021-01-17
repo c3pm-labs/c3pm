@@ -46,7 +46,7 @@ var _ = Describe("CMake interaction", func() {
 		})
 	})
 
-	Describe("Cmake Build", func() {
+	Describe("CMake Build", func() {
 		const (
 			BUILD_DIR = "/tmp/c3pm_cmake_test2"
 		)
@@ -69,7 +69,7 @@ var _ = Describe("CMake interaction", func() {
 		})
 	})
 
-	Describe("Cmake Install", func() {
+	Describe("CMake Install", func() {
 		const (
 			BUILD_DIR = "/tmp/c3pm_cmake_test3"
 		)

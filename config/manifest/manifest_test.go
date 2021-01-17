@@ -34,7 +34,7 @@ var _ = Describe("manifest", func() {
 		pc, err := deserialize([]byte(exampleConfig))
 		Ω(err).ShouldNot(HaveOccurred())
 
-		Ω(pc.C3pmVersion).To(Equal(C3pmVersion1))
+		Ω(pc.C3PMVersion).To(Equal(C3PMVersion1))
 		Ω(pc.Type).To(Equal(Library))
 		Ω(pc.Name).To(Equal("c3pm"))
 		Ω(pc.Description).To(Equal("This is the package c3pm"))

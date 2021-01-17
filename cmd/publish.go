@@ -8,10 +8,12 @@ import (
 	"net/http"
 )
 
+//PublishCmd defines the parameters of the publish command.
 type PublishCmd struct {
 	Ignore []string `kong:"optional,name='ignore',short='i',help='Ignore file'"`
 }
 
+//Run handles the behavior of the publish command.
 func (p *PublishCmd) Run() error {
 	token, err := config.TokenStrict()
 	if err != nil {

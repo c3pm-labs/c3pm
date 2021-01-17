@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestCmakeGen(t *testing.T) {
+func TestCMakeGen(t *testing.T) {
 	RegisterFailHandler(Fail)
 	path, err := filepath.Abs("testsArtifacts")
 	fmt.Println("PATH:", path)

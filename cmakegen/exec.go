@@ -39,7 +39,7 @@ target_link_libraries(
 
 func executable(v CMakeVars) (string, error) {
 	cmake := bytes.NewBuffer([]byte{})
-	tmpl, err := template.New("cmakeExecutable").Parse(addPlatformSpecificCmake(executableTemplate, v))
+	tmpl, err := template.New("cmakeExecutable").Parse(addPlatformSpecificCMake(executableTemplate, v))
 	if err != nil {
 		return "", fmt.Errorf("could not parse cmake template: %w", err)
 	}

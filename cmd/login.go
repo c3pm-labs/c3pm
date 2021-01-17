@@ -7,9 +7,10 @@ import (
 	"net/http"
 )
 
-type LoginCmd struct {
-}
+//LoginCmd defines the parameters of the login command.
+type LoginCmd struct{}
 
+//Run handles the behavior of the login command.
 func (l *LoginCmd) Run() error {
 	payload, err := input.Login()
 	if err != nil {

@@ -20,7 +20,7 @@ var (
 	OriginalDirAbs, _ = filepath.Abs(OriginalDir)
 	TestConfig        = &config.ProjectConfig{
 		Manifest: manifest.Manifest{
-			C3pmVersion: manifest.C3pmVersion1,
+			C3PMVersion: manifest.C3PMVersion1,
 			Type:        manifest.Executable,
 			Name:        "hello-bin",
 			Description: "Demo binary",
@@ -39,7 +39,7 @@ var (
 			Dependencies: manifest.Dependencies{
 				"hello": "1.0.5",
 			},
-			CustomCmake: nil,
+			CustomCMake: nil,
 			LinuxConfig: nil,
 		},
 		ProjectRoot: OriginalDirAbs,
@@ -112,13 +112,13 @@ var _ = Describe("Config utils", func() {
 			It("gets from HOME", func() {
 				err := os.Setenv("HOME", ".")
 				Ω(err).ShouldNot(HaveOccurred())
-				path := config.GlobalC3pmDirPath()
+				path := config.GlobalC3PMDirPath()
 				Ω(path).Should(Equal(".c3pm"))
 			})
 			It("ets from C3PM_USER_DIR", func() {
 				err := os.Setenv("C3PM_USER_DIR", "../.c3pm")
 				Ω(err).ShouldNot(HaveOccurred())
-				path := config.GlobalC3pmDirPath()
+				path := config.GlobalC3PMDirPath()
 				Ω(path).Should(Equal("../.c3pm"))
 			})
 			It("has priority from C3PM_USER_DIR over HOME", func() {
@@ -126,7 +126,7 @@ var _ = Describe("Config utils", func() {
 				Ω(err).ShouldNot(HaveOccurred())
 				err = os.Setenv("HOME", "..")
 				Ω(err).ShouldNot(HaveOccurred())
-				path := config.GlobalC3pmDirPath()
+				path := config.GlobalC3PMDirPath()
 				Ω(path).Should(Equal("../.c3pm"))
 			})
 		})

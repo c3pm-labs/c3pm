@@ -1,6 +1,6 @@
 // Package config handles the interactions with C3PM's various configuration files.
 // It handles interaction with both the c3pm.yml file (see package manifest), and
-// the storage of authentication tokens in the global C3PM directory as found by GlobalC3pmDirPath.
+// the storage of authentication tokens in the global C3PM directory as found by GlobalC3PMDirPath.
 package config
 
 import (
@@ -48,14 +48,14 @@ func (pc *ProjectConfig) BuildDir() string {
 
 //CMakeDir returns the path to the CMake files to use for the project.
 func (pc *ProjectConfig) CMakeDir() string {
-	if pc.UseCustomCmake() {
-		return filepath.Join(pc.ProjectRoot, pc.Manifest.CustomCmake.Path)
+	if pc.UseCustomCMake() {
+		return filepath.Join(pc.ProjectRoot, pc.Manifest.CustomCMake.Path)
 	}
 	return filepath.Join(pc.ProjectRoot, ".c3pm", "cmake")
 }
 
-//GlobalC3pmDirPath finds the path to the global C3PM directory.
-func GlobalC3pmDirPath() string {
+//GlobalC3PMDirPath finds the path to the global C3PM directory.
+func GlobalC3PMDirPath() string {
 	if dir := os.Getenv("C3PM_USER_DIR"); dir != "" {
 		return dir
 	}
@@ -63,12 +63,12 @@ func GlobalC3pmDirPath() string {
 	return path.Join(homeDir, ".c3pm")
 }
 
-//UseCustomCmake checks if a custom CMake configuration is to be used for the project.
-func (pc *ProjectConfig) UseCustomCmake() bool {
-	return pc.Manifest.CustomCmake != nil
+//UseCustomCMake checks if a custom CMake configuration is to be used for the project.
+func (pc *ProjectConfig) UseCustomCMake() bool {
+	return pc.Manifest.CustomCMake != nil
 }
 
 //LibCachePath returns the path to the global C3PM cache
 func LibCachePath(name, version string) string {
-	return filepath.Join(GlobalC3pmDirPath(), "cache", name, version)
+	return filepath.Join(GlobalC3PMDirPath(), "cache", name, version)
 }

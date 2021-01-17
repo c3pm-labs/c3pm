@@ -9,16 +9,17 @@ import (
 	"path/filepath"
 )
 
+// TODO: unused
 func Install(pc *config.ProjectConfig) error {
-	libDir := filepath.Join(config.GlobalC3pmDirPath(), "cache", pc.Manifest.Name, pc.Manifest.Version.String())
+	libDir := filepath.Join(config.GlobalC3PMDirPath(), "cache", pc.Manifest.Name, pc.Manifest.Version.String())
 
 	cmakeVariables := map[string]string{
-		"CMAKE_INSTALL_BINDIR": filepath.Join(config.GlobalC3pmDirPath(), "bin"),
+		"CMAKE_INSTALL_BINDIR": filepath.Join(config.GlobalC3PMDirPath(), "bin"),
 		"CMAKE_INSTALL_PREFIX": libDir,
 	}
 
-	if pc.UseCustomCmake() {
-		for key, value := range pc.Manifest.CustomCmake.Variables {
+	if pc.UseCustomCMake() {
+		for key, value := range pc.Manifest.CustomCMake.Variables {
 			cmakeVariables[key] = value
 		}
 	} else {
