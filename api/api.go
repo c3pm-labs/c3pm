@@ -1,4 +1,4 @@
-// The api package handles interaction between the C3PM Command Line Interface (CLI), and C3PM's API.
+// Package api handles interaction between the C3PM Command Line Interface (CLI), and C3PM's API.
 // The package's role is to abstract all needed low level interaction, such as HTTP or filesystem calls
 // exposing an interface simple, clear and easy to understand from the rest of the CLI.
 package api

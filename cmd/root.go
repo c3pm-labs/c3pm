@@ -1,3 +1,4 @@
+// Package cmd hosts the configuration and handling of the command line interface of C3PM.
 package cmd
 
 import "github.com/alecthomas/kong"

@@ -1,3 +1,4 @@
+// Package cmakegen handles the templating and generation of CMake configuration files.
 package cmakegen
 
 import (

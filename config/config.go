@@ -1,6 +1,6 @@
-// The config package handles the interactions with C3PM's various configuration files, mainly with the
-// c3pm.yml file, called the Manifest in the code.
-// It also handles the storage of authentication tokens in the global C3PM directory as found by GlobalC3pmDirPath.
+// Package config handles the interactions with C3PM's various configuration files.
+// It handles interaction with both the c3pm.yml file (see package manifest), and
+// the storage of authentication tokens in the global C3PM directory as found by GlobalC3pmDirPath.
 package config
 
 import (

@@ -1,3 +1,5 @@
+// Package registry handles interaction with the C3PM registry.
+// It handles file downloading and version querying.
 package registry
 
 import (
