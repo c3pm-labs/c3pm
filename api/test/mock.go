@@ -1,4 +1,4 @@
-// The role of this package is to create simple mock servers to be used when testing interaction with C3PM's API.
+// Package test provides simple mock servers to be used when testing interaction with C3PM's API.
 package apitest
 
 import "net/http"
