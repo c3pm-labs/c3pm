@@ -19,7 +19,7 @@ target_sources({{.ProjectName}} PRIVATE {{.Sources}} {{.Includes}})
 target_include_directories({{.ProjectName}} PRIVATE {{.IncludeDirs}})
 
 install(
-	DIRECTORY {{ .ExportedDir }}
+	DIRECTORY {{ .ExportedDir | AddTrailingSlash }}
 	DESTINATION ${CMAKE_INSTALL_PREFIX}
 )
 install(TARGETS {{.ProjectName}} ARCHIVE)
@@ -37,8 +37,16 @@ func removeCommand(cmake string, command string) string {
 }
 
 func library(v CMakeVars) (string, error) {
+	funcMap := template.FuncMap{
+		"AddTrailingSlash": func(text string) string {
+			if !strings.HasSuffix(text, "/") {
+				return text + "/"
+			}
+			return text
+		},
+	}
 	cmake := bytes.NewBuffer([]byte{})
-	tmpl, err := template.New("cmakeExecutable").Parse(addPlatformSpecificCmake(libraryTemplate, v))
+	tmpl, err := template.New("cmakeExecutable").Funcs(funcMap).Parse(addPlatformSpecificCmake(libraryTemplate, v))
 	if err != nil {
 		return "", fmt.Errorf("could not parse cmake template: %w", err)
 	}
