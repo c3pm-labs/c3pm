@@ -1,6 +1,7 @@
 package input
 
 import (
+	"fmt"
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/Masterminds/semver/v3"
 	"github.com/c3pm-labs/c3pm/config/manifest"
@@ -50,8 +51,35 @@ var InitSurvey = []*survey.Question{
 	},
 }
 
+type InitValues = struct {
+	Name string
+	Executable bool
+	Library bool
+	Description string
+	Version string
+	License string
+}
+
 func Init() (manifest.Manifest, error) {
 	man := manifest.New()
 	err := survey.Ask(InitSurvey, &man, SurveyOptions...)
 	return man, err
+}
+
+func InitNonInteractive(val InitValues) (manifest.Manifest, error) {
+	man := manifest.New()
+	man.Name = val.Name
+	if val.Executable {
+		man.Type = manifest.Executable
+	} else if val.Library {
+		man.Type = manifest.Library
+	}
+	man.Description = val.Description
+	v, err := manifest.VersionFromString(val.Version)
+	if err != nil {
+		return man, fmt.Errorf("invalid version given: %w", err)
+	}
+	man.Version = v
+	man.License = val.License
+	return man, nil
 }
