@@ -26,7 +26,7 @@ type CMakeVars struct {
 	Includes         string
 	IncludeDirs      string
 	ExportedDir      string
-	Home             string
+	C3pmGlobalDir    string
 	Dependencies     []Dependency
 	PublicIncludeDir string
 	LinuxConfig      *manifest.LinuxConfig
@@ -103,7 +103,7 @@ func varsFromProjectConfig(pc *config.ProjectConfig) (CMakeVars, error) {
 		Includes:         filesSliceToCMake(pc.Manifest.Files.Includes),
 		IncludeDirs:      filesSliceToCMake(pc.Manifest.Files.IncludeDirs),
 		ExportedDir:      filepath.ToSlash(filepath.Join(pc.ProjectRoot, pc.Manifest.Files.ExportedDir)),
-		Home:             filepath.ToSlash(os.Getenv("HOME")),
+		C3pmGlobalDir:    filepath.ToSlash(config.GlobalC3pmDirPath()),
 		Dependencies:     dependencies,
 		LinuxConfig:      pc.Manifest.LinuxConfig,
 		LanguageStandard: pc.Manifest.Standard,
