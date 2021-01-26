@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"runtime"
 )
 
 //ProjectConfig represents the configuration of a C3PM project.
@@ -59,7 +60,12 @@ func GlobalC3PMDirPath() string {
 	if dir := os.Getenv("C3PM_USER_DIR"); dir != "" {
 		return dir
 	}
-	homeDir := os.Getenv("HOME")
+	var homeDir string
+	if runtime.GOOS == "windows" {
+		homeDir = os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+	} else {
+		homeDir = os.Getenv("HOME")
+	}
 	return path.Join(homeDir, ".c3pm")
 }
 

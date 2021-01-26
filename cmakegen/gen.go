@@ -42,8 +42,8 @@ type CMakeVars struct {
 	IncludeDirs string
 	//ExportedDir is the path to the directory containing export headers for the project.
 	ExportedDir string
-	//Home is the path to the current $HOME user directory.
-	Home string
+	//C3PMGlobalDir is the path to the current $HOME user directory.
+	C3PMGlobalDir string
 	//Dependencies is a list of all the data for each Dependency of the project
 	Dependencies []Dependency
 	//TODO: Unused
@@ -112,7 +112,7 @@ func globbingExprsToCMakeVar(globs []string, projectRoot string) (string, error)
 }
 
 func varsFromProjectConfig(pc *config.ProjectConfig) (CMakeVars, error) {
-	dependencies, err := dependenciesToCMake(pc.Manifest.Dependencies)
+	dependencies, err := dependenciesToCmake(pc.Manifest.Dependencies)
 	if err != nil {
 		return CMakeVars{}, err
 	}
@@ -124,7 +124,7 @@ func varsFromProjectConfig(pc *config.ProjectConfig) (CMakeVars, error) {
 		Includes:         filesSliceToCMake(pc.Manifest.Files.Includes),
 		IncludeDirs:      filesSliceToCMake(pc.Manifest.Files.IncludeDirs),
 		ExportedDir:      filepath.ToSlash(filepath.Join(pc.ProjectRoot, pc.Manifest.Files.ExportedDir)),
-		Home:             filepath.ToSlash(os.Getenv("HOME")),
+		C3pmGlobalDir:    filepath.ToSlash(config.GlobalC3pmDirPath()),
 		Dependencies:     dependencies,
 		LinuxConfig:      pc.Manifest.LinuxConfig,
 		LanguageStandard: pc.Manifest.Standard,
