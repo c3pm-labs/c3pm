@@ -1,9 +1,8 @@
-package cmakegen
+package cmakegen_test
 
 import (
 	"fmt"
 	"os"
-
 	"path/filepath"
 	"testing"
 

@@ -1,4 +1,4 @@
-// Package CMake handles interaction with the CMake Command Line Interface.
+// Package cmake handles interaction with the CMake Command Line Interface.
 // CMake is used internally by C3PM to manage the build and installation phases of using a C3PM project.
 //
 // More information about what the CMake CLI does can be found on CMake's website: https://cmake.org/cmake/help/latest/manual/cmake.1.html
