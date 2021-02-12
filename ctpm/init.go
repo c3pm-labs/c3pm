@@ -2,13 +2,14 @@ package ctpm
 
 import (
 	"fmt"
-	"github.com/c3pm-labs/c3pm/cmakegen"
-	"github.com/c3pm-labs/c3pm/config"
-	"github.com/mitchellh/go-spdx"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"text/template"
+
+	"github.com/c3pm-labs/c3pm/cmakegen"
+	"github.com/c3pm-labs/c3pm/config"
+	"github.com/mitchellh/go-spdx"
 )
 
 type InitOptions struct {
@@ -31,6 +32,10 @@ func Init(pc *config.ProjectConfig, opt InitOptions) error {
 		}
 	}
 	if !opt.NoTemplate {
+		err = generateReadMe(pc)
+		if err != nil {
+			return err
+		}
 		if pc.Manifest.Type == "executable" {
 			err := saveExecutableTemplate(pc)
 			if err != nil {
@@ -65,6 +70,84 @@ const libTemplate = `#include <iostream>
 void hello() {
 	std::cout << "Hello c3pm!" << std::endl;
 }`
+const readMeTemplate = `<p align="center">
+<a href="https://c3pm.io/">
+	<img alt="c3pm" src="https://dev.c3pm.io/assets/c3pm.png" width="546"/>
+</a>
+</p>
+
+<p align="center">
+	Your toolkit to dive into C++ easily
+</p>
+
+---
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [What is c3pm?](#what-is-c3pm)
+- [Installing c3pm](#installing-c3pm)
+- [Usage](#usage)
+- [Start your project](#start-your-project)
+- [Add a package](#add-a-package)
+- [Building your project](#building-your-project)
+- [Publishing your project](#publishing-your-project)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## What is c3pm?
+
+**c3pm** stands for C++ package manager.
+
+c3pm abstracts your build system and eases the management of your dependencies.
+
+It manages your CMake and compiles your project with **minimal configuration**.
+
+Feel free to explore the available packages on our [platform](https://c3pm.io).
+
+## Installing c3pm
+
+To install c3pm, click on this [link](https://github.com/c3pm-labs/c3pm/releases) and download the version
+relase you want for your operating system.
+
+c3pm is available for macOS, Windows and Linux.
+
+## Usage
+
+Once you installed c3pm, you can start using it.
+Here are some basic commands you will need.
+
+### Start your project
+` + "```" + `shell
+$ ctpm init
+` + "```" + `
+
+### Add a package
+` + "```" + `shell
+$ ctpm add <package>
+` + "```" + `
+
+
+### Building your project
+` + "```" + `shell
+$ ctpm build
+` + "```" + `
+
+### Publishing your project
+
+` + "```" + `shell
+$ ctpm publish
+` + "```" + `
+
+<br />
+
+You can find a more complete list of the available commands [here](https://github.com/gabrielcolson/c3pm/tree/master/specs/cli) !
+`
+
+func generateReadMe(pc *config.ProjectConfig) error {
+	return ioutil.WriteFile(filepath.Join(pc.ProjectRoot, "README.md"), []byte(readMeTemplate), 0644)
+}
 
 func generateLicenseFile(pc *config.ProjectConfig) error {
 	lic, err := spdx.License(pc.Manifest.License)
