@@ -45,3 +45,15 @@ func Build(pc *config.ProjectConfig) error {
 	}
 	return nil
 }
+
+func InstallBeforeBuild(pc *config.ProjectConfig) error {
+	err := addAllDependencies(pc)
+	if err != nil {
+		return fmt.Errorf("error installing dependencies: %w", err)
+	}
+	err = Build(pc)
+	if err != nil {
+		return fmt.Errorf("build failed: %w", err)
+	}
+	return nil
+}

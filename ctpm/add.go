@@ -73,6 +73,7 @@ func addDependency(man *manifest.Manifest, dependency string, opts AddOptions) e
 	if err = createBuildDirectory(name, version.String()); err != nil {
 		return fmt.Errorf("error creating internal c3pm directories: %w", err)
 	}
+	fmt.Println("pkgDir", pkgDir)
 	if err = installPackage(pkgDir); err != nil {
 		return fmt.Errorf("error building dependency: %w", err)
 	}
