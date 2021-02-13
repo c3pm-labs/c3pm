@@ -1,6 +1,7 @@
 package cmakegen_test
 
 import (
+	"fmt"
 	"github.com/Masterminds/semver/v3"
 	"github.com/c3pm-labs/c3pm/cmakegen"
 	"github.com/c3pm-labs/c3pm/config"
@@ -76,6 +77,7 @@ var _ = Describe("Gen Test", func() {
 	})
 	Context("generates a cmake file without dependencies", func() {
 		err := cmakegen.Generate(simpleProject)
+		fmt.Println(err)
 		Ω(err).ShouldNot(HaveOccurred())
 		data, err := ioutil.ReadFile(filepath.Join(simpleProject.CMakeDir(), "CMakeLists.txt"))
 		Ω(err).ShouldNot(HaveOccurred())
