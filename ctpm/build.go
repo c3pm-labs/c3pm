@@ -2,6 +2,7 @@ package ctpm
 
 import (
 	"fmt"
+	"github.com/Masterminds/semver/v3"
 	"github.com/c3pm-labs/c3pm/cmake"
 	"github.com/c3pm-labs/c3pm/cmakegen"
 	"github.com/c3pm-labs/c3pm/config"
@@ -42,6 +43,22 @@ func Build(pc *config.ProjectConfig) error {
 	err = cmake.Build(pc.BuildDir())
 	if err != nil {
 		return fmt.Errorf("build failed: %w", err)
+	}
+	return nil
+}
+
+func addAllDependencies(pc *config.ProjectConfig) error {
+	opts := AddOptions{Force: false, RegistryURL: "", Dependencies: nil}
+	options := buildOptions(opts)
+
+	for dep, version := range pc.Manifest.Dependencies {
+		semverVersion, err := semver.NewVersion(version)
+		if err != nil {
+			return fmt.Errorf("error getting dependencies: %w", err)
+		}
+		if err := addDependency(&pc.Manifest, dep, semverVersion, options); err != nil {
+			return fmt.Errorf("error adding %s: %w", dep, err)
+		}
 	}
 	return nil
 }

@@ -19,8 +19,13 @@ import (
 )
 
 func Add(pc *config.ProjectConfig, opts AddOptions) error {
+	options := buildOptions(opts)
 	for _, dep := range opts.Dependencies {
-		if err := addDependency(&pc.Manifest, dep, opts); err != nil {
+		name, version, err := getRequiredVersion(dep, options)
+		if err != nil {
+			return fmt.Errorf("error getting dependencies: %w", err)
+		}
+		if err = addDependency(&pc.Manifest, name, version, options); err != nil {
 			return fmt.Errorf("error adding %s: %w", dep, err)
 		}
 	}
@@ -54,13 +59,13 @@ func createBuildDirectory(name, version string) error {
 	return nil
 }
 
-func addDependency(man *manifest.Manifest, dependency string, opts AddOptions) error {
-	options := buildOptions(opts)
-	name, version, err := getRequiredVersion(dependency, options)
-	if err != nil {
-		return fmt.Errorf("error getting dependencies: %w", err)
-	}
+func addDependency(man *manifest.Manifest, name string, version *semver.Version, options AddOptions) error {
+	//name, version, err := getRequiredVersion(dependency, options)
+	//if err != nil {
+	//	return fmt.Errorf("error getting dependencies: %w", err)
+	//}
 	var pkg *os.File
+	var err error
 	if pkg, err = registry.FetchPackage(name, version, registry.Options{
 		RegistryURL: options.RegistryURL,
 	}); err != nil {
@@ -73,7 +78,6 @@ func addDependency(man *manifest.Manifest, dependency string, opts AddOptions) e
 	if err = createBuildDirectory(name, version.String()); err != nil {
 		return fmt.Errorf("error creating internal c3pm directories: %w", err)
 	}
-	fmt.Println("pkgDir", pkgDir)
 	if err = installPackage(pkgDir); err != nil {
 		return fmt.Errorf("error building dependency: %w", err)
 	}
