@@ -6,10 +6,12 @@ import (
 	"reflect"
 )
 
+// Version holds the Semantic Versioning-compatible version of a package.
 type Version struct {
 	*semver.Version
 }
 
+// VersionFromString converts a string to a Version instance.
 func VersionFromString(version string) (v Version, err error) {
 	v.Version, err = semver.NewVersion(version)
 	if err != nil {
@@ -18,6 +20,7 @@ func VersionFromString(version string) (v Version, err error) {
 	return v, nil
 }
 
+// UnmarshalYAML is used to read a Version from a YAML file.
 func (v *Version) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var version string
 	err := unmarshal(&version)
@@ -31,10 +34,12 @@ func (v *Version) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	return nil
 }
 
+// MarshalYAML is used to write a Version to a YAML file.
 func (v Version) MarshalYAML() (interface{}, error) {
 	return v.String(), nil
 }
 
+// WriteAnswer allows type to be used in survey questions
 func (v *Version) WriteAnswer(name string, value interface{}) (err error) {
 	vs, ok := value.(string)
 	if !ok {

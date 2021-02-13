@@ -6,6 +6,7 @@ import (
 	"github.com/c3pm-labs/c3pm/ctpm"
 )
 
+//AddCmd defines the parameters of the add command.
 type AddCmd struct {
 	Force       bool   `kong:"optional,name='force',help='Ignore cache.'"`
 	RegistryURL string `kong:"optional,name='registry-url',help='Select specific registry to use.'"`
@@ -13,6 +14,7 @@ type AddCmd struct {
 	Dependencies []string `kong:"arg,help='List of dependencies to add.'"`
 }
 
+//Run handles the behavior of the add command.
 func (a *AddCmd) Run() error {
 	pc, err := config.Load(".")
 	if err != nil {

@@ -15,11 +15,13 @@ var loginSurvey = []*survey.Question{
 	},
 }
 
+//LoginPayload is the data retrieved from the user to log them in.
 type LoginPayload struct {
 	Login    string
 	Password string
 }
 
+//Login handles the user interaction during the login command.
 func Login() (*LoginPayload, error) {
 	payload := &LoginPayload{}
 	err := survey.Ask(loginSurvey, payload, SurveyOptions...)

@@ -29,13 +29,13 @@ func buildTarFile(files []string) bytes.Buffer {
 				Typeflag: tar.TypeSymlink,
 			}
 			if err := tw.WriteHeader(hdr); err != nil {
-				fmt.Printf("error writing %s: %s. ignoringa...", fn, err.Error())
+				fmt.Printf("error writing %s: %s. ignoring...", fn, err.Error())
 				continue
 			}
 		} else {
 			contents, err := ioutil.ReadFile(fn)
 			if err != nil {
-				fmt.Printf("error reading %s: %s. ignoringaa...\n", fn, err.Error())
+				fmt.Printf("error reading %s: %s. ignoring...\n", fn, err.Error())
 				continue
 			}
 			hdr := &tar.Header{
@@ -44,11 +44,11 @@ func buildTarFile(files []string) bytes.Buffer {
 				Size: st.Size(),
 			}
 			if err := tw.WriteHeader(hdr); err != nil {
-				fmt.Printf("error writing %s: %s. ignoringaaa...", fn, err.Error())
+				fmt.Printf("error writing %s: %s. ignoring...", fn, err.Error())
 				continue
 			}
 			if _, err := tw.Write(contents); err != nil {
-				fmt.Printf("error writing %s: %s. ignoringaaaa...", fn, err.Error())
+				fmt.Printf("error writing %s: %s. ignoring...", fn, err.Error())
 				continue
 			}
 		}
@@ -57,6 +57,9 @@ func buildTarFile(files []string) bytes.Buffer {
 	return buf
 }
 
+// Upload is a wrapper function around C3PM's publish endpoint.
+// It takes an array of file paths, creates a tar file containing
+// them, then uploads it to the API.
 func (c API) Upload(files []string) error {
 	buf := buildTarFile(files)
 	return c.send("POST", "/packages/publish", &buf)

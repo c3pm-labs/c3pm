@@ -32,37 +32,45 @@ var _ = Describe("Login", func() {
 
 			var got loginPayload
 			body, err := ioutil.ReadAll(req.Body)
-			Ω(err).To(BeNil())
+			Ω(err).ShouldNot(HaveOccurred())
+
 			err = json.Unmarshal(body, &got)
-			Ω(err).To(BeNil())
+			Ω(err).ShouldNot(HaveOccurred())
 
 			Ω(want).To(Equal(got))
 
 			res, err := json.Marshal(struct{ ApiKey string }{testApiKey})
-			Ω(err).To(BeNil())
+			Ω(err).ShouldNot(HaveOccurred())
+
 			_, err = rw.Write(res)
-			Ω(err).To(BeNil())
+			Ω(err).ShouldNot(HaveOccurred())
+
 		}))
 		defer server.Close()
-		apiClient := api.API{Client: server.Client()}
+		apiClient := api.New(server.Client(), "")
 
 		err := os.MkdirAll(c3pmHomeDir, os.ModePerm)
-		Ω(err).To(BeNil())
+		Ω(err).ShouldNot(HaveOccurred())
+
 		err = os.Setenv("C3PM_USER_DIR", c3pmHomeDir)
-		Ω(err).To(BeNil())
+		Ω(err).ShouldNot(HaveOccurred())
+
 		defer os.Unsetenv("C3PM_USER_DIR")
 
 		err = os.Setenv("C3PM_API_ENDPOINT", server.URL)
-		Ω(err).To(BeNil())
+		Ω(err).ShouldNot(HaveOccurred())
+
 		defer os.Unsetenv("C3PM_API_ENDPOINT")
 
 		err = ctpm.Login(apiClient, testLogin, testPassword)
-		Ω(err).To(BeNil())
+		Ω(err).ShouldNot(HaveOccurred())
+
 	})
 
 	It("should create auth file", func() {
 		got, err := ioutil.ReadFile(path.Join(c3pmHomeDir, "auth.cfg"))
-		Ω(err).To(BeNil())
+		Ω(err).ShouldNot(HaveOccurred())
+
 		Ω(string(got)).To(Equal(testApiKey))
 	})
 })

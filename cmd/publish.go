@@ -8,16 +8,18 @@ import (
 	"net/http"
 )
 
+//PublishCmd defines the parameters of the publish command.
 type PublishCmd struct {
 	Ignore []string `kong:"optional,name='ignore',short='i',help='Ignore file'"`
 }
 
+//Run handles the behavior of the publish command.
 func (p *PublishCmd) Run() error {
 	token, err := config.TokenStrict()
 	if err != nil {
 		return fmt.Errorf("not logged in: %w", err)
 	}
-	client := api.API{Client: &http.Client{}, Token: token}
+	client := api.New(&http.Client{}, token)
 	pc, err := config.Load(".")
 	if err != nil {
 		return fmt.Errorf("failed to read c3pm.yml: %w", err)
