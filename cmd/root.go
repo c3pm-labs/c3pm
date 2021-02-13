@@ -1,7 +1,9 @@
+// Package cmd hosts the configuration and handling of the command line interface of C3PM.
 package cmd
 
 import "github.com/alecthomas/kong"
 
+//CLI is the root configuration of C3PM's command line interface.
 var CLI struct {
 	Version kong.VersionFlag `short:"v" help:"outputs the version number"`
 	Add     AddCmd           `kong:"cmd,help='Add a new dependency'"`

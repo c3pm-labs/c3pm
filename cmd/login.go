@@ -7,14 +7,15 @@ import (
 	"net/http"
 )
 
-type LoginCmd struct {
-}
+//LoginCmd defines the parameters of the login command.
+type LoginCmd struct{}
 
+//Run handles the behavior of the login command.
 func (l *LoginCmd) Run() error {
 	payload, err := input.Login()
 	if err != nil {
 		return err
 	}
-	client := api.API{Client: &http.Client{}}
+	client := api.New(&http.Client{}, "")
 	return ctpm.Login(client, payload.Login, payload.Password)
 }

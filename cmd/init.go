@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 )
 
+//InitCmd defines the parameters of the init command.
 type InitCmd struct {
 	NoTemplate  bool   `kong:"optional,name='no-template',help='Prevents the creation of CMake files'"`
 	Path        string `kong:"optional,arg,name='path',help='Project path, default to working directory',default='.'"`
@@ -20,6 +21,7 @@ type InitCmd struct {
 	License     string `kong:"optional,group='ni',name='license',help='Project license when using non-interactive mode',default='UNLICENSED'"`
 }
 
+//Run handles the behavior of the init command.
 func (i *InitCmd) Run() error {
 	var man manifest.Manifest
 	var err error

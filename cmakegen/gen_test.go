@@ -1,49 +1,122 @@
-package cmakegen
+package cmakegen_test
 
 import (
+	"fmt"
+	"github.com/Masterminds/semver/v3"
+	"github.com/c3pm-labs/c3pm/cmakegen"
+	"github.com/c3pm-labs/c3pm/config"
+	"github.com/c3pm-labs/c3pm/config/manifest"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Gen Test", func() {
-	It("generate cmake", func() {
-		cwd, err := os.Getwd()
-		Ω(err).To(BeNil())
-		defer func() {
-			err = os.Chdir(cwd)
-			Ω(err).To(BeNil())
-			err = os.RemoveAll(getTestFolder(""))
-			Ω(err).To(BeNil())
-		}()
-		testFolder := getTestFolder("glob")
-		err = os.MkdirAll(testFolder, os.ModePerm)
-		Ω(err).To(BeNil())
-		err = os.Chdir(testFolder)
-		Ω(err).To(BeNil())
-		err = ioutil.WriteFile("main.c", []byte{}, 0644)
-		Ω(err).To(BeNil())
-		err = ioutil.WriteFile("help.c", []byte{}, 0644)
-		Ω(err).To(BeNil())
-		utilsFolder := "utils"
-		err = os.MkdirAll(utilsFolder, os.ModePerm)
-		Ω(err).To(BeNil())
-		err = ioutil.WriteFile(filepath.Join(utilsFolder, "read.c"), []byte{}, 0644)
-		Ω(err).To(BeNil())
-		err = ioutil.WriteFile(filepath.Join(utilsFolder, "write.c"), []byte{}, 0644)
-		Ω(err).To(BeNil())
-		utilsTestsFolder := filepath.Join(utilsFolder, "tests")
-		err = os.MkdirAll(utilsTestsFolder, os.ModePerm)
-		Ω(err).To(BeNil())
-		err = ioutil.WriteFile(filepath.Join(utilsTestsFolder, "test_read.c"), []byte{}, 0644)
-		Ω(err).To(BeNil())
-		err = ioutil.WriteFile(filepath.Join(utilsTestsFolder, "test_write.c"), []byte{}, 0644)
-		Ω(err).To(BeNil())
-		files, err := globbingExprToFiles("**/*.c")
-		Ω(err).To(BeNil())
-		Ω(files).To(ContainElements([]string{"utils/tests/test_read.c", "utils/tests/test_write.c", "main.c", "help.c", "utils/read.c", "utils/write.c"}))
+	path, _ := filepath.Abs("../test_helpers/projects/genProject")
+	var (
+		simpleProject = &config.ProjectConfig{
+			Manifest: manifest.Manifest{
+				C3PMVersion: manifest.C3PMVersion1,
+				Type:        manifest.Executable,
+				Name:        "hello-bin",
+				Description: "Demo binary",
+				Version: manifest.Version{
+					Version: semver.MustParse("1.1.5"),
+				},
+				Standard: "20",
+				License:  "ISC",
+				Files: manifest.FilesConfig{
+					Sources:             []string{"**/*.cpp"},
+					Includes:            []string{"**/*.hpp"},
+					IncludeDirs:         []string{"include"},
+					ExportedDir:         "",
+					ExportedIncludeDirs: []string{},
+				},
+				Dependencies: manifest.Dependencies{},
+				CustomCMake:  nil,
+				LinuxConfig:  nil,
+			},
+			ProjectRoot: path,
+		}
+		projectWithDependencies = &config.ProjectConfig{
+			Manifest: manifest.Manifest{
+				C3PMVersion: manifest.C3PMVersion1,
+				Type:        manifest.Executable,
+				Name:        "hello-bin",
+				Description: "Demo binary",
+				Version: manifest.Version{
+					Version: semver.MustParse("1.1.5"),
+				},
+				Standard: "20",
+				License:  "ISC",
+				Files: manifest.FilesConfig{
+					Sources:             []string{"**/*.cpp"},
+					Includes:            []string{"**/*.hpp"},
+					IncludeDirs:         []string{"include"},
+					ExportedDir:         "",
+					ExportedIncludeDirs: []string{},
+				},
+				Dependencies: manifest.Dependencies{
+					"hello": "1.0.3",
+					"m":     "2.0.0",
+				},
+				CustomCMake: nil,
+				LinuxConfig: nil,
+			},
+			ProjectRoot: path,
+		}
+	)
+
+	BeforeEach(func() {
+	})
+	AfterEach(func() {
+		err := os.RemoveAll(simpleProject.CMakeDir())
+		Ω(err).ShouldNot(HaveOccurred())
+	})
+	Context("generates a cmake file without dependencies", func() {
+		err := cmakegen.Generate(simpleProject)
+		fmt.Println(err)
+		Ω(err).ShouldNot(HaveOccurred())
+		data, err := ioutil.ReadFile(filepath.Join(simpleProject.CMakeDir(), "CMakeLists.txt"))
+		Ω(err).ShouldNot(HaveOccurred())
+		content := string(data)
+
+		It("contains the correct source files", func() {
+			mainPath, err := filepath.Abs(filepath.Join(path, "main.cpp"))
+			Ω(err).ShouldNot(HaveOccurred())
+			libPath, err := filepath.Abs(filepath.Join(path, "lib", "hello.cpp"))
+			Ω(err).ShouldNot(HaveOccurred())
+			Ω(content).Should(ContainSubstring(mainPath))
+			Ω(content).Should(ContainSubstring(libPath))
+		})
+		It("doesn't contain dependencies", func() {
+			Ω(content).ShouldNot(ContainSubstring("-l"))
+			Ω(content).ShouldNot(ContainSubstring("-L"))
+		})
+	})
+	Context("generates a cmake file with dependencies", func() {
+		_ = projectWithDependencies
+		//TODO: dependencies tests
+		//err := cmakegen.Generate(projectWithDependencies)
+		//Ω(err).ShouldNot(HaveOccurred())
+		//data, err := ioutil.ReadFile(filepath.Join(projectWithDependencies.CMakeDir(), "CMakeLists.txt"))
+		//Ω(err).ShouldNot(HaveOccurred())
+		//content := string(data)
+		//fmt.Println(content)
+		//It("contains the correct source files", func() {
+		//	mainPath, err := filepath.Abs(filepath.Join(path, "main.cpp"))
+		//	Ω(err).ShouldNot(HaveOccurred())
+		//	libPath, err := filepath.Abs(filepath.Join(path, "lib", "hello.cpp"))
+		//	Ω(err).ShouldNot(HaveOccurred())
+		//	Ω(content).Should(ContainSubstring(mainPath))
+		//	Ω(content).Should(ContainSubstring(libPath))
+		//})
+		//It("contains links to the dependencies", func() {
+		//	Ω(content).Should(ContainSubstring("-lhello"))
+		//	Ω(content).Should(ContainSubstring("-lm"))
+		//	Ω(content).Should(ContainSubstring("-L"))
+		//})
 	})
 })
