@@ -6,23 +6,26 @@ import (
 	"github.com/bmatcuk/doublestar"
 	"github.com/c3pm-labs/c3pm/api"
 	"github.com/c3pm-labs/c3pm/config"
+	"github.com/c3pm-labs/c3pm/config/manifest"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-var IgnoreFiles = []string{".gitignore", ".c3pmignore"}
+var IgnoreFiles = []string{".gitignore"}
 
 type PublishOptions struct {
-	Ignore []string
+	Exclude []string
+	Include []string
 }
 
 var PublishDefaultOptions = PublishOptions{
-	Ignore: []string{".git/**", ".c3pm/**"},
+	Exclude: []string{".git/**", ".c3pm/**"},
+	Include: []string{"c3pm.yml"},
 }
 
-func publishIgnoredFiles(opt PublishOptions) ([]string, error) {
-	var ignored []string
+func publishFiles(userList []string, filesType string, filesConfig manifest.FilesConfig) ([]string, error) {
+	var files []string
 	//var err error
 	for _, ignoreFile := range IgnoreFiles {
 		f, err := os.Open(ignoreFile)
@@ -32,20 +35,27 @@ func publishIgnoredFiles(opt PublishOptions) ([]string, error) {
 		scanner := bufio.NewScanner(f)
 		scanner.Split(bufio.ScanLines)
 		for scanner.Scan() {
-			ignored = append(ignored, scanner.Text())
+			files = append(files, scanner.Text())
 		}
 		f.Close()
 	}
-	ignored = append(ignored, opt.Ignore...)
-	ignored = append(ignored, PublishDefaultOptions.Ignore...)
-	return ignored, nil
+	files = append(files, userList...)
+	var defaultOptions []string
+	if filesType == "include" {
+		defaultOptions = append(PublishDefaultOptions.Include, filesConfig.Sources...)
+		defaultOptions = append(defaultOptions, filesConfig.Includes...)
+	} else {
+		defaultOptions = PublishDefaultOptions.Exclude
+	}
+	files = append(files, defaultOptions...)
+	return files, nil
 }
 
-// isIgnored return true if path is ignored, it will use rules/regex given
+// IsFileInList return true if path is in rules, it will use rules/regex given
 // rules follow pattern format from gitignore
-func isIgnored(rules []string, path string) (bool, error) {
+func isFileInList(rules []string, path string) (bool, error) {
 	var negate bool
-	var ignored = false
+	var fileIsInRules = false
 	for _, i := range rules {
 		if strings.HasPrefix(i, "!") {
 			i = i[1:]
@@ -55,19 +65,19 @@ func isIgnored(rules []string, path string) (bool, error) {
 		}
 		ok, err := doublestar.Match(i, path)
 		if err != nil {
-			return false, fmt.Errorf("failed to match [%s] with [%s] ignore regex: %w", path, i, err)
+			return false, fmt.Errorf("failed to match [%s] with [%s] regex: %w", path, i, err)
 		}
 		if ok {
-			ignored = true
+			fileIsInRules = true
 		}
 		if ok && negate {
-			ignored = false
+			fileIsInRules = false
 		}
 	}
-	return ignored, nil
+	return fileIsInRules, nil
 }
 
-func publishListFiles(ignored []string) ([]string, error) {
+func publishListFiles(excluded []string, included []string) ([]string, error) {
 	var files []string
 	err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -76,11 +86,18 @@ func publishListFiles(ignored []string) ([]string, error) {
 		if info.IsDir() {
 			return nil
 		}
-		ok, err := isIgnored(ignored, path)
+		isIncluded, err := isFileInList(included, path)
 		if err != nil {
-			return fmt.Errorf("could not find if path [%s] is ignored: %w", path, err)
+			return fmt.Errorf("could not find if path [%s] is included: %w", path, err)
 		}
-		if ok {
+		if !isIncluded {
+			return nil
+		}
+		isExcluded, err := isFileInList(excluded, path)
+		if err != nil {
+			return fmt.Errorf("could not find if path [%s] is excluded: %w", path, err)
+		}
+		if isExcluded {
 			return nil
 		}
 		files = append(files, path)
@@ -90,11 +107,15 @@ func publishListFiles(ignored []string) ([]string, error) {
 }
 
 func Publish(pc *config.ProjectConfig, client api.API, opt PublishOptions) error {
-	ignored, err := publishIgnoredFiles(opt)
+	excluded, err := publishFiles(opt.Exclude, "exclude", pc.Manifest.Files)
 	if err != nil {
-		return fmt.Errorf("failed to parse ignored files: %w", err)
+		return fmt.Errorf("failed to parse excluded files: %w", err)
 	}
-	files, err := publishListFiles(ignored)
+	included, err := publishFiles(opt.Include, "include", pc.Manifest.Files)
+	if err != nil {
+		return fmt.Errorf("failed to parse included files: %w", err)
+	}
+	files, err := publishListFiles(excluded, included)
 	if err != nil {
 		return fmt.Errorf("failed to list files to publish: %w", err)
 	}

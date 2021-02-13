@@ -9,7 +9,6 @@ import (
 )
 
 type PublishCmd struct {
-	Ignore []string `kong:"optional,name='ignore',short='i',help='Ignore file'"`
 }
 
 func (p *PublishCmd) Run() error {
@@ -23,6 +22,7 @@ func (p *PublishCmd) Run() error {
 		return fmt.Errorf("failed to read c3pm.yml: %w", err)
 	}
 	return ctpm.Publish(pc, client, ctpm.PublishOptions{
-		Ignore: p.Ignore,
+		Exclude: pc.Manifest.Exclude,
+		Include: pc.Manifest.Include,
 	})
 }
