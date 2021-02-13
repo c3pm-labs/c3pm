@@ -60,26 +60,25 @@ func createBuildDirectory(name, version string) error {
 }
 
 func addDependency(man *manifest.Manifest, name string, version *semver.Version, options AddOptions) error {
-	//name, version, err := getRequiredVersion(dependency, options)
-	//if err != nil {
-	//	return fmt.Errorf("error getting dependencies: %w", err)
-	//}
-	var pkg *os.File
-	var err error
-	if pkg, err = registry.FetchPackage(name, version, registry.Options{
-		RegistryURL: options.RegistryURL,
-	}); err != nil {
-		return fmt.Errorf("error fetching package: %w", err)
-	}
-	pkgDir, err := unpackPackage(pkg)
-	if err != nil {
-		return fmt.Errorf("error unpacking package: %w", err)
-	}
-	if err = createBuildDirectory(name, version.String()); err != nil {
-		return fmt.Errorf("error creating internal c3pm directories: %w", err)
-	}
-	if err = installPackage(pkgDir); err != nil {
-		return fmt.Errorf("error building dependency: %w", err)
+	libPath := config.LibCachePath(name, version.String())
+	if _, err := os.Stat(libPath); os.IsNotExist(err) {
+		var pkg *os.File
+		if pkg, err = registry.FetchPackage(name, version, registry.Options{
+			RegistryURL: options.RegistryURL,
+		}); err != nil {
+			return fmt.Errorf("error fetching package: %w", err)
+		}
+		var pkgDir string
+		pkgDir, err = unpackPackage(pkg)
+		if err != nil {
+			return fmt.Errorf("error unpacking package: %w", err)
+		}
+		if err = createBuildDirectory(name, version.String()); err != nil {
+			return fmt.Errorf("error creating internal c3pm directories: %w", err)
+		}
+		if err = installPackage(pkgDir); err != nil {
+			return fmt.Errorf("error building dependency: %w", err)
+		}
 	}
 	if man.Dependencies == nil {
 		man.Dependencies = make(manifest.Dependencies)

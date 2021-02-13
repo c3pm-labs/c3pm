@@ -39,7 +39,7 @@ func dependenciesToCmake(dependencies map[string]string) ([]Dependency, error) {
 	for n, v := range dependencies {
 		m, err := manifest.Load(filepath.Join(config.LibCachePath(n, v), "c3pm.yml"))
 		if err != nil {
-			return nil, err
+			continue
 		}
 		deps[i] = Dependency{
 			Name:                n,

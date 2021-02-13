@@ -13,5 +13,5 @@ func (b *BuildCmd) Run() error {
 	if err != nil {
 		return fmt.Errorf("failed to read c3pm.yml: %w", err)
 	}
-	return ctpm.InstallBeforeBuild(pc)
+	return ctpm.AddDependenciesAndBuild(pc)
 }
