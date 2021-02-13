@@ -52,12 +52,12 @@ var InitSurvey = []*survey.Question{
 }
 
 type InitValues = struct {
-	Name string
-	Executable bool
-	Library bool
+	Name        string
+	Executable  bool
+	Library     bool
 	Description string
-	Version string
-	License string
+	Version     string
+	License     string
 }
 
 func Init() (manifest.Manifest, error) {
