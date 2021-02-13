@@ -18,7 +18,7 @@ target_sources({{.ProjectName}} PRIVATE
 	{{.Sources -}}
 	{{.Includes}}
 )
-{{$c3pmGlobalDir:=.C3pmGlobalDir}}
+{{$c3pmGlobalDir:=.C3PMGlobalDir}}
 
 target_include_directories(
 	{{- .ProjectName}} PRIVATE {{.IncludeDirs}}
