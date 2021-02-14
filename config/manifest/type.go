@@ -6,17 +6,22 @@ import (
 	"reflect"
 )
 
+// Type holds the kind of project to manage.
 type Type string
 
 const (
+	// Executable is the Type of a project yielding a binary executable.
 	Executable = Type("executable")
-	Library    = Type("library")
+	// Library is the Type of a project yielding a package to be included by others.
+	Library = Type("library")
 )
 
+// String returns the string representation of a Type
 func (t Type) String() string {
 	return string(t)
 }
 
+// TypeFromString creates a Type instance from a corresponding string.
 func TypeFromString(t string) (Type, error) {
 	switch t {
 	case Executable.String():

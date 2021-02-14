@@ -16,15 +16,15 @@ func Build(pc *config.ProjectConfig) error {
 		"CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE": pc.ProjectRoot,
 		"CMAKE_RUNTIME_OUTPUT_DIRECTORY":         pc.ProjectRoot,
 		"CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE": pc.ProjectRoot,
-		"CMAKE_INSTALL_PREFIX":                   filepath.ToSlash(filepath.Join(config.GlobalC3pmDirPath(), "cache", pc.Manifest.Name, pc.Manifest.Version.String())),
+		"CMAKE_INSTALL_PREFIX":                   filepath.ToSlash(filepath.Join(config.GlobalC3PMDirPath(), "cache", pc.Manifest.Name, pc.Manifest.Version.String())),
 		"CMAKE_BUILD_TYPE":                       "Release",
 		// Useful for Windows build
 		//"MSVC_TOOLSET_VERSION":           "141",
 		//"MSVC_VERSION":                   "1916",
 	}
 
-	if pc.UseCustomCmake() {
-		for key, value := range pc.Manifest.CustomCmake.Variables {
+	if pc.UseCustomCMake() {
+		for key, value := range pc.Manifest.CustomCMake.Variables {
 			cmakeVariables[key] = value
 		}
 	} else {

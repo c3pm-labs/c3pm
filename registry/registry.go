@@ -1,3 +1,5 @@
+// Package registry handles interaction with the C3PM registry.
+// It handles file downloading and version querying.
 package registry
 
 import (
@@ -12,10 +14,13 @@ import (
 	"sort"
 )
 
+//Options holds the options to pass to every function interacting with the registry
 type Options struct {
+	//RegistryURL is the URL to call to reach the registry.
 	RegistryURL string
 }
 
+//ListRegistryResponse is the representation of the XML structure returned by the registry.
 type ListRegistryResponse struct {
 	Name     string
 	Contents []struct {
@@ -23,6 +28,10 @@ type ListRegistryResponse struct {
 	} `xml:"Contents"`
 }
 
+//GetLastVersion calls the registry to find the latest version published to the API.
+//The version found can be different to the version that has been published to the API in case of support of ancient versions.
+//For example, if a package is currently at version 3.3.0, but the maintainer last pushed version 2.7.3, a patch for version 2.7.
+//The version returned by GetLastVersion will be 3.3.0, because it is the highest SemVer version number.
 func GetLastVersion(dependency string, options Options) (*semver.Version, error) {
 	client := http.Client{}
 	req, err := http.NewRequest("GET", options.RegistryURL, nil)
@@ -64,6 +73,7 @@ func GetLastVersion(dependency string, options Options) (*semver.Version, error)
 	return vs[len(vs)-1], nil
 }
 
+//FetchPackage downloads a package given it's name and version number.
 func FetchPackage(dependency string, version *semver.Version, options Options) (*os.File, error) {
 	client := http.Client{}
 	resp, err := client.Get(fmt.Sprintf("%s/%s/%s", options.RegistryURL, dependency, version.String()))

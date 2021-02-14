@@ -1,9 +1,8 @@
-package cmakegen
+package cmakegen_test
 
 import (
 	"fmt"
 	"os"
-
 	"path/filepath"
 	"testing"
 
@@ -11,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestCmakeGen(t *testing.T) {
+func TestCMakeGen(t *testing.T) {
 	RegisterFailHandler(Fail)
 	path, err := filepath.Abs("testsArtifacts")
 	fmt.Println("PATH:", path)
@@ -23,8 +22,4 @@ func TestCmakeGen(t *testing.T) {
 	if err != nil {
 		t.Fatal("Failed to clean test artifacts\n")
 	}
-}
-
-func getTestFolder(path string) string {
-	return filepath.Join("testsArtifacts/", path)
 }

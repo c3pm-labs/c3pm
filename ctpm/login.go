@@ -21,9 +21,9 @@ func Login(client api.API, login, password string) error {
 	if !os.IsNotExist(err) {
 		return fmt.Errorf("failed to write auth file %s: %w", config.AuthFilePath(), err)
 	}
-	err = os.Mkdir(config.GlobalC3pmDirPath(), os.ModePerm)
+	err = os.Mkdir(config.GlobalC3PMDirPath(), os.ModePerm)
 	if err != nil {
-		return fmt.Errorf("failed to create .c3pm at %s: %w", config.GlobalC3pmDirPath(), err)
+		return fmt.Errorf("failed to create .c3pm at %s: %w", config.GlobalC3PMDirPath(), err)
 	}
 	return ioutil.WriteFile(config.AuthFilePath(), []byte(apiKey), 0644)
 }

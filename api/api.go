@@ -1,3 +1,6 @@
+// Package api handles interaction between the C3PM Command Line Interface (CLI), and C3PM's API.
+// The package's role is to abstract all needed low level interaction, such as HTTP or filesystem calls
+// exposing an interface simple, clear and easy to understand from the rest of the CLI.
 package api
 
 import (
@@ -12,9 +15,18 @@ import (
 	"os"
 )
 
+// API represents a connection to c3pm's backend, used for authentication and publishing purposes
 type API struct {
 	Client *http.Client
 	Token  string
+}
+
+// New builds a new API object
+func New(c *http.Client, t string) API {
+	return API{
+		Client: c,
+		Token:  t,
+	}
 }
 
 func (c API) newRequest(method string, path string, body io.Reader) (*http.Request, error) {

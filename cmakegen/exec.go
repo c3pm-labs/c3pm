@@ -18,7 +18,7 @@ target_sources({{.ProjectName}} PRIVATE
 	{{.Sources -}}
 	{{.Includes}}
 )
-{{$c3pmGlobalDir:=.C3pmGlobalDir}}
+{{$c3pmGlobalDir:=.C3PMGlobalDir}}
 
 target_include_directories(
 	{{- .ProjectName}} PRIVATE {{.IncludeDirs}}
@@ -48,7 +48,7 @@ func executable(v CMakeVars) (string, error) {
 		"ToUpper": strings.ToUpper,
 	}
 	cmake := bytes.NewBuffer([]byte{})
-	tmpl, err := template.New("cmakeExecutable").Funcs(funcMap).Parse(addPlatformSpecificCmake(executableTemplate, v))
+	tmpl, err := template.New("cmakeExecutable").Funcs(funcMap).Parse(addPlatformSpecificCMake(executableTemplate, v))
 	if err != nil {
 		return "", fmt.Errorf("could not parse cmake template: %w", err)
 	}

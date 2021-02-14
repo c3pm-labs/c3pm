@@ -45,10 +45,10 @@ func buildOptions(opts AddOptions) AddOptions {
 }
 
 func createBuildDirectory(name, version string) error {
-	if err := os.MkdirAll(filepath.Join(config.GlobalC3pmDirPath(), "lib", name, version), os.ModePerm); err != nil {
+	if err := os.MkdirAll(filepath.Join(config.GlobalC3PMDirPath(), "lib", name, version), os.ModePerm); err != nil {
 		return err
 	}
-	if err := os.MkdirAll(filepath.Join(config.GlobalC3pmDirPath(), "include", name, version), os.ModePerm); err != nil {
+	if err := os.MkdirAll(filepath.Join(config.GlobalC3PMDirPath(), "include", name, version), os.ModePerm); err != nil {
 		return err
 	}
 	return nil
