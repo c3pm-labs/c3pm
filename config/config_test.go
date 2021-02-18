@@ -32,7 +32,7 @@ var (
 			Website:       "",
 			Readme:        "",
 			Repository:    "",
-			Authors:       [],
+			Authors:       nil,
 			Standard:      "20",
 			License:       "ISC",
 			Files: manifest.FilesConfig{
