@@ -1,15 +1,16 @@
 package config_test
 
 import (
+	"io/ioutil"
+	"os"
+	"path/filepath"
+
 	"github.com/Masterminds/semver/v3"
 	"github.com/c3pm-labs/c3pm/config"
 	"github.com/c3pm-labs/c3pm/config/manifest"
 	"github.com/mohae/deepcopy"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 )
 
 const (
@@ -27,8 +28,13 @@ var (
 			Version: manifest.Version{
 				Version: semver.MustParse("1.1.5"),
 			},
-			Standard: "20",
-			License:  "ISC",
+			Documentation: "",
+			Website:       "",
+			Readme:        "",
+			Repository:    "",
+			Authors:       nil,
+			Standard:      "20",
+			License:       "ISC",
 			Files: manifest.FilesConfig{
 				Sources:             []string{"**/*.cpp"},
 				Includes:            []string{"**/*.hpp"},
