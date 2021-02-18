@@ -20,7 +20,7 @@ var packages = map[string][]PackageMeta{
 		Version:      "0.0.1",
 		Dependencies: dependencies.Dependencies{"boost/config": "0.0.0"},
 	}},
-	"boost/chrono":          {{"0.0.0", dependencies.Dependencies{"boost/assert": "0.0.0", "boost/config": "0.0.0", "boost/core": "0.0.0", "boost/mpl": "0.0.0", "boost/static_assert": "0.0.0", "boost/integer": "0.0.0", "boost/typeof": "0.0.0", "boost/type_traits": "0.0.0", "boost/winapi": "0.0.0", "boost/move": "0.0.0", "boost/system": "0.0.0", "boost/throw_exception": "0.0.0"}}},
+	"boost/chrono":          {{"0.0.0", dependencies.Dependencies{"boost/assert": "0.0.0", "boost/config": "0.0.0", "boost/core": "0.0.0", "boost/mpl": "0.0.0", "boost/static_assert": "0.0.0", "boost/integer": "0.0.0", "boost/typeof": "0.0.0", "boost/type_traits": "0.0.0", "boost/winapi": "0.0.0", "boost/move": "0.0.0", "boost/system": "0.0.0", "boost/throw_exception": "0.0.0", "boost/ratio": "0.0.0"}}},
 	"boost/config":          {{"0.0.0", nil}},
 	"boost/core":            {{"0.0.0", dependencies.Dependencies{"boost/config": "0.0.0", "boost/assert": "0.0.0"}}},
 	"boost/integer":         {{"0.0.0", dependencies.Dependencies{"boost/config": "0.0.0", "boost/static_assert": "0.0.0"}}},
@@ -135,5 +135,35 @@ var _ = Describe("Dependencies", func() {
 		Ω(err).ShouldNot(HaveOccurred())
 		Ω(pkgs).Should(Equal(packages))
 		close(done)
+	})
+
+	It("resolves an important (17) number of packages", func(done Done) {
+		packages := dependencies.Packages{
+			"boost/assert":          {"0.0.0": struct{}{}},
+			"boost/config":          {"0.0.0": struct{}{}},
+			"boost/core":            {"0.0.0": struct{}{}},
+			"boost/chrono":          {"0.0.0": struct{}{}},
+			"boost/integer":         {"0.0.0": struct{}{}},
+			"boost/move":            {"0.0.0": struct{}{}},
+			"boost/mpl":             {"0.0.0": struct{}{}},
+			"boost/predef":          {"0.0.0": struct{}{}},
+			"boost/preprocessor":    {"0.0.0": struct{}{}},
+			"boost/ratio":           {"0.0.0": struct{}{}},
+			"boost/type_traits":     {"0.0.0": struct{}{}},
+			"boost/typeof":          {"0.0.0": struct{}{}},
+			"boost/throw_exception": {"0.0.0": struct{}{}},
+			"boost/static_assert":   {"0.0.0": struct{}{}},
+			"boost/system":          {"0.0.0": struct{}{}},
+			"boost/utility":         {"0.0.0": struct{}{}},
+			"boost/winapi":          {"0.0.0": struct{}{}},
+		}
+		pkgs, err := dependencies.Install(dependencies.PackageRequest{
+			Name:    "boost/chrono",
+			Version: "0.0.0",
+		}, fetcher)
+		Ω(err).ShouldNot(HaveOccurred())
+		Ω(pkgs).Should(Equal(packages))
+		close(done)
+
 	})
 })
