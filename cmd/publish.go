@@ -23,8 +23,5 @@ func (p *PublishCmd) Run() error {
 	if err != nil {
 		return fmt.Errorf("failed to read c3pm.yml: %w", err)
 	}
-	return ctpm.Publish(pc, client, ctpm.PublishOptions{
-		Exclude: pc.Manifest.Exclude,
-		Include: pc.Manifest.Include,
-	})
+	return ctpm.Publish(pc, client)
 }
