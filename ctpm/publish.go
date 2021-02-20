@@ -7,7 +7,6 @@ import (
 	"github.com/c3pm-labs/c3pm/config"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 type PublishOptions struct {
@@ -20,28 +19,17 @@ var PublishDefaultOptions = PublishOptions{
 	Include: []string{"c3pm.yml"},
 }
 
-func isFileInList(rules []string, path string) (bool, error) {
-	var negate bool
-	var fileIsInRules = false
+func isFileInList(path string, rules []string) (bool, error) {
 	for _, i := range rules {
-		if strings.HasPrefix(i, "!") {
-			i = i[1:]
-			negate = true
-		} else {
-			negate = false
-		}
 		ok, err := doublestar.Match(i, path)
 		if err != nil {
 			return false, fmt.Errorf("failed to match [%s] with [%s] regex: %w", path, i, err)
 		}
 		if ok {
-			fileIsInRules = true
-		}
-		if ok && negate {
-			fileIsInRules = false
+			return true, nil
 		}
 	}
-	return fileIsInRules, nil
+	return false, nil
 }
 
 func getFilesFromRules(included []string, excluded []string) ([]string, error) {
@@ -53,16 +41,18 @@ func getFilesFromRules(included []string, excluded []string) ([]string, error) {
 		if info.IsDir() {
 			return nil
 		}
-		isExcluded, err := isFileInList(excluded, path)
-		if err != nil {
-			return fmt.Errorf("could not find if path [%s] is excluded: %w", path, err)
-		}
-		isIncluded, err := isFileInList(included, path)
+		isIncluded, err := isFileInList(path, included)
 		if err != nil {
 			return fmt.Errorf("could not find if path [%s] is included: %w", path, err)
 		}
-		if isIncluded && !isExcluded {
-			files = append(files, path)
+		if isIncluded {
+			isExcluded, err := isFileInList(path, excluded)
+			if err != nil {
+				return fmt.Errorf("could not find if path [%s] is excluded: %w", path, err)
+			}
+			if !isExcluded {
+				files = append(files, path)
+			}
 		}
 		return nil
 	})
