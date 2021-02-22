@@ -19,9 +19,11 @@ jobs:
       - uses: actions/checkout@v2
       - name: Setup Go
         uses: actions/setup-go@v2.0.3
+      - name: Install ginkgo
+        run: go get github.com/onsi/ginkgo/ginkgo
       - name: Test project
         working-directory: ./
-        run: go test ./...
+        run: ~/go/bin/ginkgo -v -r
   lint:
     runs-on: ubuntu-latest
     steps:

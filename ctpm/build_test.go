@@ -35,38 +35,48 @@ var _ = Describe("Build", func() {
 			pc.Manifest.Version, _ = manifest.VersionFromString("1.0.0")
 
 			err := os.MkdirAll(projectFolder, os.ModePerm)
-			Ω(err).To(BeNil())
+			Ω(err).ShouldNot(HaveOccurred())
+
 			oldPath, err = filepath.Rel(projectFolder, ".")
-			Ω(err).To(BeNil())
+			Ω(err).ShouldNot(HaveOccurred())
+
 			err = os.Chdir(projectFolder)
-			Ω(err).To(BeNil())
+			Ω(err).ShouldNot(HaveOccurred())
+
 			err = ioutil.WriteFile("main.cpp", []byte(execSrc), 0644)
-			Ω(err).To(BeNil())
+			Ω(err).ShouldNot(HaveOccurred())
+
 			err = ctpm.Build(pc)
-			Ω(err).To(BeNil())
+			Ω(err).ShouldNot(HaveOccurred())
+
 		})
 
 		It("Generate cmake scripts", func() {
 			fi, err := os.Stat(".c3pm/cmake/CMakeLists.txt")
-			Ω(err).To(BeNil())
+			Ω(err).ShouldNot(HaveOccurred())
+
 			Ω(fi.Size()).To(BeNumerically(">", 0))
 		})
 		It("Generate makefiles", func() {
 			fi, err := os.Stat(".c3pm/build/Makefile")
-			Ω(err).To(BeNil())
+			Ω(err).ShouldNot(HaveOccurred())
+
 			Ω(fi.Size()).To(BeNumerically(">", 0))
 		})
 		It("build m", func() {
 			fi, err := os.Stat("buildTest")
-			Ω(err).To(BeNil())
+			Ω(err).ShouldNot(HaveOccurred())
+
 			Ω(fi.Size()).To(BeNumerically(">", 0))
 			buf := bytes.NewBuffer([]byte{})
 			cmd := exec.Command("./buildTest")
 			cmd.Stdout = buf
 			err = cmd.Start()
-			Ω(err).To(BeNil())
+			Ω(err).ShouldNot(HaveOccurred())
+
 			err = cmd.Wait()
-			Ω(err).To(BeNil())
+			Ω(err).ShouldNot(HaveOccurred())
+
 			Ω(buf.String()).To(Equal("Build test\n"))
 		})
 

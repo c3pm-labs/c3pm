@@ -1,3 +1,4 @@
+// Package cmakegen handles the templating and generation of CMake configuration files.
 package cmakegen
 
 import (
@@ -11,29 +12,49 @@ import (
 	"strings"
 )
 
+//Dependency is holds metadata about a dependency of a project.
 type Dependency struct {
-	Name                string
-	Version             string
-	Targets             []string
-	ExportedDir         string
+	// Name is the package name of the dependency
+	Name string
+	// Version is the version of the dependency to depend on
+	Version string
+	// Targets is the list of the libraries contained by the dependencies.
+	// In most cases this will only contain one entry, but there are cases of packages containing several libraries, for
+	// separation of concerns reasons.
+	Targets []string
+	//TODO: Unused
+	ExportedDir string
+	// ExportedIncludeDirs is the list of the directories in which header files for the library can be found.
 	ExportedIncludeDirs []string
 }
 
+//CMakeVars is the structure passed to the templates used for generating CMake config files.
 type CMakeVars struct {
-	ProjectName      string
-	ProjectVersion   string
-	Sources          string
-	Includes         string
-	IncludeDirs      string
-	ExportedDir      string
-	C3pmGlobalDir    string
-	Dependencies     []Dependency
+	//ProjectName is the name of the current project
+	ProjectName string
+	//ProjectVersion is the current version of the project
+	ProjectVersion string
+	//Sources is a string containing the list of all of the project's sources, space-separated.
+	Sources string
+	//Includes is string containing the list of all of the project's header files, space-separated.
+	Includes string
+	//IncludeDirs is a string containing the list of all of the project's additional header directories, space-separated.
+	IncludeDirs string
+	//ExportedDir is the path to the directory containing export headers for the project.
+	ExportedDir string
+	//C3PMGlobalDir is the path to the current $HOME user directory.
+	C3PMGlobalDir string
+	//Dependencies is a list of all the data for each Dependency of the project
+	Dependencies []Dependency
+	//TODO: Unused
 	PublicIncludeDir string
-	LinuxConfig      *manifest.LinuxConfig
+	//LinuxConfig holds linux-specific configuration information
+	LinuxConfig *manifest.LinuxConfig
+	//LanguageStandard is the C++ language standard version to use.
 	LanguageStandard string
 }
 
-func dependenciesToCmake(dependencies map[string]string) ([]Dependency, error) {
+func dependenciesToCMake(dependencies map[string]string) ([]Dependency, error) {
 	deps := make([]Dependency, len(dependencies))
 	i := 0
 	for n, v := range dependencies {
@@ -48,7 +69,7 @@ func dependenciesToCmake(dependencies map[string]string) ([]Dependency, error) {
 			ExportedDir:         m.Files.ExportedDir,
 			ExportedIncludeDirs: m.Files.ExportedIncludeDirs,
 		}
-		if m.CustomCmake != nil {
+		if m.CustomCMake != nil {
 			deps[i].ExportedIncludeDirs = []string{"include"}
 		}
 	}
@@ -91,7 +112,7 @@ func globbingExprsToCMakeVar(globs []string, projectRoot string) (string, error)
 }
 
 func varsFromProjectConfig(pc *config.ProjectConfig) (CMakeVars, error) {
-	dependencies, err := dependenciesToCmake(pc.Manifest.Dependencies)
+	dependencies, err := dependenciesToCMake(pc.Manifest.Dependencies)
 	if err != nil {
 		return CMakeVars{}, err
 	}
@@ -103,7 +124,7 @@ func varsFromProjectConfig(pc *config.ProjectConfig) (CMakeVars, error) {
 		Includes:         filesSliceToCMake(pc.Manifest.Files.Includes),
 		IncludeDirs:      filesSliceToCMake(pc.Manifest.Files.IncludeDirs),
 		ExportedDir:      filepath.ToSlash(filepath.Join(pc.ProjectRoot, pc.Manifest.Files.ExportedDir)),
-		C3pmGlobalDir:    filepath.ToSlash(config.GlobalC3pmDirPath()),
+		C3PMGlobalDir:    filepath.ToSlash(config.GlobalC3PMDirPath()),
 		Dependencies:     dependencies,
 		LinuxConfig:      pc.Manifest.LinuxConfig,
 		LanguageStandard: pc.Manifest.Standard,
@@ -144,6 +165,7 @@ func fromProjectConfig(pc *config.ProjectConfig) (string, error) {
 	return cmake, nil
 }
 
+//Generate takes a config.ProjectConfig and creates CMake configuration files based on the project config.
 func Generate(pc *config.ProjectConfig) error {
 	cmakeContent, err := fromProjectConfig(pc)
 	if err != nil {

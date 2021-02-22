@@ -6,6 +6,7 @@ import (
 	"github.com/c3pm-labs/c3pm/config/manifest"
 )
 
+//InitSurvey is the definition of the user interaction happening in the init command to choose project parameters.
 var InitSurvey = []*survey.Question{
 	{
 		Name:     "Name",
@@ -50,6 +51,7 @@ var InitSurvey = []*survey.Question{
 	},
 }
 
+//Init handles the user interaction happening during the init command
 func Init() (manifest.Manifest, error) {
 	man := manifest.New()
 	err := survey.Ask(InitSurvey, &man, SurveyOptions...)

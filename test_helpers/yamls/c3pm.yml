@@ -1,0 +1,18 @@
+c3pm_version: v1
+type: executable
+name: hello-bin
+description: Demo binary
+version: 1.1.5
+standard: "20"
+license: ISC
+files:
+  sources:
+    - '**/*.cpp'
+  includes:
+    - '**/*.hpp'
+  include_dirs:
+    - include
+  exported_dir: ""
+  exported_include_dirs: []
+dependencies:
+  hello: 1.0.5
