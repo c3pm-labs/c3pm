@@ -44,16 +44,6 @@ func buildOptions(opts AddOptions) AddOptions {
 	return opts
 }
 
-func createBuildDirectory(name, version string) error {
-	if err := os.MkdirAll(filepath.Join(config.GlobalC3PMDirPath(), "lib", name, version), os.ModePerm); err != nil {
-		return err
-	}
-	if err := os.MkdirAll(filepath.Join(config.GlobalC3PMDirPath(), "include", name, version), os.ModePerm); err != nil {
-		return err
-	}
-	return nil
-}
-
 func addDependency(man *manifest.Manifest, dependency string, opts AddOptions) error {
 	options := buildOptions(opts)
 	name, version, err := getRequiredVersion(dependency, options)
@@ -69,9 +59,6 @@ func addDependency(man *manifest.Manifest, dependency string, opts AddOptions) e
 	pkgDir, err := unpackPackage(pkg)
 	if err != nil {
 		return fmt.Errorf("error unpacking package: %w", err)
-	}
-	if err = createBuildDirectory(name, version.String()); err != nil {
-		return fmt.Errorf("error creating internal c3pm directories: %w", err)
 	}
 	if err = installPackage(pkgDir); err != nil {
 		return fmt.Errorf("error building dependency: %w", err)
