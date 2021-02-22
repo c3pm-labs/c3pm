@@ -46,7 +46,6 @@ func (c *Client) GetLastVersion(ctx context.Context, pkgName string) (*semver.Ve
 		Prefix: aws.String(pkgName),
 	})
 	if err != nil {
-		fmt.Println("HERE")
 		return nil, err
 	}
 	vs := make([]*semver.Version, len(resp.Contents))
