@@ -6,6 +6,10 @@ require (
 	github.com/AlecAivazis/survey/v2 v2.2.5
 	github.com/Masterminds/semver/v3 v3.1.1
 	github.com/alecthomas/kong v0.2.12
+	github.com/aws/aws-sdk-go-v2 v1.2.0
+	github.com/aws/aws-sdk-go-v2/config v1.1.1
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.2.0
+	github.com/aws/smithy-go v1.1.0
 	github.com/bmatcuk/doublestar v1.3.4
 	github.com/hashicorp/go-cleanhttp v0.5.1 // indirect
 	github.com/mattn/go-colorable v0.1.8 // indirect
@@ -16,6 +20,7 @@ require (
 	github.com/onsi/gomega v1.10.1
 	github.com/pkg/errors v0.9.1 // indirect
 	golang.org/x/crypto v0.0.0-20201208171446-5f87f3452ae9 // indirect
+	golang.org/x/net v0.0.0-20201110031124-69a78807bb2b // indirect
 	golang.org/x/sys v0.0.0-20201211090839-8ad439b19e0f // indirect
 	golang.org/x/term v0.0.0-20201210144234-2321bbc49cbf // indirect
 	golang.org/x/text v0.3.4 // indirect

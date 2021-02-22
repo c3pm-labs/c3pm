@@ -2,6 +2,7 @@ package ctpm
 
 import (
 	"archive/tar"
+	"context"
 	"errors"
 	"fmt"
 	"github.com/Masterminds/semver/v3"
@@ -20,7 +21,7 @@ import (
 
 func Add(pc *config.ProjectConfig, opts AddOptions) error {
 	for _, dep := range opts.Dependencies {
-		if err := addDependency(&pc.Manifest, dep, opts); err != nil {
+		if err := addDependency(context.TODO(), &pc.Manifest, dep, opts); err != nil {
 			return fmt.Errorf("error adding %s: %w", dep, err)
 		}
 	}
@@ -54,16 +55,18 @@ func createBuildDirectory(name, version string) error {
 	return nil
 }
 
-func addDependency(man *manifest.Manifest, dependency string, opts AddOptions) error {
+func addDependency(ctx context.Context, man *manifest.Manifest, dependency string, opts AddOptions) error {
 	options := buildOptions(opts)
-	name, version, err := getRequiredVersion(dependency, options)
+	reg := registry.NewClient(registry.Options{
+		RegistryURL: options.RegistryURL,
+	})
+
+	name, version, err := getRequiredVersion(ctx, reg, dependency)
 	if err != nil {
 		return fmt.Errorf("error getting dependencies: %w", err)
 	}
 	var pkg *os.File
-	if pkg, err = registry.FetchPackage(name, version, registry.Options{
-		RegistryURL: options.RegistryURL,
-	}); err != nil {
+	if pkg, err = reg.FetchPackage(ctx, name, version); err != nil {
 		return fmt.Errorf("error fetching package: %w", err)
 	}
 	pkgDir, err := unpackPackage(pkg)
@@ -169,16 +172,14 @@ func validateDependency(dep string) error {
 	return errors.New("%s is not a valid dependency string")
 }
 
-func getRequiredVersion(dep string, options AddOptions) (name string, version *semver.Version, err error) {
-	if err := validateDependency(dep); err != nil {
+func getRequiredVersion(ctx context.Context, reg *registry.Client, pkg string) (name string, version *semver.Version, err error) {
+	if err := validateDependency(pkg); err != nil {
 		return "", nil, err
 	}
-	dependency := strings.Split(dep, "@")
+	dependency := strings.Split(pkg, "@")
 	if len(dependency) == 1 {
-		version, err = registry.GetLastVersion(dep, registry.Options{
-			RegistryURL: options.RegistryURL,
-		})
-		name = dep
+		version, err = reg.GetLastVersion(ctx, pkg)
+		name = pkg
 		return
 	}
 	name = dependency[0]

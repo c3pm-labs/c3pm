@@ -3,12 +3,14 @@
 package registry
 
 import (
-	"encoding/xml"
+	"context"
 	"fmt"
 	"github.com/Masterminds/semver/v3"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/c3pm-labs/c3pm/env"
 	"io"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"path/filepath"
 	"sort"
@@ -20,49 +22,36 @@ type Options struct {
 	RegistryURL string
 }
 
-//ListRegistryResponse is the representation of the XML structure returned by the registry.
-type ListRegistryResponse struct {
-	Name     string
-	Contents []struct {
-		Key string `xml:"Key"`
-	} `xml:"Contents"`
+type Client struct {
+	s3Client *s3.Client
+}
+
+func NewClient(opts Options) *Client {
+	s3Client := s3.New(s3.Options{
+		UsePathStyle:     true,
+		Region: "fr-par",
+		EndpointResolver: s3.EndpointResolverFromURL(opts.RegistryURL),
+	})
+
+	return &Client{s3Client: s3Client}
 }
 
 //GetLastVersion calls the registry to find the latest version published to the API.
 //The version found can be different to the version that has been published to the API in case of support of ancient versions.
 //For example, if a package is currently at version 3.3.0, but the maintainer last pushed version 2.7.3, a patch for version 2.7.
 //The version returned by GetLastVersion will be 3.3.0, because it is the highest SemVer version number.
-func GetLastVersion(dependency string, options Options) (*semver.Version, error) {
-	client := http.Client{}
-	req, err := http.NewRequest("GET", options.RegistryURL, nil)
+func (c *Client) GetLastVersion(ctx context.Context, pkgName string) (*semver.Version, error) {
+	resp, err := c.s3Client.ListObjectsV2(ctx, &s3.ListObjectsV2Input{
+		Bucket: aws.String(env.REGISTRY_BUCKET_NAME),
+		Prefix: aws.String(pkgName),
+	})
 	if err != nil {
-		return nil, fmt.Errorf("error creating version query: %w", err)
+		fmt.Println("HERE")
+		return nil, err
 	}
-	q := req.URL.Query()
-	q.Add("typeList", "2")
-	q.Add("prefix", dependency)
-	req.URL.RawQuery = q.Encode()
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("error fetching versions: %w", err)
-	}
-	defer resp.Body.Close()
-	var registryResponse ListRegistryResponse
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("error reading body: %w", err)
-	}
-	err = xml.Unmarshal(body, &registryResponse)
-	if err != nil {
-		return nil, fmt.Errorf("error unmarshaling versions: %w", err)
-	}
-	if len(registryResponse.Contents) == 0 {
-		fmt.Printf("%s: package not found\n", dependency)
-		os.Exit(1)
-	}
-	vs := make([]*semver.Version, len(registryResponse.Contents))
-	for i, r := range registryResponse.Contents {
-		version := filepath.Base(r.Key)
+	vs := make([]*semver.Version, len(resp.Contents))
+	for i, r := range resp.Contents {
+		version := filepath.Base(*r.Key)
 		v, err := semver.NewVersion(version)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing version %s: %w", r, err)
@@ -74,14 +63,19 @@ func GetLastVersion(dependency string, options Options) (*semver.Version, error)
 }
 
 //FetchPackage downloads a package given it's name and version number.
-func FetchPackage(dependency string, version *semver.Version, options Options) (*os.File, error) {
-	client := http.Client{}
-	resp, err := client.Get(fmt.Sprintf("%s/%s/%s", options.RegistryURL, dependency, version.String()))
+func (c *Client) FetchPackage(ctx context.Context, pkgName string, version *semver.Version) (*os.File, error) {
+	key := fmt.Sprintf("/%s/%s", pkgName, version.String())
+
+	resp, err := c.s3Client.GetObject(ctx, &s3.GetObjectInput{
+		Bucket: aws.String(env.REGISTRY_BUCKET_NAME),
+		Key:    aws.String(key),
+	})
 	if err != nil {
-		return nil, fmt.Errorf("error fetching package %s: %w", dependency, err)
+		return nil, err
 	}
+
 	defer resp.Body.Close()
-	file, err := ioutil.TempFile("", fmt.Sprintf("%s.%s.*.tar", dependency, version.String()))
+	file, err := ioutil.TempFile("", fmt.Sprintf("%s.%s.*.tar", pkgName, version.String()))
 	if err != nil {
 		return nil, fmt.Errorf("error creating temporary package file: %w", err)
 	}
