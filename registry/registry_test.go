@@ -1,6 +1,7 @@
 package registry_test
 
 import (
+	"context"
 	"encoding/xml"
 	"github.com/Masterminds/semver/v3"
 	"github.com/c3pm-labs/c3pm/registry"
@@ -33,7 +34,8 @@ var _ = Describe("Add", func() {
 			)
 		})
 		It("fetches the right version", func() {
-			version, err := registry.GetLastVersion("boost", options)
+			client := registry.NewClient(options)
+			version, err := client.GetLastVersion(context.TODO(), "boost")
 			Ω(err).ShouldNot(HaveOccurred())
 			Ω(server.ReceivedRequests()).Should(HaveLen(1))
 			Ω(version).Should(Equal(semver.MustParse("1.0.0")))
