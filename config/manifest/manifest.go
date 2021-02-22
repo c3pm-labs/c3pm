@@ -23,18 +23,17 @@ type Manifest struct {
 	LinuxConfig  *LinuxConfig `yaml:"linux,omitempty"`
 }
 
-var defaultManifest = Manifest{
-	C3pmVersion: C3pmVersion1,
-	Files: FilesConfig{
-		Sources:             []string{"**/*.cpp"},
-		Includes:            []string{"**/*.hpp"},
-		ExportedIncludeDirs: []string{},
-	},
-	Dependencies: make(map[string]string),
-	Standard:     "20",
-}
-
 func New() Manifest {
+	defaultManifest := Manifest{
+		C3pmVersion: C3pmVersion1,
+		Files: FilesConfig{
+			Sources:             []string{"**/*.cpp"},
+			Includes:            []string{"**/*.hpp"},
+			ExportedIncludeDirs: []string{},
+		},
+		Dependencies: make(map[string]string),
+		Standard:     "20",
+	}
 	return defaultManifest
 }
 
