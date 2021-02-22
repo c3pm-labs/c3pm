@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/Masterminds/semver/v3"
-	"github.com/c3pm-labs/c3pm/cmake"
+	"github.com/c3pm-labs/c3pm/adapter/builtin/cmake"
 	"github.com/c3pm-labs/c3pm/config"
 	"github.com/c3pm-labs/c3pm/config/manifest"
 	"github.com/c3pm-labs/c3pm/env"

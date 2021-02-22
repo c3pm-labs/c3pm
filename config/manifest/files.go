@@ -1,6 +1,6 @@
 package manifest
 
-// FilesConfig holdes configuration about the files used by the project.
+// FilesConfig holds configuration about the files used by the project.
 type FilesConfig struct {
 	// Sources lists the project's source files.
 	Sources []string `yaml:"sources"`

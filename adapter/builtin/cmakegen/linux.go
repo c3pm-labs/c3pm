@@ -11,7 +11,7 @@ target_link_libraries({{.ProjectName}} PUBLIC Threads::Threads)
 `
 
 func addLinuxData(sb *strings.Builder, v CMakeVars) {
-	if v.LinuxConfig.UsePthread {
+	if v.LinuxUsePthread {
 		sb.WriteString(pthreadTemplate)
 	}
 }

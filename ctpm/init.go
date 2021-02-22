@@ -2,7 +2,7 @@ package ctpm
 
 import (
 	"fmt"
-	"github.com/c3pm-labs/c3pm/cmakegen"
+	"github.com/c3pm-labs/c3pm/adapter/builtin/cmakegen"
 	"github.com/c3pm-labs/c3pm/config"
 	"github.com/mitchellh/go-spdx"
 	"io/ioutil"
@@ -47,7 +47,7 @@ func Init(pc *config.ProjectConfig, opt InitOptions) error {
 	if err != nil {
 		return fmt.Errorf("failed to save project file: %w", err)
 	}
-	return cmakegen.Generate(pc)
+	return cmakegen.GenerateScripts(pc)
 }
 
 const execTemplate = `#include <iostream>

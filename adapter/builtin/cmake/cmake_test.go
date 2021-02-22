@@ -2,7 +2,7 @@ package cmake_test
 
 import (
 	"bufio"
-	"github.com/c3pm-labs/c3pm/cmake"
+	"github.com/c3pm-labs/c3pm/adapter/builtin/cmake"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"os"

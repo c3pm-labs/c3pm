@@ -3,7 +3,7 @@ package cmakegen_test
 import (
 	"fmt"
 	"github.com/Masterminds/semver/v3"
-	"github.com/c3pm-labs/c3pm/cmakegen"
+	"github.com/c3pm-labs/c3pm/adapter/builtin/cmakegen"
 	"github.com/c3pm-labs/c3pm/config"
 	"github.com/c3pm-labs/c3pm/config/manifest"
 	. "github.com/onsi/ginkgo"
@@ -76,7 +76,7 @@ var _ = Describe("Gen Test", func() {
 		Ω(err).ShouldNot(HaveOccurred())
 	})
 	Context("generates a cmake file without dependencies", func() {
-		err := cmakegen.Generate(simpleProject)
+		err := cmakegen.GenerateScripts(simpleProject)
 		fmt.Println(err)
 		Ω(err).ShouldNot(HaveOccurred())
 		data, err := ioutil.ReadFile(filepath.Join(simpleProject.CMakeDir(), "CMakeLists.txt"))
@@ -99,7 +99,7 @@ var _ = Describe("Gen Test", func() {
 	Context("generates a cmake file with dependencies", func() {
 		_ = projectWithDependencies
 		//TODO: dependencies tests
-		//err := cmakegen.Generate(projectWithDependencies)
+		//err := cmakegen.GenerateScripts(projectWithDependencies)
 		//Ω(err).ShouldNot(HaveOccurred())
 		//data, err := ioutil.ReadFile(filepath.Join(projectWithDependencies.CMakeDir(), "CMakeLists.txt"))
 		//Ω(err).ShouldNot(HaveOccurred())

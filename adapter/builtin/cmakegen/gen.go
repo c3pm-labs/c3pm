@@ -4,6 +4,7 @@ package cmakegen
 import (
 	"fmt"
 	"github.com/bmatcuk/doublestar"
+	builtinAdapterConfig "github.com/c3pm-labs/c3pm/adapter/builtin/config"
 	"github.com/c3pm-labs/c3pm/config"
 	"github.com/c3pm-labs/c3pm/config/manifest"
 	"io/ioutil"
@@ -36,8 +37,8 @@ type CMakeVars struct {
 	ProjectVersion string
 	//Sources is a string containing the list of all of the project's sources, space-separated.
 	Sources string
-	//Includes is string containing the list of all of the project's header files, space-separated.
-	Includes string
+	//Headers is string containing the list of all of the project's header files, space-separated.
+	Headers string
 	//IncludeDirs is a string containing the list of all of the project's additional header directories, space-separated.
 	IncludeDirs string
 	//ExportedDir is the path to the directory containing export headers for the project.
@@ -49,7 +50,7 @@ type CMakeVars struct {
 	//TODO: Unused
 	PublicIncludeDir string
 	//LinuxConfig holds linux-specific configuration information
-	LinuxConfig *manifest.LinuxConfig
+	LinuxConfig *builtinAdapterConfig.LinuxConfig
 	//LanguageStandard is the C++ language standard version to use.
 	LanguageStandard string
 }
@@ -63,14 +64,11 @@ func dependenciesToCMake(dependencies map[string]string) ([]Dependency, error) {
 			return nil, err
 		}
 		deps[i] = Dependency{
-			Name:                n,
-			Version:             v,
-			Targets:             m.Targets(),
-			ExportedDir:         m.Files.ExportedDir,
-			ExportedIncludeDirs: m.Files.ExportedIncludeDirs,
-		}
-		if m.CustomCMake != nil {
-			deps[i].ExportedIncludeDirs = []string{"include"}
+			Name:    n,
+			Version: v,
+			Targets: m.Targets(),
+			//ExportedDir:         m.Files.ExportedDir,
+			//ExportedIncludeDirs: m.Files.ExportedIncludeDirs,
 		}
 	}
 	return deps, nil
@@ -117,31 +115,37 @@ func varsFromProjectConfig(pc *config.ProjectConfig) (CMakeVars, error) {
 		return CMakeVars{}, err
 	}
 
-	vars := CMakeVars{
-		ProjectName:      pc.Manifest.Name,
-		ProjectVersion:   pc.Manifest.Version.String(),
-		Sources:          filesSliceToCMake(pc.Manifest.Files.Sources),
-		Includes:         filesSliceToCMake(pc.Manifest.Files.Includes),
-		IncludeDirs:      filesSliceToCMake(pc.Manifest.Files.IncludeDirs),
-		ExportedDir:      filepath.ToSlash(filepath.Join(pc.ProjectRoot, pc.Manifest.Files.ExportedDir)),
-		C3PMGlobalDir:    filepath.ToSlash(config.GlobalC3PMDirPath()),
-		Dependencies:     dependencies,
-		LinuxConfig:      pc.Manifest.LinuxConfig,
-		LanguageStandard: pc.Manifest.Standard,
+	adapterCfg, err := builtinAdapterConfig.Parse(pc.Manifest.Build.Config)
+	if err != nil {
+		return CMakeVars{}, err
 	}
 
-	vars.Sources, err = globbingExprsToCMakeVar(pc.Manifest.Files.Sources, pc.ProjectRoot)
+	sources, err := globbingExprsToCMakeVar(adapterCfg.Sources, pc.ProjectRoot)
 	if err != nil {
 		return CMakeVars{}, fmt.Errorf("could not parse Sources: %w", err)
 	}
-	vars.Includes, err = globbingExprsToCMakeVar(pc.Manifest.Files.Includes, pc.ProjectRoot)
+	headers, err := globbingExprsToCMakeVar(adapterCfg.Headers, pc.ProjectRoot)
 	if err != nil {
 		return CMakeVars{}, fmt.Errorf("could not parse Includes: %w", err)
 	}
-	vars.IncludeDirs, err = globbingExprsToCMakeVar(pc.Manifest.Files.IncludeDirs, pc.ProjectRoot)
-	if err != nil {
-		return CMakeVars{}, fmt.Errorf("could not parse IncludeDirs: %w", err)
+	//includeDirs, err := globbingExprsToCMakeVar(pc.Manifest.Files.IncludeDirs, pc.ProjectRoot)
+	//if err != nil {
+	//	return CMakeVars{}, fmt.Errorf("could not parse IncludeDirs: %w", err)
+	//}
+
+	vars := CMakeVars{
+		ProjectName:    pc.Manifest.Name,
+		ProjectVersion: pc.Manifest.Version.String(),
+		Sources:        sources,
+		Headers:        headers,
+		//IncludeDirs:      includeDirs,
+		//ExportedDir:      filepath.ToSlash(filepath.Join(pc.ProjectRoot, pc.Manifest.Files.ExportedDir)),
+		C3PMGlobalDir: filepath.ToSlash(config.GlobalC3PMDirPath()),
+		Dependencies:  dependencies,
+		LinuxConfig:   adapterCfg.LinuxConfig,
+		//LanguageStandard: pc.Manifest.Standard,
 	}
+
 	return vars, nil
 }
 
@@ -165,17 +169,17 @@ func fromProjectConfig(pc *config.ProjectConfig) (string, error) {
 	return cmake, nil
 }
 
-//Generate takes a config.ProjectConfig and creates CMake configuration files based on the project config.
-func Generate(pc *config.ProjectConfig) error {
+//GenerateScripts takes a config.ProjectConfig and creates CMake configuration files based on the project config.
+func GenerateScripts(targetDir string, pc *config.ProjectConfig) error {
 	cmakeContent, err := fromProjectConfig(pc)
 	if err != nil {
 		return fmt.Errorf("failed to generate cmake scripts: %w", err)
 	}
-	err = os.MkdirAll(pc.CMakeDir(), os.ModePerm)
+	err = os.MkdirAll(targetDir, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("failed to create c3pm cmake directory: %w", err)
 	}
-	err = ioutil.WriteFile(filepath.Join(pc.CMakeDir(), "CMakeLists.txt"), []byte(cmakeContent), 0644)
+	err = ioutil.WriteFile(filepath.Join(targetDir, "CMakeLists.txt"), []byte(cmakeContent), 0644)
 	if err != nil {
 		return fmt.Errorf("failed to create CMakeLists.txt: %w", err)
 	}

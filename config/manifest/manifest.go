@@ -14,17 +14,19 @@ type Manifest struct {
 	Name         string       `yaml:"name"`
 	Description  string       `yaml:"description"`
 	Version      Version      `yaml:"version"`
-	Standard     string       `yaml:"standard"`
 	License      string       `yaml:"license"`
-	Files        FilesConfig  `yaml:"files"`
 	Dependencies Dependencies `yaml:"dependencies"`
-	CustomCMake  *CustomCMake `yaml:"custom_cmake,omitempty"`
-	LinuxConfig  *LinuxConfig `yaml:"linux,omitempty"`
+	Build        *BuildConfig `yaml:"build,omitempty"`
 }
 
-// LinuxConfig holds specific configuration on Linux operating systems.
-type LinuxConfig struct {
-	UsePthread bool `yaml:"pthread"`
+type BuildConfig struct {
+	Adapter *AdapterConfig `yaml:"adapter,omitempty"`
+	Config  *interface{}   `yaml:"config,omitempty"`
+}
+
+type AdapterConfig struct {
+	Name    string   `yaml:"name"`
+	Version *Version `yaml:"version,omitempty"`
 }
 
 var defaultManifest = Manifest{
@@ -85,8 +87,5 @@ func (m *Manifest) Save(destination string) error {
 
 // Targets returns the CMake targets to use.
 func (m *Manifest) Targets() []string {
-	if m.CustomCMake != nil {
-		return m.CustomCMake.Targets
-	}
 	return []string{m.Name}
 }

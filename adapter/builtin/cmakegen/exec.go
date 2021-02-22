@@ -26,7 +26,7 @@ target_include_directories(
 		{{- $name:=.Name }}
 		{{- $version:=.Version}}
 		{{- range .ExportedIncludeDirs }}
-	{{ $c3pmGlobalDir }}/cache/{{$name}}/{{$version}}/{{.}}
+			{{ $c3pmGlobalDir }}/cache/{{$name}}/{{$version}}/{{.}}
 		{{- end }}
 	{{- end }}
 )
