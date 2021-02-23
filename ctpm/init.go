@@ -2,7 +2,6 @@ package ctpm
 
 import (
 	"fmt"
-	"github.com/c3pm-labs/c3pm/adapter/builtin/cmakegen"
 	"github.com/c3pm-labs/c3pm/config"
 	"github.com/mitchellh/go-spdx"
 	"io/ioutil"
@@ -43,11 +42,7 @@ func Init(pc *config.ProjectConfig, opt InitOptions) error {
 			}
 		}
 	}
-	err = pc.Save()
-	if err != nil {
-		return fmt.Errorf("failed to save project file: %w", err)
-	}
-	return cmakegen.GenerateScripts(pc)
+	return pc.Save()
 }
 
 const execTemplate = `#include <iostream>
@@ -85,7 +80,6 @@ func saveExecutableTemplate(pc *config.ProjectConfig) error {
 }
 
 func saveLibraryTemplate(pc *config.ProjectConfig) error {
-	pc.Manifest.Files.IncludeDirs = append(pc.Manifest.Files.IncludeDirs, "include")
 	t := template.Must(template.New("libTemplate").Parse(libTemplate))
 	if err := os.Mkdir(filepath.Join(pc.ProjectRoot, "src"), os.ModePerm); err != nil {
 		return err
