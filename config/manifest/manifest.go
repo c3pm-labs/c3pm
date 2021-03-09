@@ -14,12 +14,12 @@ type Manifest struct {
 	Type         Type           `yaml:"type"`
 	Name         string         `yaml:"name"`
 	Description  string         `yaml:"description"`
+	Standard     string         `yaml:"standard,omitempty"`
 	Version      Version        `yaml:"version"`
 	License      string         `yaml:"license"`
-	Dependencies Dependencies   `yaml:"dependencies"`
-	Build        *BuildConfig   `yaml:"build,omitempty"`
-	Standard     string         `yaml:"standard,omitempty"`
 	Publish      *PublishConfig `yaml:"publish,omitempty"`
+	Build        *BuildConfig   `yaml:"build,omitempty"`
+	Dependencies Dependencies   `yaml:"dependencies"`
 }
 
 type BuildConfig struct {
