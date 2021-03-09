@@ -1,20 +1,13 @@
 package ctpm
 
 import (
-	"archive/tar"
 	"errors"
 	"fmt"
 	"github.com/Masterminds/semver/v3"
-	"github.com/c3pm-labs/c3pm/adapter/builtin/cmake"
 	"github.com/c3pm-labs/c3pm/config"
 	"github.com/c3pm-labs/c3pm/config/manifest"
 	"github.com/c3pm-labs/c3pm/env"
 	"github.com/c3pm-labs/c3pm/registry"
-	"io"
-	"io/ioutil"
-	"os"
-	"path"
-	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -26,9 +19,14 @@ func Add(pc *config.ProjectConfig, opts AddOptions) error {
 		if err != nil {
 			return fmt.Errorf("error getting dependencies: %w", err)
 		}
-		if err = addDependency(&pc.Manifest, name, version, options); err != nil {
+		err = Install(name, version)
+		if err != nil {
 			return fmt.Errorf("error adding %s: %w", dep, err)
 		}
+		if pc.Manifest.Dependencies == nil {
+			pc.Manifest.Dependencies = make(manifest.Dependencies)
+		}
+		pc.Manifest.Dependencies[name] = version.String()
 	}
 	if err := pc.Save(); err != nil {
 		return fmt.Errorf("error saving project config: %w", err)
@@ -48,95 +46,6 @@ func buildOptions(opts AddOptions) AddOptions {
 		opts.RegistryURL = env.REGISTRY_ENDPOINT
 	}
 	return opts
-}
-
-func addDependency(man *manifest.Manifest, name string, version *semver.Version, options AddOptions) error {
-	libPath := config.LibCachePath(name, version.String())
-	if _, err := os.Stat(libPath); os.IsNotExist(err) {
-		var pkg *os.File
-		if pkg, err = registry.FetchPackage(name, version, registry.Options{
-			RegistryURL: options.RegistryURL,
-		}); err != nil {
-			return fmt.Errorf("error fetching package: %w", err)
-		}
-		var pkgDir string
-		pkgDir, err = unpackPackage(pkg)
-		if err != nil {
-			return fmt.Errorf("error unpacking package: %w", err)
-		}
-		if err = installPackage(pkgDir); err != nil {
-			return fmt.Errorf("error building dependency: %w", err)
-		}
-	}
-	if man.Dependencies == nil {
-		man.Dependencies = make(manifest.Dependencies)
-	}
-	man.Dependencies[name] = version.String()
-	return nil
-}
-
-func unpackPackage(pkg *os.File) (string, error) {
-	tr := tar.NewReader(pkg)
-	dst, err := ioutil.TempDir("", "c3pm")
-	if err != nil {
-		return "", fmt.Errorf("error creating package directory: %w", err)
-	}
-	for {
-		header, err := tr.Next()
-		switch {
-		case err == io.EOF:
-			_ = os.Remove(pkg.Name())
-			return dst, nil
-		case err != nil:
-			return "", err
-		case header == nil:
-			continue
-		}
-		target := filepath.Join(dst, header.Name)
-		switch header.Typeflag {
-		case tar.TypeDir:
-			if _, err := os.Stat(target); err != nil {
-				if err := os.MkdirAll(target, os.ModePerm); err != nil {
-					return "", err
-				}
-			}
-		case tar.TypeReg:
-			_ = os.MkdirAll(filepath.Dir(target), os.ModePerm)
-			f, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
-			if err != nil {
-				return "", err
-			}
-			if _, err := io.Copy(f, tr); err != nil {
-				return "", err
-			}
-			_ = f.Close()
-		case tar.TypeSymlink:
-			err = os.MkdirAll(filepath.Dir(target), os.ModePerm)
-			if err != nil {
-				return "", err
-			}
-			if err = os.Symlink(header.Linkname, target); err != nil {
-				return "", err
-			}
-		}
-	}
-}
-
-func installPackage(pkgDir string) error {
-	pc, err := config.Load(pkgDir)
-	if err != nil {
-		return fmt.Errorf("failed to read c3pm.yml: %w", err)
-	}
-	err = Build(pc)
-	if err != nil {
-		return err
-	}
-	// TODO: use installer
-	err = cmake.Install(path.Join(pc.ProjectRoot, ".c3pm", "build"))
-	if err != nil {
-		return err
-	}
-	return pc.Manifest.Save(filepath.Join(config.LibCachePath(pc.Manifest.Name, pc.Manifest.Version.String()), "c3pm.yml"))
 }
 
 const depRegexString = `^[\-a-z0-9_]*(@.*)?$`

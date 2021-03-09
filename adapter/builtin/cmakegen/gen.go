@@ -23,10 +23,8 @@ type Dependency struct {
 	// In most cases this will only contain one entry, but there are cases of packages containing several libraries, for
 	// separation of concerns reasons.
 	Targets []string
-	//TODO: Unused
-	ExportedDir string
-	// ExportedIncludeDirs is the list of the directories in which header files for the library can be found.
-	ExportedIncludeDirs []string
+	// IncludeDirs is the list of the directories in which header files for the library can be found.
+	IncludeDirs []string
 }
 
 //CMakeVars is the structure passed to the templates used for generating CMake config files.
@@ -64,22 +62,13 @@ func dependenciesToCMake(dependencies map[string]string) ([]Dependency, error) {
 			return nil, err
 		}
 		deps[i] = Dependency{
-			Name:    n,
-			Version: v,
-			Targets: m.Targets(),
-			//ExportedDir:         m.Files.ExportedDir,
-			//ExportedIncludeDirs: m.Files.ExportedIncludeDirs,
+			Name:        n,
+			Version:     v,
+			Targets:     m.Targets(),
+			IncludeDirs: m.Publish.IncludeDirs,
 		}
 	}
 	return deps, nil
-}
-
-func filesSliceToCMake(files []string) string {
-	fileString := ""
-	for _, file := range files {
-		fileString += " " + filepath.ToSlash(file)
-	}
-	return fileString
 }
 
 func globbingExprToFiles(globStr string) ([]string, error) {
@@ -106,7 +95,16 @@ func globbingExprsToCMakeVar(globs []string, projectRoot string) (string, error)
 		files = append(files, globFiles...)
 	}
 	files = filterInternalSources(files, projectRoot)
-	return filesSliceToCMake(files), nil
+	return strings.Join(files, " "), nil
+}
+
+func pathListToCmakeVar(paths []string, projectRoot string) string {
+	res := ""
+	for _, path := range paths {
+		res += " "
+		res += filepath.Join(projectRoot, path)
+	}
+	return res
 }
 
 func varsFromProjectConfig(pc *config.ProjectConfig) (CMakeVars, error) {
@@ -128,22 +126,17 @@ func varsFromProjectConfig(pc *config.ProjectConfig) (CMakeVars, error) {
 	if err != nil {
 		return CMakeVars{}, fmt.Errorf("could not parse Includes: %w", err)
 	}
-	//includeDirs, err := globbingExprsToCMakeVar(pc.Manifest.Files.IncludeDirs, pc.ProjectRoot)
-	//if err != nil {
-	//	return CMakeVars{}, fmt.Errorf("could not parse IncludeDirs: %w", err)
-	//}
 
 	vars := CMakeVars{
-		ProjectName:    pc.Manifest.Name,
-		ProjectVersion: pc.Manifest.Version.String(),
-		Sources:        sources,
-		Headers:        headers,
-		//IncludeDirs:      includeDirs,
-		//ExportedDir:      filepath.ToSlash(filepath.Join(pc.ProjectRoot, pc.Manifest.Files.ExportedDir)),
-		C3PMGlobalDir: filepath.ToSlash(config.GlobalC3PMDirPath()),
-		Dependencies:  dependencies,
-		LinuxConfig:   adapterCfg.LinuxConfig,
-		//LanguageStandard: pc.Manifest.Standard,
+		ProjectName:      pc.Manifest.Name,
+		ProjectVersion:   pc.Manifest.Version.String(),
+		Sources:          sources,
+		Headers:          headers,
+		IncludeDirs:      pathListToCmakeVar(adapterCfg.IncludeDirs, pc.ProjectRoot),
+		C3PMGlobalDir:    filepath.ToSlash(config.GlobalC3PMDirPath()),
+		Dependencies:     dependencies,
+		LinuxConfig:      adapterCfg.LinuxConfig,
+		LanguageStandard: pc.Manifest.Standard,
 	}
 
 	return vars, nil
@@ -159,9 +152,9 @@ func fromProjectConfig(pc *config.ProjectConfig) (string, error) {
 	}
 	switch pc.Manifest.Type {
 	case manifest.Executable:
-		cmake, err = executable(cmakeVars)
+		cmake, err = (func() (string, error) { return executable(cmakeVars) })()
 	case manifest.Library:
-		cmake, err = library(cmakeVars)
+		cmake, err = (func() (string, error) { return library(cmakeVars) })()
 	}
 	if err != nil {
 		return "", fmt.Errorf("failed to generate cmake: %w", err)

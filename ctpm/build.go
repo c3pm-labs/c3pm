@@ -15,15 +15,12 @@ func Build(pc *config.ProjectConfig) error {
 }
 
 func addAllDependencies(pc *config.ProjectConfig) error {
-	opts := AddOptions{Force: false, RegistryURL: "", Dependencies: nil}
-	options := buildOptions(opts)
-
 	for dep, version := range pc.Manifest.Dependencies {
 		semverVersion, err := semver.NewVersion(version)
 		if err != nil {
 			return fmt.Errorf("error getting dependencies: %w", err)
 		}
-		if err := addDependency(&pc.Manifest, dep, semverVersion, options); err != nil {
+		if err := Install(dep, semverVersion); err != nil {
 			return fmt.Errorf("error adding %s: %w", dep, err)
 		}
 	}

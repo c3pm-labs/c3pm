@@ -10,15 +10,16 @@ import (
 
 // Manifest is the main configuration structure for C3PM.
 type Manifest struct {
-	C3PMVersion  C3PMVersion  `yaml:"c3pm_version"`
-	Type         Type         `yaml:"type"`
-	Name         string       `yaml:"name"`
-	Description  string       `yaml:"description"`
-	Version      Version      `yaml:"version"`
-	License      string       `yaml:"license"`
-	Dependencies Dependencies `yaml:"dependencies"`
-	Build        *BuildConfig `yaml:"build,omitempty"`
-	Standard      string       `yaml:"standard,omitempty"`
+	C3PMVersion  C3PMVersion    `yaml:"c3pm_version"`
+	Type         Type           `yaml:"type"`
+	Name         string         `yaml:"name"`
+	Description  string         `yaml:"description"`
+	Version      Version        `yaml:"version"`
+	License      string         `yaml:"license"`
+	Dependencies Dependencies   `yaml:"dependencies"`
+	Build        *BuildConfig   `yaml:"build,omitempty"`
+	Standard     string         `yaml:"standard,omitempty"`
+	Publish      *PublishConfig `yaml:"publish,omitempty"`
 }
 
 type BuildConfig struct {
@@ -29,6 +30,10 @@ type BuildConfig struct {
 type AdapterConfig struct {
 	Name    string  `yaml:"name"`
 	Version Version `yaml:"version,omitempty"`
+}
+
+type PublishConfig struct {
+	IncludeDirs []string `yaml:"include_dirs,omitempty"`
 }
 
 // New returns the default manifest values.
@@ -85,6 +90,7 @@ func (m *Manifest) Save(destination string) error {
 }
 
 // Targets returns the CMake targets to use.
+// TODO: delete this
 func (m *Manifest) Targets() []string {
 	return []string{m.Name}
 }

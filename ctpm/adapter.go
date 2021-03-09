@@ -8,7 +8,8 @@ import (
 )
 
 func adapterFromPc(pc *config.ProjectConfig) (adapter.Adapter, error) {
-	if pc.Manifest.Build.Adapter == nil {
+	adp := pc.Manifest.Build.Adapter
+	if adp == nil || adp.Name == "c3pm" {
 		return builtin.New(), nil
 	} else {
 		return nil, errors.New("only default adapter is supported")

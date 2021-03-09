@@ -46,7 +46,7 @@ func (a *Adapter) Build(pc *config.ProjectConfig) error {
 		return fmt.Errorf("cmake build failed: %w", err)
 	}
 
-	err = cmake.Build(CMakeDirFromPc(pc))
+	err = cmake.Build(BuildDirFromPc(pc))
 	if err != nil {
 		return fmt.Errorf("build failed: %w", err)
 	}

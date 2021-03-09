@@ -16,7 +16,7 @@ add_executable({{.ProjectName}})
 
 target_sources({{.ProjectName}} PRIVATE
 	{{.Sources -}}
-	{{.Includes}}
+	{{.Headers}}
 )
 {{$c3pmGlobalDir:=.C3PMGlobalDir}}
 
@@ -25,13 +25,13 @@ target_include_directories(
 	{{- range .Dependencies }}
 		{{- $name:=.Name }}
 		{{- $version:=.Version}}
-		{{- range .ExportedIncludeDirs }}
+		{{- range .IncludeDirs }}
 			{{ $c3pmGlobalDir }}/cache/{{$name}}/{{$version}}/{{.}}
 		{{- end }}
 	{{- end }}
 )
 {{range .Dependencies}}
-find_library({{ .Name | ToUpper}} {{.Name}} "{{$c3pmGlobalDir}}/cache/{{.Name}}/{{.Version}}/lib")
+find_library({{ .Name | ToUpper}} {{.Name}} "{{$c3pmGlobalDir}}/cache/{{.Name}}/{{.Version}}/")
 {{end}}
 
 target_link_libraries(
