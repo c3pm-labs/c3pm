@@ -11,14 +11,13 @@ import (
 
 //InitCmd defines the parameters of the init command.
 type InitCmd struct {
-	NoTemplate  bool   `kong:"optional,name='no-template',help='Prevents the creation of CMake files'"`
-	Path        string `kong:"optional,arg,name='path',help='Project path, default to working directory',default='.'"`
-	Name        string `kong:"optional,group='ni',name='name',help='Give project name to skip interactive entry and enter non-interactive mode'"`
-	Executable  bool   `kong:"optional,xor='type',group='ni',name='executable',help='Specify if project is an executable when using non-interactive mode', default='True'"`
-	Library     bool   `kong:"optional,xor='type',group='ni',name='library',help='Specify if project is a library when using non-interactive mode'"`
-	Description string `kong:"optional,group='ni',name='description',help='Project description when using non-interactive mode'"`
-	Version     string `kong:"optional,group='ni',name='pversion',help='Project version when using non-interactive mode',default='1.0.0'"`
-	License     string `kong:"optional,group='ni',name='license',help='Project license when using non-interactive mode',default='UNLICENSED'"`
+	NoTemplate  bool          `kong:"optional,name='no-template',help='Prevents the creation of CMake files'"`
+	Path        string        `kong:"optional,arg,name='path',help='Project path, default to working directory',default='.'"`
+	Name        string        `kong:"optional,group='ni',name='name',help='Give project name to skip interactive entry and enter non-interactive mode'"`
+	Type        manifest.Type `kong:"optional,enum='executable,library',group='ni',name='type',help='Project\\'s type when using non-interactive mode'"`
+	Description string        `kong:"optional,group='ni',name='description',help='Project description when using non-interactive mode'"`
+	Version     string        `kong:"optional,group='ni',name='pversion',help='Project version when using non-interactive mode',default='1.0.0'"`
+	License     string        `kong:"optional,group='ni',name='license',help='Project license when using non-interactive mode',default='UNLICENSED'"`
 }
 
 //Run handles the behavior of the init command.
@@ -30,8 +29,7 @@ func (i *InitCmd) Run() error {
 	} else {
 		man, err = input.InitNonInteractive(input.InitValues{
 			Name:        i.Name,
-			Executable:  i.Executable,
-			Library:     i.Library,
+			Type:        i.Type,
 			Description: i.Description,
 			Version:     i.Version,
 			License:     i.License,

@@ -54,8 +54,7 @@ var InitSurvey = []*survey.Question{
 
 type InitValues = struct {
 	Name        string
-	Executable  bool
-	Library     bool
+	Type        manifest.Type
 	Description string
 	Version     string
 	License     string
@@ -71,11 +70,7 @@ func Init() (manifest.Manifest, error) {
 func InitNonInteractive(val InitValues) (manifest.Manifest, error) {
 	man := manifest.New()
 	man.Name = val.Name
-	if val.Executable {
-		man.Type = manifest.Executable
-	} else if val.Library {
-		man.Type = manifest.Library
-	}
+	man.Type = val.Type
 	man.Description = val.Description
 	v, err := manifest.VersionFromString(val.Version)
 	if err != nil {
