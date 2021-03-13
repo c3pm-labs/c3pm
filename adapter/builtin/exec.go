@@ -34,11 +34,16 @@ target_include_directories(
 find_library({{ .Name | ToUpper}} {{.Name}} "{{$c3pmGlobalDir}}/cache/{{.Name}}/{{.Version}}/")
 {{end}}
 
+{{range .Dependencies}}
+message(STATUS {{"${"}}{{.Name|ToUpper}}{{"}"}})
+file(GENERATE OUTPUT ./toto.txt CONTENT $<STREQUAL:"{{"${"}}{{.Name|ToUpper}}{{"}"}}","HELLO_WORLD-NOTFOUND">)
+{{- end}}
+
 target_link_libraries(
 	{{.ProjectName}}
 	PUBLIC
 	{{range .Dependencies}}
-	$<IF:$<NOT:$<STREQUAL:{{"${"}}{{.Name|ToUpper}}{{"}"}},"NOTFOUND">>, {{"${"}}{{.Name|ToUpper}}{{"}"}}>
+	$<$<NOT:$<STREQUAL:"{{"${"}}{{.Name|ToUpper}}{{"}"}}","{{.Name|ToUpper}}-NOTFOUND">>:{{"${"}}{{.Name|ToUpper}}{{"}"}}>
 	{{- end}}
 )
 `
