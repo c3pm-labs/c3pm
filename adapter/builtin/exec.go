@@ -1,4 +1,4 @@
-package cmakegen
+package builtin
 
 import (
 	"bytes"
@@ -38,7 +38,7 @@ target_link_libraries(
 	{{.ProjectName}}
 	PUBLIC
 	{{range .Dependencies}}
-	{{"${"}}{{.Name|ToUpper}}{{"}"}}
+	$<IF:$<NOT:$<STREQUAL:{{"${"}}{{.Name|ToUpper}}{{"}"}},"NOTFOUND">>, {{"${"}}{{.Name|ToUpper}}{{"}"}}>
 	{{- end}}
 )
 `

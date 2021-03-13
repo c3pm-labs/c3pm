@@ -1,4 +1,4 @@
-package cmakegen_test
+package builtin_test
 
 import (
 	"fmt"

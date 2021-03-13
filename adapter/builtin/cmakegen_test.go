@@ -1,9 +1,9 @@
-package cmakegen_test
+package builtin_test
 
 import (
 	"fmt"
 	"github.com/Masterminds/semver/v3"
-	"github.com/c3pm-labs/c3pm/adapter/builtin/cmakegen"
+	"github.com/c3pm-labs/c3pm/adapter/builtin"
 	"github.com/c3pm-labs/c3pm/config"
 	"github.com/c3pm-labs/c3pm/config/manifest"
 	. "github.com/onsi/ginkgo"
@@ -76,7 +76,7 @@ var _ = Describe("Gen Test", func() {
 		Ω(err).ShouldNot(HaveOccurred())
 	})
 	Context("generates a cmake file without dependencies", func() {
-		err := cmakegen.GenerateScripts(simpleProject)
+		err := builtin.GenerateScripts(simpleProject)
 		fmt.Println(err)
 		Ω(err).ShouldNot(HaveOccurred())
 		data, err := ioutil.ReadFile(filepath.Join(simpleProject.CMakeDir(), "CMakeLists.txt"))

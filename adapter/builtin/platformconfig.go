@@ -1,4 +1,4 @@
-package cmakegen
+package builtin
 
 import (
 	"runtime"

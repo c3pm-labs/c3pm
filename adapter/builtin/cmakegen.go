@@ -1,10 +1,9 @@
 // Package cmakegen handles the templating and generation of CMake configuration files.
-package cmakegen
+package builtin
 
 import (
 	"fmt"
 	"github.com/bmatcuk/doublestar"
-	builtinAdapterConfig "github.com/c3pm-labs/c3pm/adapter/builtin/config"
 	"github.com/c3pm-labs/c3pm/config"
 	"github.com/c3pm-labs/c3pm/config/manifest"
 	"io/ioutil"
@@ -48,7 +47,7 @@ type CMakeVars struct {
 	//TODO: Unused
 	PublicIncludeDir string
 	//LinuxConfig holds linux-specific configuration information
-	LinuxConfig *builtinAdapterConfig.LinuxConfig
+	LinuxConfig *LinuxConfig
 	//LanguageStandard is the C++ language standard version to use.
 	LanguageStandard string
 }
@@ -113,7 +112,7 @@ func varsFromProjectConfig(pc *config.ProjectConfig) (CMakeVars, error) {
 		return CMakeVars{}, err
 	}
 
-	adapterCfg, err := builtinAdapterConfig.Parse(pc.Manifest.Build.Config)
+	adapterCfg, err := Parse(pc.Manifest.Build.Config)
 	if err != nil {
 		return CMakeVars{}, err
 	}

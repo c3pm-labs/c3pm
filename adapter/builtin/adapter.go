@@ -2,10 +2,11 @@ package builtin
 
 import (
 	"fmt"
+	"github.com/bmatcuk/doublestar"
 	"github.com/c3pm-labs/c3pm/adapter"
 	"github.com/c3pm-labs/c3pm/adapter/builtin/cmake"
-	"github.com/c3pm-labs/c3pm/adapter/builtin/cmakegen"
 	"github.com/c3pm-labs/c3pm/config"
+	"github.com/c3pm-labs/c3pm/config/manifest"
 	"path/filepath"
 )
 
@@ -36,7 +37,18 @@ func (a *Adapter) Build(pc *config.ProjectConfig) error {
 		//"MSVC_VERSION":                   "1916",
 	}
 
-	err := cmakegen.GenerateScripts(CMakeDirFromPc(pc), pc)
+	headerOnly, err := isHeaderOnly(pc)
+	if err != nil {
+		return err
+	}
+
+	// don't build if the lib is header only
+	if headerOnly && pc.Manifest.Type == manifest.Library {
+		// TODO: generate cmake files so we can have IDE integration
+		return nil
+	}
+
+	err = GenerateScripts(CMakeDirFromPc(pc), pc)
 	if err != nil {
 		return fmt.Errorf("error generating config files: %w", err)
 	}
@@ -51,6 +63,29 @@ func (a *Adapter) Build(pc *config.ProjectConfig) error {
 		return fmt.Errorf("build failed: %w", err)
 	}
 	return nil
+}
+
+func isHeaderOnly(pc *config.ProjectConfig) (bool, error) {
+	cfg, err := Parse(pc.Manifest.Build.Config)
+	if err != nil {
+		return false, err
+	}
+
+	hasSources, err := hasFileMatchingRule(cfg.Sources)
+	return !hasSources, err
+}
+
+func hasFileMatchingRule(rules []string) (bool, error) {
+	for _, rule := range rules {
+		files, err := doublestar.Glob(rule)
+		if err != nil {
+			return false, err
+		}
+		if len(files) > 0 {
+			return true, nil
+		}
+	}
+	return false, nil
 }
 
 func (a *Adapter) Targets(_ *config.ProjectConfig) ([]string, error) {

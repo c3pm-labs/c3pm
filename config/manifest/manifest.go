@@ -3,7 +3,6 @@
 package manifest
 
 import (
-	"github.com/c3pm-labs/c3pm/adapter/builtin/config"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 )
@@ -48,7 +47,11 @@ func New() Manifest {
 				Name:    "c3pm",
 				Version: c3pmAdapterVersion,
 			},
-			Config: &config.Config{
+			Config: &struct {
+				Sources []string
+				Headers []string
+				IncludeDirs []string
+			}{
 				Sources:     []string{"**/*.cpp"},
 				Headers:     []string{"**/*.hpp"},
 				IncludeDirs: []string{},
