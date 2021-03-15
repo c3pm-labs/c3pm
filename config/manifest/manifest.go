@@ -27,19 +27,18 @@ type LinuxConfig struct {
 	UsePthread bool `yaml:"pthread"`
 }
 
-var defaultManifest = Manifest{
-	C3PMVersion: C3PMVersion1,
-	Files: FilesConfig{
-		Sources:             []string{"**/*.cpp"},
-		Includes:            []string{"**/*.hpp"},
-		ExportedIncludeDirs: []string{},
-	},
-	Dependencies: make(map[string]string),
-	Standard:     "20",
-}
-
 // New returns the default manifest values.
 func New() Manifest {
+	defaultManifest := Manifest{
+		C3PMVersion: C3PMVersion1,
+		Files: FilesConfig{
+			Sources:             []string{"**/*.cpp"},
+			Includes:            []string{"**/*.hpp"},
+			ExportedIncludeDirs: []string{},
+		},
+		Dependencies: make(map[string]string),
+		Standard:     "20",
+	}
 	return defaultManifest
 }
 
