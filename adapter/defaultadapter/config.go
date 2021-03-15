@@ -13,7 +13,7 @@ type Config struct {
 	// IncludeDirs lists the projects additional header directories.
 	IncludeDirs []string `yaml:"include_dirs"`
 	// LinuxConfig holds Linux specific configuration
-	LinuxConfig  *LinuxConfig `yaml:"linux,omitempty"`
+	LinuxConfig *LinuxConfig `yaml:"linux,omitempty"`
 }
 
 // LinuxConfig holds specific configuration on Linux operating systems.
