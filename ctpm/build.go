@@ -3,11 +3,12 @@ package ctpm
 import (
 	"fmt"
 	"github.com/Masterminds/semver/v3"
+	"github.com/c3pm-labs/c3pm/adapter"
 	"github.com/c3pm-labs/c3pm/config"
 )
 
 func Build(pc *config.ProjectConfig) error {
-	adp, err := adapterFromPc(pc)
+	adp, err := adapter.FromPC(pc)
 	if err != nil {
 		return err
 	}

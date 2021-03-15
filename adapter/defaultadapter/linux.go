@@ -1,4 +1,4 @@
-package builtin
+package defaultadapter
 
 import (
 	"strings"
@@ -10,7 +10,7 @@ find_package(Threads REQUIRED)
 target_link_libraries({{.ProjectName}} PUBLIC Threads::Threads)
 `
 
-func addLinuxData(sb *strings.Builder, v CMakeVars) {
+func addLinuxData(sb *strings.Builder, v cmakeVars) {
 	if v.LinuxConfig.UsePthread {
 		sb.WriteString(pthreadTemplate)
 	}

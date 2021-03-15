@@ -14,16 +14,21 @@ name: c3pm
 description: This is the package c3pm
 version: 1.0.0
 license: ISC
-files:
-    sources:
+publish:
+    include_dirs:
+    - 'include/public'
+build:
+    adapter:
+        name: c3pm
+        version: 0.0.1
+    config:
+        sources:
         - 'src/**/*.cpp'
-    includes:
+        headers:
         - include/private/header.h
         - include/private/private.h
-    include_dirs:
+        include_dirs:
         - include/private
-    exports:
-        - 'include/public/**/*.h'
 dependencies:
     future: 12.2.3
     past: 2.0.0

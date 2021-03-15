@@ -5,14 +5,9 @@ description: Demo binary
 version: 1.1.5
 standard: "20"
 license: ISC
-files:
-  sources:
-    - '**/*.cpp'
-  includes:
-    - '**/*.hpp'
-  include_dirs:
-    - include
-  exported_dir: ""
-  exported_include_dirs: []
+build:
+  adapter:
+    name: c3pm
+    version: 0.0.1
 dependencies:
   hello: 1.0.5

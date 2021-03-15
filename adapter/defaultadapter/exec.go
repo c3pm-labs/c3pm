@@ -1,4 +1,4 @@
-package builtin
+package defaultadapter
 
 import (
 	"bytes"
@@ -43,7 +43,7 @@ target_link_libraries(
 )
 `
 
-func executable(v CMakeVars) (string, error) {
+func executable(v cmakeVars) (string, error) {
 	funcMap := template.FuncMap{
 		"ToUpper": strings.ToUpper,
 	}

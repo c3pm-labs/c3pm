@@ -2,6 +2,7 @@ package ctpm_test
 
 import (
 	"bytes"
+	"github.com/c3pm-labs/c3pm/adapter/defaultadapter"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -31,7 +32,15 @@ var _ = Describe("Build", func() {
 		It("Run build", func() {
 			pc.Manifest.Name = "buildTest"
 			pc.Manifest.Type = manifest.Executable
-			pc.Manifest.Files.Sources = []string{"main.cpp"}
+			pc.Manifest.Build = &manifest.BuildConfig{
+				Adapter: &manifest.AdapterConfig{
+					Name:    "c3pm",
+					Version: defaultadapter.CurrentVersion,
+				},
+				Config: &defaultadapter.Config{
+					Sources: []string{"main.cpp"},
+				},
+			}
 			pc.Manifest.Version, _ = manifest.VersionFromString("1.0.0")
 
 			err := os.MkdirAll(projectFolder, os.ModePerm)

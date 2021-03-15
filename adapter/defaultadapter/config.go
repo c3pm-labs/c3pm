@@ -1,4 +1,4 @@
-package builtin
+package defaultadapter
 
 import (
 	"gopkg.in/yaml.v2"

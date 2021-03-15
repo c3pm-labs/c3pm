@@ -1,5 +1,5 @@
 // Package cmakegen handles the templating and generation of CMake configuration files.
-package builtin
+package defaultadapter
 
 import (
 	"fmt"
@@ -12,8 +12,8 @@ import (
 	"strings"
 )
 
-//Dependency is holds metadata about a dependency of a project.
-type Dependency struct {
+//dependency is holds metadata about a dependency of a project.
+type dependency struct {
 	// Name is the package name of the dependency
 	Name string
 	// Version is the version of the dependency to depend on
@@ -26,8 +26,8 @@ type Dependency struct {
 	IncludeDirs []string
 }
 
-//CMakeVars is the structure passed to the templates used for generating CMake config files.
-type CMakeVars struct {
+//cmakeVars is the structure passed to the templates used for generating CMake config files.
+type cmakeVars struct {
 	//ProjectName is the name of the current project
 	ProjectName string
 	//ProjectVersion is the current version of the project
@@ -42,8 +42,8 @@ type CMakeVars struct {
 	ExportedDir string
 	//C3PMGlobalDir is the path to the current $HOME user directory.
 	C3PMGlobalDir string
-	//Dependencies is a list of all the data for each Dependency of the project
-	Dependencies []Dependency
+	//Dependencies is a list of all the data for each dependency of the project
+	Dependencies []dependency
 	//TODO: Unused
 	PublicIncludeDir string
 	//LinuxConfig holds linux-specific configuration information
@@ -52,15 +52,15 @@ type CMakeVars struct {
 	LanguageStandard string
 }
 
-func dependenciesToCMake(dependencies map[string]string) ([]Dependency, error) {
-	deps := make([]Dependency, len(dependencies))
+func dependenciesToCMake(dependencies map[string]string) ([]dependency, error) {
+	deps := make([]dependency, len(dependencies))
 	i := 0
 	for n, v := range dependencies {
 		m, err := manifest.Load(filepath.Join(config.LibCachePath(n, v), "c3pm.yml"))
 		if err != nil {
 			return nil, err
 		}
-		deps[i] = Dependency{
+		deps[i] = dependency{
 			Name:        n,
 			Version:     v,
 			Targets:     m.Targets(),
@@ -106,27 +106,27 @@ func pathListToCmakeVar(paths []string, projectRoot string) string {
 	return res
 }
 
-func varsFromProjectConfig(pc *config.ProjectConfig) (CMakeVars, error) {
+func varsFromProjectConfig(pc *config.ProjectConfig) (cmakeVars, error) {
 	dependencies, err := dependenciesToCMake(pc.Manifest.Dependencies)
 	if err != nil {
-		return CMakeVars{}, err
+		return cmakeVars{}, err
 	}
 
 	adapterCfg, err := Parse(pc.Manifest.Build.Config)
 	if err != nil {
-		return CMakeVars{}, err
+		return cmakeVars{}, err
 	}
 
 	sources, err := globbingExprsToCMakeVar(adapterCfg.Sources, pc.ProjectRoot)
 	if err != nil {
-		return CMakeVars{}, fmt.Errorf("could not parse Sources: %w", err)
+		return cmakeVars{}, fmt.Errorf("could not parse Sources: %w", err)
 	}
 	headers, err := globbingExprsToCMakeVar(adapterCfg.Headers, pc.ProjectRoot)
 	if err != nil {
-		return CMakeVars{}, fmt.Errorf("could not parse Includes: %w", err)
+		return cmakeVars{}, fmt.Errorf("could not parse Includes: %w", err)
 	}
 
-	vars := CMakeVars{
+	vars := cmakeVars{
 		ProjectName:      pc.Manifest.Name,
 		ProjectVersion:   pc.Manifest.Version.String(),
 		Sources:          sources,
@@ -143,17 +143,17 @@ func varsFromProjectConfig(pc *config.ProjectConfig) (CMakeVars, error) {
 
 func fromProjectConfig(pc *config.ProjectConfig) (string, error) {
 	var cmake string
-	var cmakeVars CMakeVars
+	var vars cmakeVars
 
-	cmakeVars, err := varsFromProjectConfig(pc)
+	vars, err := varsFromProjectConfig(pc)
 	if err != nil {
 		return "", fmt.Errorf("failed to generate cmake variables: %w", err)
 	}
 	switch pc.Manifest.Type {
 	case manifest.Executable:
-		cmake, err = (func() (string, error) { return executable(cmakeVars) })()
+		cmake, err = (func() (string, error) { return executable(vars) })()
 	case manifest.Library:
-		cmake, err = (func() (string, error) { return library(cmakeVars) })()
+		cmake, err = (func() (string, error) { return library(vars) })()
 	}
 	if err != nil {
 		return "", fmt.Errorf("failed to generate cmake: %w", err)
@@ -161,9 +161,10 @@ func fromProjectConfig(pc *config.ProjectConfig) (string, error) {
 	return cmake, nil
 }
 
-//GenerateScripts takes a config.ProjectConfig and creates CMake configuration files based on the project config.
-func GenerateScripts(targetDir string, pc *config.ProjectConfig) error {
+//generateCMakeScripts takes a config.ProjectConfig and creates CMake configuration files based on the project config.
+func generateCMakeScripts(targetDir string, pc *config.ProjectConfig) error {
 	cmakeContent, err := fromProjectConfig(pc)
+	fmt.Println("CMAKE CONTENT: ", cmakeContent)
 	if err != nil {
 		return fmt.Errorf("failed to generate cmake scripts: %w", err)
 	}

@@ -13,6 +13,9 @@ import (
 var _ = Describe("Init", func() {
 	Describe("Project creation", func() {
 		var projectFolder = getTestFolder("InitTestFolder")
+		projectFolder, err := filepath.Abs(projectFolder)
+		Ω(err).ShouldNot(HaveOccurred())
+
 		var projectName = "InitProject"
 		var projectType = manifest.Library
 		var projectDesc = "description"
@@ -32,7 +35,6 @@ var _ = Describe("Init", func() {
 				pc := &config.ProjectConfig{Manifest: m, ProjectRoot: projectFolder}
 				err = ctpm.Init(pc, ctpm.InitDefaultOptions)
 				Ω(err).ShouldNot(HaveOccurred())
-
 			})
 		})
 

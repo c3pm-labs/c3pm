@@ -42,6 +42,11 @@ func Init(pc *config.ProjectConfig, opt InitOptions) error {
 			}
 		}
 	}
+
+	err = Build(pc)
+	if err != nil {
+		return err
+	}
 	return pc.Save()
 }
 

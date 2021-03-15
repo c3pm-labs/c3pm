@@ -1,28 +1,25 @@
-package builtin
+package defaultadapter
 
 import (
 	"fmt"
 	"github.com/bmatcuk/doublestar"
-	"github.com/c3pm-labs/c3pm/adapter"
-	"github.com/c3pm-labs/c3pm/adapter/builtin/cmake"
 	"github.com/c3pm-labs/c3pm/config"
 	"github.com/c3pm-labs/c3pm/config/manifest"
 	"path/filepath"
 )
 
-// Adapter is the builtin adapter used by default in c3pm
-type Adapter struct {
+// DefaultAdapter is the builtin adapter used by default in c3pm
+type DefaultAdapter struct {
 }
 
-// checks if Adapter implements the adapter.Adapter interface
-var _ adapter.Adapter = (*Adapter)(nil)
-
-// New creates a new builtin Adapter
-func New() *Adapter {
-	return &Adapter{}
+// New creates a new builtin DefaultAdapter
+func New() *DefaultAdapter {
+	return &DefaultAdapter{}
 }
 
-func (a *Adapter) Build(pc *config.ProjectConfig) error {
+var CurrentVersion, _ = manifest.VersionFromString("0.0.1")
+
+func (a *DefaultAdapter) Build(pc *config.ProjectConfig) error {
 	cmakeVariables := map[string]string{
 		"CMAKE_LIBRARY_OUTPUT_DIRECTORY":         pc.ProjectRoot,
 		"CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE": pc.ProjectRoot,
@@ -48,17 +45,17 @@ func (a *Adapter) Build(pc *config.ProjectConfig) error {
 		return nil
 	}
 
-	err = GenerateScripts(CMakeDirFromPc(pc), pc)
+	err = generateCMakeScripts(cmakeDirFromPc(pc), pc)
 	if err != nil {
 		return fmt.Errorf("error generating config files: %w", err)
 	}
 
-	err = cmake.GenerateBuildFiles(CMakeDirFromPc(pc), BuildDirFromPc(pc), cmakeVariables)
+	err = cmakeGenerateBuildFiles(cmakeDirFromPc(pc), buildDirFromPc(pc), cmakeVariables)
 	if err != nil {
 		return fmt.Errorf("cmake build failed: %w", err)
 	}
 
-	err = cmake.Build(BuildDirFromPc(pc))
+	err = cmakeBuild(buildDirFromPc(pc))
 	if err != nil {
 		return fmt.Errorf("build failed: %w", err)
 	}
@@ -71,13 +68,13 @@ func isHeaderOnly(pc *config.ProjectConfig) (bool, error) {
 		return false, err
 	}
 
-	hasSources, err := hasFileMatchingRule(cfg.Sources)
+	hasSources, err := hasFileMatchingRule(cfg.Sources, pc.ProjectRoot)
 	return !hasSources, err
 }
 
-func hasFileMatchingRule(rules []string) (bool, error) {
+func hasFileMatchingRule(rules []string, projectRoot string) (bool, error) {
 	for _, rule := range rules {
-		files, err := doublestar.Glob(rule)
+		files, err := doublestar.Glob(filepath.Join(projectRoot, rule))
 		if err != nil {
 			return false, err
 		}
@@ -88,14 +85,14 @@ func hasFileMatchingRule(rules []string) (bool, error) {
 	return false, nil
 }
 
-func (a *Adapter) Targets(_ *config.ProjectConfig) ([]string, error) {
+func (a *DefaultAdapter) Targets(_ *config.ProjectConfig) ([]string, error) {
 	return nil, nil
 }
 
-func CMakeDirFromPc(pc *config.ProjectConfig) string {
+func cmakeDirFromPc(pc *config.ProjectConfig) string {
 	return filepath.Join(pc.LocalC3PMDirPath(), "cmake")
 }
 
-func BuildDirFromPc(pc *config.ProjectConfig) string {
+func buildDirFromPc(pc *config.ProjectConfig) string {
 	return filepath.Join(pc.LocalC3PMDirPath(), "build")
 }

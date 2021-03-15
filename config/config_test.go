@@ -2,6 +2,7 @@ package config_test
 
 import (
 	"github.com/Masterminds/semver/v3"
+	"github.com/c3pm-labs/c3pm/adapter/defaultadapter"
 	"github.com/c3pm-labs/c3pm/config"
 	"github.com/c3pm-labs/c3pm/config/manifest"
 	"github.com/mohae/deepcopy"
@@ -29,18 +30,16 @@ var (
 			},
 			Standard: "20",
 			License:  "ISC",
-			Files: manifest.FilesConfig{
-				Sources:             []string{"**/*.cpp"},
-				Includes:            []string{"**/*.hpp"},
-				IncludeDirs:         []string{"include"},
-				ExportedDir:         "",
-				ExportedIncludeDirs: []string{},
+			Build: &manifest.BuildConfig{
+				Adapter: &manifest.AdapterConfig{
+					Name:    "c3pm",
+					Version: defaultadapter.CurrentVersion,
+				},
+				Config: nil,
 			},
 			Dependencies: manifest.Dependencies{
 				"hello": "1.0.5",
 			},
-			CustomCMake: nil,
-			LinuxConfig: nil,
 		},
 		ProjectRoot: OriginalDirAbs,
 	}
@@ -52,6 +51,7 @@ var _ = Describe("Config loading and writing", func() {
 		It("loads the file properly", func() {
 			p, err := config.Load(OriginalDir)
 			Ω(err).ShouldNot(HaveOccurred())
+			p.Manifest.Build.Config = nil // we ignore the Build.Config field
 			Ω(p).Should(Equal(TestConfig))
 		})
 	})
@@ -74,12 +74,15 @@ var _ = Describe("Config loading and writing", func() {
 		It("Updates the file correctly", func() {
 			p := deepcopy.Copy(TestConfig).(*config.ProjectConfig)
 			p.ProjectRoot = TargetDir
-			p.Manifest.Version = TestConfig.Manifest.Version // Private values are not copied by deepcopy, so let's just add the value ourselves
+			p.Manifest.Version = TestConfig.Manifest.Version                             // Private values are not copied by deep copy, so let's just add the value ourselves
+			p.Manifest.Build.Adapter.Version = TestConfig.Manifest.Build.Adapter.Version // Private values are not copied by deep copy, so let's just add the value ourselves
 			p.Manifest.Description = "Different Description"
+			p.Manifest.Build.Config = nil // we ignore the Build.Config field
 			err := p.Save()
 			Ω(err).ShouldNot(HaveOccurred())
 			p2, err := config.Load(TargetDir)
 			Ω(err).ShouldNot(HaveOccurred())
+			p2.Manifest.Build.Config = nil // we ignore the Build.Config field
 			Ω(p2).ShouldNot(Equal(TestConfig), "Test against the original config")
 			Ω(p2).Should(Equal(p))
 		})
@@ -87,16 +90,6 @@ var _ = Describe("Config loading and writing", func() {
 })
 
 var _ = Describe("Config utils", func() {
-	Context("Local directories", func() {
-		It("Gets the correct build directory", func() {
-			path := TestConfig.BuildDir()
-			Ω(path).Should(Equal(OriginalDirAbs + "/.c3pm/build"))
-		})
-		It("Gets the correct cmake directory", func() {
-			path := TestConfig.CMakeDir()
-			Ω(path).Should(Equal(OriginalDirAbs + "/.c3pm/cmake"))
-		})
-	})
 	Context("Global directory", func() {
 		var (
 			OriginalHomeDir = os.Getenv("HOME")

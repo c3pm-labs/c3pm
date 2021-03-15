@@ -1,9 +1,8 @@
-package builtin_test
+package defaultadapter
 
 import (
 	"fmt"
 	"github.com/Masterminds/semver/v3"
-	"github.com/c3pm-labs/c3pm/adapter/builtin"
 	"github.com/c3pm-labs/c3pm/config"
 	"github.com/c3pm-labs/c3pm/config/manifest"
 	. "github.com/onsi/ginkgo"
@@ -14,7 +13,7 @@ import (
 )
 
 var _ = Describe("Gen Test", func() {
-	path, _ := filepath.Abs("../test_helpers/projects/genProject")
+	path, _ := filepath.Abs("../../test_helpers/projects/genProject")
 	var (
 		simpleProject = &config.ProjectConfig{
 			Manifest: manifest.Manifest{
@@ -27,16 +26,18 @@ var _ = Describe("Gen Test", func() {
 				},
 				Standard: "20",
 				License:  "ISC",
-				Files: manifest.FilesConfig{
-					Sources:             []string{"**/*.cpp"},
-					Includes:            []string{"**/*.hpp"},
-					IncludeDirs:         []string{"include"},
-					ExportedDir:         "",
-					ExportedIncludeDirs: []string{},
+				Build: &manifest.BuildConfig{
+					Adapter: &manifest.AdapterConfig{
+						Name:    "c3pm",
+						Version: CurrentVersion,
+					},
+					Config: &Config{
+						Sources:     []string{"**/*.cpp"},
+						Headers:     []string{"**/*.hpp"},
+						IncludeDirs: []string{"include"},
+					},
 				},
 				Dependencies: manifest.Dependencies{},
-				CustomCMake:  nil,
-				LinuxConfig:  nil,
 			},
 			ProjectRoot: path,
 		}
@@ -51,19 +52,21 @@ var _ = Describe("Gen Test", func() {
 				},
 				Standard: "20",
 				License:  "ISC",
-				Files: manifest.FilesConfig{
-					Sources:             []string{"**/*.cpp"},
-					Includes:            []string{"**/*.hpp"},
-					IncludeDirs:         []string{"include"},
-					ExportedDir:         "",
-					ExportedIncludeDirs: []string{},
+				Build: &manifest.BuildConfig{
+					Adapter: &manifest.AdapterConfig{
+						Name:    "c3pm",
+						Version: CurrentVersion,
+					},
+					Config: &Config{
+						Sources:     []string{"**/*.cpp"},
+						Headers:     []string{"**/*.hpp"},
+						IncludeDirs: []string{"include"},
+					},
 				},
 				Dependencies: manifest.Dependencies{
 					"hello": "1.0.3",
 					"m":     "2.0.0",
 				},
-				CustomCMake: nil,
-				LinuxConfig: nil,
 			},
 			ProjectRoot: path,
 		}
@@ -72,14 +75,14 @@ var _ = Describe("Gen Test", func() {
 	BeforeEach(func() {
 	})
 	AfterEach(func() {
-		err := os.RemoveAll(simpleProject.CMakeDir())
+		err := os.RemoveAll(cmakeDirFromPc(simpleProject))
 		Ω(err).ShouldNot(HaveOccurred())
 	})
 	Context("generates a cmake file without dependencies", func() {
-		err := builtin.GenerateScripts(simpleProject)
+		err := generateCMakeScripts(cmakeDirFromPc(simpleProject), simpleProject)
 		fmt.Println(err)
 		Ω(err).ShouldNot(HaveOccurred())
-		data, err := ioutil.ReadFile(filepath.Join(simpleProject.CMakeDir(), "CMakeLists.txt"))
+		data, err := ioutil.ReadFile(filepath.Join(cmakeDirFromPc(simpleProject), "CMakeLists.txt"))
 		Ω(err).ShouldNot(HaveOccurred())
 		content := string(data)
 
@@ -99,7 +102,7 @@ var _ = Describe("Gen Test", func() {
 	Context("generates a cmake file with dependencies", func() {
 		_ = projectWithDependencies
 		//TODO: dependencies tests
-		//err := cmakegen.GenerateScripts(projectWithDependencies)
+		//err := cmakegen.generateCMakeScripts(projectWithDependencies)
 		//Ω(err).ShouldNot(HaveOccurred())
 		//data, err := ioutil.ReadFile(filepath.Join(projectWithDependencies.CMakeDir(), "CMakeLists.txt"))
 		//Ω(err).ShouldNot(HaveOccurred())

@@ -48,13 +48,13 @@ func New() Manifest {
 				Version: c3pmAdapterVersion,
 			},
 			Config: &struct {
-				Sources []string
-				Headers []string
-				IncludeDirs []string
+				Sources     []string
+				Headers     []string
+				IncludeDirs []string `yaml:"include_dirs"`
 			}{
 				Sources:     []string{"**/*.cpp"},
 				Headers:     []string{"**/*.hpp"},
-				IncludeDirs: []string{},
+				IncludeDirs: []string{"include"},
 			},
 		},
 	}

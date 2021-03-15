@@ -1,4 +1,4 @@
-package builtin_test
+package defaultadapter_test
 
 import (
 	"fmt"

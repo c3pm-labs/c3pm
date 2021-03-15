@@ -1,4 +1,4 @@
-package builtin
+package defaultadapter
 
 import (
 	"bufio"
@@ -30,7 +30,7 @@ func removeCommand(cmake string, command string) string {
 	return cmakeClean
 }
 
-func library(v CMakeVars) (string, error) {
+func library(v cmakeVars) (string, error) {
 	funcMap := template.FuncMap{
 		"AddTrailingSlash": func(text string) string {
 			if !strings.HasSuffix(text, "/") {
