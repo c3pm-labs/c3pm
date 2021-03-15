@@ -164,7 +164,6 @@ func fromProjectConfig(pc *config.ProjectConfig) (string, error) {
 //generateCMakeScripts takes a config.ProjectConfig and creates CMake configuration files based on the project config.
 func generateCMakeScripts(targetDir string, pc *config.ProjectConfig) error {
 	cmakeContent, err := fromProjectConfig(pc)
-	fmt.Println("CMAKE CONTENT: ", cmakeContent)
 	if err != nil {
 		return fmt.Errorf("failed to generate cmake scripts: %w", err)
 	}

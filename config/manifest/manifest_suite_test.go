@@ -14,7 +14,6 @@ import (
 func TestCMakeGen(t *testing.T) {
 	RegisterFailHandler(Fail)
 	path, err := filepath.Abs("testsArtifacts")
-	fmt.Println("PATH:", path)
 	if err != nil {
 		t.Fatal("Failed to get testsArtifacts absolute path")
 	}
