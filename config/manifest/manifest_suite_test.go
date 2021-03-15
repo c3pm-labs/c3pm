@@ -1,7 +1,6 @@
 package manifest
 
 import (
-	"fmt"
 	"os"
 
 	"path/filepath"

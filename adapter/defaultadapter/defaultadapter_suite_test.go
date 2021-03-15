@@ -1,7 +1,6 @@
 package defaultadapter_test
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
