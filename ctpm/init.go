@@ -70,7 +70,7 @@ const libTemplate = `#include <iostream>
 void hello() {
 	std::cout << "Hello c3pm!" << std::endl;
 }`
-const readMeTemplate = `
+const readMeTemplate = `# {{.Name}}
 
 A new C++ project.
 
@@ -95,16 +95,18 @@ $ ctpm add <package>
 $ ctpm publish
 ` + "```" + `
 
-<br />
-
 For help getting started with c3pm, view our
 [online documentation](https://docs.c3pm.io/), which offers tutorials, samples and
 a list of all available commands.
 `
 
 func generateReadMe(pc *config.ProjectConfig) error {
-	projectName := `# ` + pc.Manifest.Name
-	return ioutil.WriteFile(filepath.Join(pc.ProjectRoot, "README.md"), []byte(projectName+readMeTemplate), 0644)
+	t := template.Must(template.New("readMeTemplate").Parse(readMeTemplate))
+	f, err := os.Create(filepath.Join(pc.ProjectRoot, "README.md"))
+	if err != nil {
+		return err
+	}
+	return t.ExecuteTemplate(f, "readMeTemplate", pc.Manifest)
 }
 
 func generateLicenseFile(pc *config.ProjectConfig) error {
