@@ -20,7 +20,7 @@ import (
 var _ = Describe("Publish", func() {
 	var wd string
 	projectsFolder := "../test_helpers/projects/publishProjects/"
-	areEqual := func (a, b []string) bool {
+	areEquals := func(a, b []string) bool {
 		if len(a) != len(b) {
 			return false
 		}
@@ -32,11 +32,10 @@ var _ = Describe("Publish", func() {
 		}
 		return true
 	}
-	moveToProjectDirectory := func (project string) {
+	moveToProjectDirectory := func(project string) {
 		err := os.Chdir(projectsFolder + project)
 		Ω(err).ShouldNot(HaveOccurred())
 	}
-
 
 	BeforeEach(func() {
 		var err error
@@ -61,7 +60,7 @@ var _ = Describe("Publish", func() {
 			file, _, _ := req.FormFile("file")
 			tr := tar.NewReader(file)
 
-			loop:
+		loop:
 			for {
 				header, err := tr.Next()
 				switch {
@@ -75,7 +74,7 @@ var _ = Describe("Publish", func() {
 				filesFound = append(filesFound, header.Name)
 
 			}
-			Ω(areEqual(expectedFiles, filesFound)).Should(BeTrue())
+			Ω(areEquals(expectedFiles, filesFound)).Should(BeTrue())
 			defer req.Body.Close()
 			rw.WriteHeader(http.StatusOK)
 		}))
@@ -92,7 +91,7 @@ var _ = Describe("Publish", func() {
 		Ω(err).ShouldNot(HaveOccurred())
 		pc := &config.ProjectConfig{Manifest: m, ProjectRoot: projectRoot}
 
-		err = ctpm.Publish(pc , apiClient)
+		err = ctpm.Publish(pc, apiClient)
 		Ω(err).ShouldNot(HaveOccurred())
 	})
 
@@ -109,7 +108,7 @@ var _ = Describe("Publish", func() {
 			file, _, _ := req.FormFile("file")
 			tr := tar.NewReader(file)
 
-			loop:
+		loop:
 			for {
 				header, err := tr.Next()
 				switch {
@@ -123,7 +122,7 @@ var _ = Describe("Publish", func() {
 				filesFound = append(filesFound, header.Name)
 
 			}
-			Ω(areEqual(expectedFiles, filesFound)).Should(BeTrue())
+			Ω(areEquals(expectedFiles, filesFound)).Should(BeTrue())
 			defer req.Body.Close()
 			rw.WriteHeader(http.StatusOK)
 		}))
@@ -140,7 +139,7 @@ var _ = Describe("Publish", func() {
 		Ω(err).ShouldNot(HaveOccurred())
 		pc := &config.ProjectConfig{Manifest: m, ProjectRoot: projectRoot}
 
-		err = ctpm.Publish(pc , apiClient)
+		err = ctpm.Publish(pc, apiClient)
 		Ω(err).ShouldNot(HaveOccurred())
 	})
 
@@ -157,7 +156,7 @@ var _ = Describe("Publish", func() {
 			file, _, _ := req.FormFile("file")
 			tr := tar.NewReader(file)
 
-			loop:
+		loop:
 			for {
 				header, err := tr.Next()
 				switch {
@@ -171,7 +170,7 @@ var _ = Describe("Publish", func() {
 				filesFound = append(filesFound, header.Name)
 
 			}
-			Ω(areEqual(expectedFiles, filesFound)).Should(BeTrue())
+			Ω(areEquals(expectedFiles, filesFound)).Should(BeTrue())
 			defer req.Body.Close()
 			rw.WriteHeader(http.StatusOK)
 		}))
@@ -188,7 +187,7 @@ var _ = Describe("Publish", func() {
 		Ω(err).ShouldNot(HaveOccurred())
 		pc := &config.ProjectConfig{Manifest: m, ProjectRoot: projectRoot}
 
-		err = ctpm.Publish(pc , apiClient)
+		err = ctpm.Publish(pc, apiClient)
 		Ω(err).ShouldNot(HaveOccurred())
 	})
 
@@ -205,7 +204,7 @@ var _ = Describe("Publish", func() {
 			file, _, _ := req.FormFile("file")
 			tr := tar.NewReader(file)
 
-			loop:
+		loop:
 			for {
 				header, err := tr.Next()
 				switch {
@@ -220,7 +219,7 @@ var _ = Describe("Publish", func() {
 
 			}
 			fmt.Println("got : ", filesFound)
-			Ω(areEqual(expectedFiles, filesFound)).Should(BeTrue())
+			Ω(areEquals(expectedFiles, filesFound)).Should(BeTrue())
 			defer req.Body.Close()
 			rw.WriteHeader(http.StatusOK)
 		}))
@@ -237,7 +236,7 @@ var _ = Describe("Publish", func() {
 		Ω(err).ShouldNot(HaveOccurred())
 		pc := &config.ProjectConfig{Manifest: m, ProjectRoot: projectRoot}
 
-		err = ctpm.Publish(pc , apiClient)
+		err = ctpm.Publish(pc, apiClient)
 		Ω(err).ShouldNot(HaveOccurred())
 	})
 })
