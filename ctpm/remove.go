@@ -14,7 +14,7 @@ func Remove(pc *config.ProjectConfig, opts RemoveOptions) error {
 		return fmt.Errorf("cannot remove dependency: there is no dependency in the project")
 	}
 	for _, dep := range opts.Dependencies {
-		if _, ok := pc.Manifest.Dependencies[dep]; ok == false {
+		if _, ok := pc.Manifest.Dependencies[dep]; !ok {
 			fmt.Printf("cannot remove dependency \"%s\": there is no dependency with this name in the project", dep)
 		} else {
 			delete(pc.Manifest.Dependencies, dep)
