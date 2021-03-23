@@ -42,7 +42,7 @@ var _ = Describe("manifest", func() {
 		Ω(pc.Type).To(Equal(Library))
 		Ω(pc.Name).To(Equal("c3pm"))
 		Ω(pc.Description).To(Equal("This is the package c3pm"))
-		Ω(pc.Documentation).To(Equal("http://docs.c3pm.io/"))
+		Ω(pc.Documentation).To(Equal("https://docs.c3pm.io/"))
 		Ω(pc.Contributors).To(Equal("Alex Hugh - Ramy J."))
 		Ω(pc.Website).To(Equal("https://c3pm.io/"))
 		Ω(pc.Repository).To(Equal("https://github.com/c3pm-labs"))

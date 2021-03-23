@@ -28,7 +28,7 @@ var (
 			Version: manifest.Version{
 				Version: semver.MustParse("1.1.5"),
 			},
-			Documentation: "http://docs.c3pm.io/",
+			Documentation: "https://docs.c3pm.io/",
 			Website:       "https://c3pm.io/",
 			Repository:    "https://github.com/c3pm-labs",
 			Contributors:  "Alex Hugh - Ramy J.",
