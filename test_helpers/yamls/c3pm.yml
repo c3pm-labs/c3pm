@@ -3,6 +3,10 @@ type: executable
 name: hello-bin
 description: Demo binary
 version: 1.1.5
+documentation: ""
+website: ""
+repository: ""
+contributors: ""
 standard: "20"
 license: ISC
 files:
