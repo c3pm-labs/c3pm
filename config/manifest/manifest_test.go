@@ -13,6 +13,10 @@ type: library
 name: c3pm
 description: This is the package c3pm
 version: 1.0.0
+Documentation: "http://docs.c3pm.io/"
+Website: "https://c3pm.io/"
+Repository: "https://github.com/c3pm-labs"
+Contributors: "Alex Hugh - Ramy J."
 license: ISC
 files:
     sources:
@@ -38,6 +42,10 @@ var _ = Describe("manifest", func() {
 		Ω(pc.Type).To(Equal(Library))
 		Ω(pc.Name).To(Equal("c3pm"))
 		Ω(pc.Description).To(Equal("This is the package c3pm"))
+		Ω(pc.Documentation).To(Equal("http://docs.c3pm.io/"))
+		Ω(pc.Contributors).To(Equal("Alex Hugh - Ramy J."))
+		Ω(pc.Website).To(Equal("https://c3pm.io/"))
+		Ω(pc.Repository).To(Equal("https://github.com/c3pm-labs"))
 		v, err := VersionFromString("1.0.0")
 		Ω(err).ShouldNot(HaveOccurred())
 

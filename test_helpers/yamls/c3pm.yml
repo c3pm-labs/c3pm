@@ -3,6 +3,10 @@ type: executable
 name: hello-bin
 description: Demo binary
 version: 1.1.5
+documentation: "http://docs.c3pm.io/"
+website: "https://c3pm.io/"
+repository: "https://github.com/c3pm-labs"
+contributors: "Alex Hugh - Ramy J."
 standard: "20"
 license: ISC
 files:

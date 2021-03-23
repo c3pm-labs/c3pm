@@ -17,9 +17,8 @@ type Manifest struct {
 	Version       Version      `yaml:"version"`
 	Documentation string       `yaml:"documentation"`
 	Website       string       `yaml:"website"`
-	Readme        string       `yaml:"readme"`
 	Repository    string       `yaml:"repository"`
-	Authors       []string     `yaml:"authors"`
+	Contributors  string       `yaml:"contributors"`
 	Standard      string       `yaml:"standard"`
 	License       string       `yaml:"license"`
 	Files         FilesConfig  `yaml:"files"`

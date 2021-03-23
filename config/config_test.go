@@ -28,11 +28,10 @@ var (
 			Version: manifest.Version{
 				Version: semver.MustParse("1.1.5"),
 			},
-			Documentation: "",
-			Website:       "",
-			Readme:        "",
-			Repository:    "",
-			Authors:       nil,
+			Documentation: "http://docs.c3pm.io/",
+			Website:       "https://c3pm.io/",
+			Repository:    "https://github.com/c3pm-labs",
+			Contributors:  "Alex Hugh - Ramy J.",
 			Standard:      "20",
 			License:       "ISC",
 			Files: manifest.FilesConfig{
