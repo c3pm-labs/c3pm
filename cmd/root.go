@@ -12,7 +12,6 @@ var CLI struct {
 	Init    InitCmd          `kong:"cmd,help='Init a c3pm project'"`
 	Logout  LogoutCmd        `kong:"cmd,help='Logout from the api'"`
 	Login   LoginCmd         `kong:"cmd,help='Login to the api'"`
-	Build   BuildCmd         `kong:"cmd,help='Build a c3pm project'"`
 	Publish PublishCmd       `kong:"cmd,help='Publish a c3pm project'"`
 }
 
@@ -24,4 +23,5 @@ var RootCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(addCmd)
+	RootCmd.AddCommand(buildCmd)
 }
