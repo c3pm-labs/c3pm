@@ -6,9 +6,9 @@ import (
 )
 
 var logoutCmd = &cobra.Command{
-	Use: "logout",
+	Use:   "logout",
 	Short: "Logout from the api",
-	Args: cobra.NoArgs,
+	Args:  cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return ctpm.Logout()
 	},

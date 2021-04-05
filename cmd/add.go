@@ -10,9 +10,9 @@ import (
 var addCmdFlags = ctpm.AddOptions{}
 
 var addCmd = &cobra.Command{
-	Use: "add [dependencies...]",
+	Use:   "add [dependencies...]",
 	Short: "Add one or more new dependency",
-	Args: cobra.MinimumNArgs(1),
+	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		pc, err := config.Load(".")
 		if err != nil {

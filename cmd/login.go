@@ -9,9 +9,9 @@ import (
 )
 
 var loginCmd = &cobra.Command{
-	Use: "login",
+	Use:   "login",
 	Short: "Login to the api",
-	Args: cobra.NoArgs,
+	Args:  cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		payload, err := input.Login()
 		if err != nil {

@@ -8,9 +8,9 @@ import (
 )
 
 var buildCmd = &cobra.Command{
-	Use: "build",
+	Use:   "build",
 	Short: "Build a c3pm project",
-	Args: cobra.NoArgs,
+	Args:  cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		pc, err := config.Load(".")
 		if err != nil {

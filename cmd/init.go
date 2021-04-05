@@ -12,7 +12,7 @@ import (
 var initCmdFlags = ctpm.InitOptions{}
 
 var initCmd = &cobra.Command{
-	Use: "init [path]",
+	Use:   "init [path]",
 	Short: "Init a c3pm project",
 	Long: "Init a c3pm project\n\n" +
 		"Project path defaults to working directory",

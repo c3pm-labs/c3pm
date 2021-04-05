@@ -12,9 +12,9 @@ var CLI struct {
 }
 
 var RootCmd = &cobra.Command{
-	Use: "ctpm",
+	Use:   "ctpm",
 	Short: "c3pm abstracts your build system and eases the management of your dependencies.",
-	Long: "C3PM is a next-generation package manager for C++.\nYou can use C3PM to share and use packages with other developers around the world.",
+	Long:  "C3PM is a next-generation package manager for C++.\nYou can use C3PM to share and use packages with other developers around the world.",
 }
 
 func init() {
