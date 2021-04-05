@@ -14,8 +14,6 @@ var publishCmdFlags = ctpm.PublishOptions{}
 var publishCmd = &cobra.Command{
 	Use:   "publish",
 	Short: "Publish a c3pm project",
-	Long: "Publish a c3pm project\n\n" +
-		"[Ignore files]",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		token, err := config.TokenStrict()
 		if err != nil {
