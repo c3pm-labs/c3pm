@@ -1,11 +1,15 @@
 package cmd
 
-import "github.com/c3pm-labs/c3pm/ctpm"
+import (
+	"github.com/c3pm-labs/c3pm/ctpm"
+	"github.com/spf13/cobra"
+)
 
-//LogoutCmd defines the parameters of the logout command.
-type LogoutCmd struct{}
-
-//Run handles the behavior of the logout command.
-func (l *LogoutCmd) Run() error {
-	return ctpm.Logout()
+var logoutCmd = &cobra.Command{
+	Use: "logout",
+	Short: "Logout from the api",
+	Args: cobra.NoArgs,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return ctpm.Logout()
+	},
 }
