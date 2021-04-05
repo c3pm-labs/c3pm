@@ -9,7 +9,6 @@ import (
 //CLI is the root configuration of C3PM's command line interface.
 var CLI struct {
 	Version kong.VersionFlag `short:"v" help:"outputs the version number"`
-	Publish PublishCmd       `kong:"cmd,help='Publish a c3pm project'"`
 }
 
 var RootCmd = &cobra.Command{
@@ -24,4 +23,5 @@ func init() {
 	RootCmd.AddCommand(initCmd)
 	RootCmd.AddCommand(logoutCmd)
 	RootCmd.AddCommand(loginCmd)
+	RootCmd.AddCommand(publishCmd)
 }
