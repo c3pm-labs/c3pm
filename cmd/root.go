@@ -18,4 +18,5 @@ func init() {
 	RootCmd.AddCommand(logoutCmd)
 	RootCmd.AddCommand(loginCmd)
 	RootCmd.AddCommand(publishCmd)
+	RootCmd.AddCommand(removeCmd)
 }
