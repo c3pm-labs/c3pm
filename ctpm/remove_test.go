@@ -15,7 +15,7 @@ var _ = Describe("Remove", func() {
 		var projectFolder = getTestFolder("RemoveTestFolder")
 		var projectName = "Test-Remove"
 		var projectType = manifest.Executable
-		var projectDesc = "description"config/manifest/manifest.go
+		var projectDesc = "description"
 		var projectLicense = "MIT"
 		var dependencies = map[string]string{
 			"calculator":  "1.0.0",
