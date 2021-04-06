@@ -1,0 +1,22 @@
+c3pm_version: v1
+type: executable
+name: includeAndExcludeFile
+description: includeAndExcludeFile for publish tests
+version: 1.0.0
+standard: "20"
+license: UNLICENSED
+files:
+  sources:
+  - '**/*.cpp'
+  includes:
+  - '**/*.hpp'
+  include_dirs: []
+  exported_dir: ""
+  exported_include_dirs: []
+include:
+  - '**/*.cpp'
+  - '**/*.hpp'
+  - 'toto.txt'
+exclude:
+  - 'README.md'
+dependencies: {}

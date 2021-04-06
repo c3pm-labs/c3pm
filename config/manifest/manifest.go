@@ -22,6 +22,8 @@ type Manifest struct {
 	Standard      string       `yaml:"standard"`
 	License       string       `yaml:"license"`
 	Files         FilesConfig  `yaml:"files"`
+	Include       []string     `yaml:"include"`
+	Exclude       []string     `yaml:"exclude"`
 	Dependencies  Dependencies `yaml:"dependencies"`
 	CustomCMake   *CustomCMake `yaml:"custom_cmake,omitempty"`
 	LinuxConfig   *LinuxConfig `yaml:"linux,omitempty"`

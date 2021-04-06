@@ -9,8 +9,6 @@ import (
 	"net/http"
 )
 
-var publishCmdFlags = ctpm.PublishOptions{}
-
 var publishCmd = &cobra.Command{
 	Use:   "publish",
 	Short: "Publish a c3pm project",
@@ -24,10 +22,6 @@ var publishCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("failed to read c3pm.yml: %w", err)
 		}
-		return ctpm.Publish(pc, client, publishCmdFlags)
+		return ctpm.Publish(pc, client)
 	},
-}
-
-func init() {
-	publishCmd.Flags().StringArrayVarP(&publishCmdFlags.Ignore, "ignore", "i", ctpm.PublishDefaultOptions.Ignore, "Ignore files")
 }

@@ -41,6 +41,8 @@ var (
 				ExportedDir:         "",
 				ExportedIncludeDirs: []string{},
 			},
+			Include: []string{},
+			Exclude: []string{},
 			Dependencies: manifest.Dependencies{
 				"hello": "1.0.5",
 			},
