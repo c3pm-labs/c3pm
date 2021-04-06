@@ -46,12 +46,12 @@ var _ = Describe("Build", func() {
 			pc.Manifest.Type = manifest.Executable
 			pc.Manifest.Files.Sources = []string{"main.cpp"}
 			pc.Manifest.Version, _ = manifest.VersionFromString("1.0.0")
+
 			err := ioutil.WriteFile("main.cpp", []byte(execSrc), 0644)
 			Ω(err).ShouldNot(HaveOccurred())
 
 			err = ctpm.Build(pc)
 			Ω(err).ShouldNot(HaveOccurred())
-
 		})
 
 		It("Generate cmake scripts", func() {
