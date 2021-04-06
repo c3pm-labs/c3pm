@@ -3,25 +3,30 @@
 package manifest
 
 import (
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
+
+	"gopkg.in/yaml.v2"
 )
 
 // Manifest is the main configuration structure for C3PM.
 type Manifest struct {
-	C3PMVersion  C3PMVersion  `yaml:"c3pm_version"`
-	Type         Type         `yaml:"type"`
-	Name         string       `yaml:"name"`
-	Description  string       `yaml:"description"`
-	Version      Version      `yaml:"version"`
-	Standard     string       `yaml:"standard"`
-	License      string       `yaml:"license"`
-	Files        FilesConfig  `yaml:"files"`
-	Include      []string     `yaml:"include"`
-	Exclude      []string     `yaml:"exclude"`
-	Dependencies Dependencies `yaml:"dependencies"`
-	CustomCMake  *CustomCMake `yaml:"custom_cmake,omitempty"`
-	LinuxConfig  *LinuxConfig `yaml:"linux,omitempty"`
+	C3PMVersion   C3PMVersion  `yaml:"c3pm_version"`
+	Type          Type         `yaml:"type"`
+	Name          string       `yaml:"name"`
+	Description   string       `yaml:"description"`
+	Version       Version      `yaml:"version"`
+	Documentation string       `yaml:"documentation"`
+	Website       string       `yaml:"website"`
+	Repository    string       `yaml:"repository"`
+	Contributors  string       `yaml:"contributors"`
+	Standard      string       `yaml:"standard"`
+	License       string       `yaml:"license"`
+	Files         FilesConfig  `yaml:"files"`
+	Include       []string     `yaml:"include"`
+	Exclude       []string     `yaml:"exclude"`
+	Dependencies  Dependencies `yaml:"dependencies"`
+	CustomCMake   *CustomCMake `yaml:"custom_cmake,omitempty"`
+	LinuxConfig   *LinuxConfig `yaml:"linux,omitempty"`
 }
 
 // LinuxConfig holds specific configuration on Linux operating systems.
@@ -29,19 +34,18 @@ type LinuxConfig struct {
 	UsePthread bool `yaml:"pthread"`
 }
 
-var defaultManifest = Manifest{
-	C3PMVersion: C3PMVersion1,
-	Files: FilesConfig{
-		Sources:             []string{"**/*.cpp"},
-		Includes:            []string{"**/*.hpp"},
-		ExportedIncludeDirs: []string{},
-	},
-	Dependencies: make(map[string]string),
-	Standard:     "20",
-}
-
 // New returns the default manifest values.
 func New() Manifest {
+	defaultManifest := Manifest{
+		C3PMVersion: C3PMVersion1,
+		Files: FilesConfig{
+			Sources:             []string{"**/*.cpp"},
+			Includes:            []string{"**/*.hpp"},
+			ExportedIncludeDirs: []string{},
+		},
+		Dependencies: make(map[string]string),
+		Standard:     "20",
+	}
 	return defaultManifest
 }
 

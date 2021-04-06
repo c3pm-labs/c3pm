@@ -13,6 +13,10 @@ type: library
 name: c3pm
 description: This is the package c3pm
 version: 1.0.0
+Documentation: "http://docs.c3pm.io/"
+Website: "https://c3pm.io/"
+Repository: "https://github.com/c3pm-labs"
+Contributors: "Alex Hugh - Ramy J."
 license: ISC
 files:
     sources:
