@@ -1,6 +1,10 @@
 package config_test
 
 import (
+	"io/ioutil"
+	"os"
+	"path/filepath"
+
 	"github.com/Masterminds/semver/v3"
 	"github.com/c3pm-labs/c3pm/adapter/defaultadapter"
 	"github.com/c3pm-labs/c3pm/config"
@@ -8,9 +12,6 @@ import (
 	"github.com/mohae/deepcopy"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 )
 
 const (
@@ -37,6 +38,12 @@ var (
 				},
 				Config: nil,
 			},
+			Documentation: "",
+			Website:       "",
+			Repository:    "",
+			Contributors:  "",
+			Include:       []string{},
+			Exclude:       []string{},
 			Dependencies: manifest.Dependencies{
 				"hello": "1.0.5",
 			},

@@ -3,22 +3,29 @@
 package manifest
 
 import (
+	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 )
 
 // Manifest is the main configuration structure for C3PM.
 type Manifest struct {
-	C3PMVersion  C3PMVersion    `yaml:"c3pm_version"`
-	Type         Type           `yaml:"type"`
-	Name         string         `yaml:"name"`
-	Description  string         `yaml:"description"`
-	Standard     string         `yaml:"standard,omitempty"`
-	Version      Version        `yaml:"version"`
-	License      string         `yaml:"license"`
-	Publish      *PublishConfig `yaml:"publish,omitempty"`
-	Build        *BuildConfig   `yaml:"build,omitempty"`
-	Dependencies Dependencies   `yaml:"dependencies"`
+	C3PMVersion   C3PMVersion    `yaml:"c3pm_version"`
+	Type          Type           `yaml:"type"`
+	Name          string         `yaml:"name"`
+	Description   string         `yaml:"description"`
+	Version       Version        `yaml:"version"`
+	Publish       *PublishConfig `yaml:"publish,omitempty"`
+	Build         *BuildConfig   `yaml:"build,omitempty"`
+	Documentation string         `yaml:"documentation"`
+	Website       string         `yaml:"website"`
+	Repository    string         `yaml:"repository"`
+	Contributors  string         `yaml:"contributors"`
+	Standard      string         `yaml:"standard"`
+	License       string         `yaml:"license"`
+	Include       []string       `yaml:"include"`
+	Exclude       []string       `yaml:"exclude"`
+	Dependencies  Dependencies   `yaml:"dependencies"`
 }
 
 type BuildConfig struct {
@@ -57,6 +64,8 @@ func New() Manifest {
 				IncludeDirs: []string{"include"},
 			},
 		},
+		Exclude: []string{},
+		Include: []string{"**/**"},
 	}
 	return defaultManifest
 }
@@ -76,6 +85,7 @@ func Load(path string) (Manifest, error) {
 	if err != nil {
 		return Manifest{}, err
 	}
+	fmt.Println("raw data:", string(data))
 	return deserialize(data)
 }
 

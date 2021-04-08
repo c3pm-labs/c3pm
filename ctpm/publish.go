@@ -1,73 +1,28 @@
 package ctpm
 
 import (
-	"bufio"
 	"fmt"
 	"github.com/bmatcuk/doublestar"
 	"github.com/c3pm-labs/c3pm/api"
 	"github.com/c3pm-labs/c3pm/config"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
-var IgnoreFiles = []string{".gitignore", ".c3pmignore"}
-
-type PublishOptions struct {
-	Ignore []string
-}
-
-var PublishDefaultOptions = PublishOptions{
-	Ignore: []string{".git/**", ".c3pm/**"},
-}
-
-func publishIgnoredFiles(opt PublishOptions) ([]string, error) {
-	var ignored []string
-	//var err error
-	for _, ignoreFile := range IgnoreFiles {
-		f, err := os.Open(ignoreFile)
-		if err != nil && !os.IsNotExist(err) {
-			return nil, fmt.Errorf("failed to open ignore file [%s]: %w", ignoreFile, err)
-		}
-		scanner := bufio.NewScanner(f)
-		scanner.Split(bufio.ScanLines)
-		for scanner.Scan() {
-			ignored = append(ignored, scanner.Text())
-		}
-		f.Close()
-	}
-	ignored = append(ignored, opt.Ignore...)
-	ignored = append(ignored, PublishDefaultOptions.Ignore...)
-	return ignored, nil
-}
-
-// isIgnored return true if path is ignored, it will use rules/regex given
-// rules follow pattern format from gitignore
-func isIgnored(rules []string, path string) (bool, error) {
-	var negate bool
-	var ignored = false
-	for _, i := range rules {
-		if strings.HasPrefix(i, "!") {
-			i = i[1:]
-			negate = true
-		} else {
-			negate = false
-		}
-		ok, err := doublestar.Match(i, path)
+func isFileInList(path string, rules []string) (bool, error) {
+	for _, rule := range rules {
+		ok, err := doublestar.Match(rule, path)
 		if err != nil {
-			return false, fmt.Errorf("failed to match [%s] with [%s] ignore regex: %w", path, i, err)
+			return false, fmt.Errorf("failed to match [%s] with [%s] regex: %w", path, rule, err)
 		}
 		if ok {
-			ignored = true
-		}
-		if ok && negate {
-			ignored = false
+			return true, nil
 		}
 	}
-	return ignored, nil
+	return false, nil
 }
 
-func publishListFiles(ignored []string) ([]string, error) {
+func getFilesFromRules(included []string, excluded []string) ([]string, error) {
 	var files []string
 	err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -76,25 +31,38 @@ func publishListFiles(ignored []string) ([]string, error) {
 		if info.IsDir() {
 			return nil
 		}
-		ok, err := isIgnored(ignored, path)
+		isIncluded, err := isFileInList(path, included)
 		if err != nil {
-			return fmt.Errorf("could not find if path [%s] is ignored: %w", path, err)
+			return fmt.Errorf("could not find if path [%s] is included: %w", path, err)
 		}
-		if ok {
-			return nil
+		if isIncluded {
+			isExcluded, err := isFileInList(path, excluded)
+			if err != nil {
+				return fmt.Errorf("could not find if path [%s] is excluded: %w", path, err)
+			}
+			if !isExcluded {
+				files = append(files, path)
+			}
 		}
-		files = append(files, path)
 		return nil
 	})
 	return files, err
 }
 
-func Publish(pc *config.ProjectConfig, client api.API, opt PublishOptions) error {
-	ignored, err := publishIgnoredFiles(opt)
-	if err != nil {
-		return fmt.Errorf("failed to parse ignored files: %w", err)
-	}
-	files, err := publishListFiles(ignored)
+// Publish function makes an array of the files to include in the tarball
+// based on the Include and Exclude fields of the c3pm.yaml
+// The array is then given to the Upload function in the client
+// We enforce the exclusion of the .git and .c3pm directories and we enforce
+// the inclusion of the c3pm.yml file
+func Publish(pc *config.ProjectConfig, client api.API) error {
+	fmt.Println("Manifest Include:", pc.Manifest.Include)
+	included := append(pc.Manifest.Include, "c3pm.yml")
+	excluded := append(pc.Manifest.Exclude, ".git/**", ".c3pm/**")
+
+	fmt.Println("included:", included)
+	fmt.Println("excluded:", excluded)
+	files, err := getFilesFromRules(included, excluded)
+	fmt.Println("files:", files)
 	if err != nil {
 		return fmt.Errorf("failed to list files to publish: %w", err)
 	}

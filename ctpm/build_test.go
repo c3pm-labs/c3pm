@@ -23,12 +23,25 @@ int main() {
 
 var _ = Describe("Build", func() {
 	Describe("Executable build", func() {
-		var oldPath string
 		projectFolder := getTestFolder("BuildTestFolder")
 		projectRoot, _ := filepath.Abs(projectFolder)
 		m := manifest.New()
 		pc := &config.ProjectConfig{Manifest: m, ProjectRoot: projectRoot}
+		var wd string
 
+		BeforeEach(func() {
+			var err error
+			err = os.MkdirAll(projectFolder, os.ModePerm)
+			Ω(err).ShouldNot(HaveOccurred())
+			wd, err = os.Getwd()
+			Ω(err).ShouldNot(HaveOccurred())
+			err = os.Chdir(projectFolder)
+			Ω(err).ShouldNot(HaveOccurred())
+		})
+		AfterEach(func() {
+			err := os.Chdir(wd)
+			Ω(err).ShouldNot(HaveOccurred())
+		})
 		It("Run build", func() {
 			pc.Manifest.Name = "buildTest"
 			pc.Manifest.Type = manifest.Executable
@@ -43,21 +56,11 @@ var _ = Describe("Build", func() {
 			}
 			pc.Manifest.Version, _ = manifest.VersionFromString("1.0.0")
 
-			err := os.MkdirAll(projectFolder, os.ModePerm)
-			Ω(err).ShouldNot(HaveOccurred())
-
-			oldPath, err = filepath.Rel(projectFolder, ".")
-			Ω(err).ShouldNot(HaveOccurred())
-
-			err = os.Chdir(projectFolder)
-			Ω(err).ShouldNot(HaveOccurred())
-
-			err = ioutil.WriteFile("main.cpp", []byte(execSrc), 0644)
+			err := ioutil.WriteFile("main.cpp", []byte(execSrc), 0644)
 			Ω(err).ShouldNot(HaveOccurred())
 
 			err = ctpm.Build(pc)
 			Ω(err).ShouldNot(HaveOccurred())
-
 		})
 
 		It("Generate cmake scripts", func() {
@@ -88,7 +91,5 @@ var _ = Describe("Build", func() {
 
 			Ω(buf.String()).To(Equal("Build test\n"))
 		})
-
-		_ = os.Chdir(oldPath)
 	})
 })
