@@ -5,9 +5,10 @@ description: includeAndExcludeFile for publish tests
 version: 1.0.0
 standard: "20"
 license: UNLICENSED
-include:
-  - 'README.md'
-  - 'toto.txt'
-exclude:
-  - 'README.md'
+publish:
+  exclude:
+    - 'README.md'
+  include:
+    - 'README.md'
+    - 'toto.txt'
 dependencies: {}

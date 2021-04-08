@@ -31,6 +31,10 @@ var (
 			},
 			Standard: "20",
 			License:  "ISC",
+			Publish: &manifest.PublishConfig{
+				Include: []string{"test-include"},
+				Exclude: []string{"test-exclude"},
+			},
 			Build: &manifest.BuildConfig{
 				Adapter: &manifest.AdapterConfig{
 					Name:    "c3pm",
@@ -42,8 +46,6 @@ var (
 			Website:       "",
 			Repository:    "",
 			Contributors:  "",
-			Include:       []string{},
-			Exclude:       []string{},
 			Dependencies: manifest.Dependencies{
 				"hello": "1.0.5",
 			},

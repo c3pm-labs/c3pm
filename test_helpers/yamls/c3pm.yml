@@ -9,11 +9,14 @@ repository: ""
 contributors: ""
 standard: "20"
 license: ISC
+publish:
+  include:
+    - test-include
+  exclude:
+    - test-exclude
 build:
   adapter:
     name: c3pm
     version: 0.0.1
 dependencies:
   hello: 1.0.5
-include: []
-exclude: []

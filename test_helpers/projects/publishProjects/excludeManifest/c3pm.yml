@@ -13,6 +13,7 @@ files:
   include_dirs: []
   exported_dir: ""
   exported_include_dirs: []
-exclude:
-  - 'c3pm.yml'
+publish:
+  exclude:
+    - 'c3pm.yml'
 dependencies: {}

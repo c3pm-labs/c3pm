@@ -3,7 +3,6 @@
 package manifest
 
 import (
-	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 )
@@ -23,8 +22,6 @@ type Manifest struct {
 	Contributors  string         `yaml:"contributors"`
 	Standard      string         `yaml:"standard"`
 	License       string         `yaml:"license"`
-	Include       []string       `yaml:"include"`
-	Exclude       []string       `yaml:"exclude"`
 	Dependencies  Dependencies   `yaml:"dependencies"`
 }
 
@@ -40,6 +37,8 @@ type AdapterConfig struct {
 
 type PublishConfig struct {
 	IncludeDirs []string `yaml:"include_dirs,omitempty"`
+	Include     []string `yaml:"include"`
+	Exclude     []string `yaml:"exclude"`
 }
 
 // New returns the default manifest values.
@@ -49,6 +48,10 @@ func New() Manifest {
 		C3PMVersion:  C3PMVersion1,
 		Dependencies: make(map[string]string),
 		Standard:     "20",
+		Publish: &PublishConfig{
+			Exclude: []string{},
+			Include: []string{"**/**"},
+		},
 		Build: &BuildConfig{
 			Adapter: &AdapterConfig{
 				Name:    "c3pm",
@@ -64,8 +67,6 @@ func New() Manifest {
 				IncludeDirs: []string{"include"},
 			},
 		},
-		Exclude: []string{},
-		Include: []string{"**/**"},
 	}
 	return defaultManifest
 }
@@ -85,7 +86,6 @@ func Load(path string) (Manifest, error) {
 	if err != nil {
 		return Manifest{}, err
 	}
-	fmt.Println("raw data:", string(data))
 	return deserialize(data)
 }
 

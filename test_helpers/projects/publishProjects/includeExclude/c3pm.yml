@@ -13,10 +13,11 @@ files:
   include_dirs: []
   exported_dir: ""
   exported_include_dirs: []
-include:
-  - '**/*.cpp'
-  - '**/*.hpp'
-  - 'toto.txt'
-exclude:
-  - 'README.md'
+publish:
+  include:
+    - '**/*.cpp'
+    - '**/*.hpp'
+    - 'toto.txt'
+  exclude:
+    - 'README.md'
 dependencies: {}
