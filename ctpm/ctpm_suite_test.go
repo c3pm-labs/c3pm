@@ -1,7 +1,6 @@
 package ctpm_test
 
 import (
-	"fmt"
 	"os"
 
 	//"os"
@@ -15,7 +14,6 @@ import (
 func TestCtpm(t *testing.T) {
 	RegisterFailHandler(Fail)
 	path, err := filepath.Abs("testsArtifacts")
-	fmt.Println("PATH:", path)
 	if err != nil {
 		t.Fatal("Failed to get testsArtifacts absolute path")
 	}

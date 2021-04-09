@@ -2,14 +2,13 @@ package ctpm
 
 import (
 	"fmt"
+	"github.com/mitchellh/go-spdx"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"text/template"
 
-	"github.com/c3pm-labs/c3pm/cmakegen"
 	"github.com/c3pm-labs/c3pm/config"
-	"github.com/mitchellh/go-spdx"
 )
 
 type InitOptions struct {
@@ -48,11 +47,12 @@ func Init(pc *config.ProjectConfig, opt InitOptions) error {
 			}
 		}
 	}
-	err = pc.Save()
+
+	err = Build(pc)
 	if err != nil {
-		return fmt.Errorf("failed to save project file: %w", err)
+		return err
 	}
-	return cmakegen.Generate(pc)
+	return pc.Save()
 }
 
 const execTemplate = `#include <iostream>
@@ -128,7 +128,6 @@ func saveExecutableTemplate(pc *config.ProjectConfig) error {
 }
 
 func saveLibraryTemplate(pc *config.ProjectConfig) error {
-	pc.Manifest.Files.IncludeDirs = append(pc.Manifest.Files.IncludeDirs, "include")
 	t := template.Must(template.New("libTemplate").Parse(libTemplate))
 	if err := os.Mkdir(filepath.Join(pc.ProjectRoot, "src"), os.ModePerm); err != nil {
 		return err

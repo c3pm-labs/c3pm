@@ -3,48 +3,70 @@
 package manifest
 
 import (
-	"io/ioutil"
-
 	"gopkg.in/yaml.v2"
+	"io/ioutil"
 )
 
 // Manifest is the main configuration structure for C3PM.
 type Manifest struct {
-	C3PMVersion   C3PMVersion  `yaml:"c3pm_version"`
-	Type          Type         `yaml:"type"`
-	Name          string       `yaml:"name"`
-	Description   string       `yaml:"description"`
-	Version       Version      `yaml:"version"`
-	Documentation string       `yaml:"documentation"`
-	Website       string       `yaml:"website"`
-	Repository    string       `yaml:"repository"`
-	Contributors  string       `yaml:"contributors"`
-	Standard      string       `yaml:"standard"`
-	License       string       `yaml:"license"`
-	Files         FilesConfig  `yaml:"files"`
-	Include       []string     `yaml:"include"`
-	Exclude       []string     `yaml:"exclude"`
-	Dependencies  Dependencies `yaml:"dependencies"`
-	CustomCMake   *CustomCMake `yaml:"custom_cmake,omitempty"`
-	LinuxConfig   *LinuxConfig `yaml:"linux,omitempty"`
+	C3PMVersion   C3PMVersion    `yaml:"c3pm_version"`
+	Type          Type           `yaml:"type"`
+	Name          string         `yaml:"name"`
+	Description   string         `yaml:"description"`
+	Version       Version        `yaml:"version"`
+	Publish       *PublishConfig `yaml:"publish,omitempty"`
+	Build         *BuildConfig   `yaml:"build,omitempty"`
+	Documentation string         `yaml:"documentation"`
+	Website       string         `yaml:"website"`
+	Repository    string         `yaml:"repository"`
+	Contributors  string         `yaml:"contributors"`
+	Standard      string         `yaml:"standard"`
+	License       string         `yaml:"license"`
+	Dependencies  Dependencies   `yaml:"dependencies"`
 }
 
-// LinuxConfig holds specific configuration on Linux operating systems.
-type LinuxConfig struct {
-	UsePthread bool `yaml:"pthread"`
+type BuildConfig struct {
+	Adapter *AdapterConfig `yaml:"adapter,omitempty"`
+	Config  interface{}    `yaml:"config,omitempty"`
+}
+
+type AdapterConfig struct {
+	Name    string  `yaml:"name"`
+	Version Version `yaml:"version,omitempty"`
+}
+
+type PublishConfig struct {
+	IncludeDirs []string `yaml:"include_dirs,omitempty"`
+	Include     []string `yaml:"include"`
+	Exclude     []string `yaml:"exclude"`
 }
 
 // New returns the default manifest values.
 func New() Manifest {
+	c3pmAdapterVersion, _ := VersionFromString("0.0.1")
 	defaultManifest := Manifest{
-		C3PMVersion: C3PMVersion1,
-		Files: FilesConfig{
-			Sources:             []string{"**/*.cpp"},
-			Includes:            []string{"**/*.hpp"},
-			ExportedIncludeDirs: []string{},
-		},
+		C3PMVersion:  C3PMVersion1,
 		Dependencies: make(map[string]string),
 		Standard:     "20",
+		Publish: &PublishConfig{
+			Exclude: []string{},
+			Include: []string{"**/**"},
+		},
+		Build: &BuildConfig{
+			Adapter: &AdapterConfig{
+				Name:    "c3pm",
+				Version: c3pmAdapterVersion,
+			},
+			Config: &struct {
+				Sources     []string
+				Headers     []string
+				IncludeDirs []string `yaml:"include_dirs"`
+			}{
+				Sources:     []string{"**/*.cpp"},
+				Headers:     []string{"**/*.hpp"},
+				IncludeDirs: []string{"include"},
+			},
+		},
 	}
 	return defaultManifest
 }
@@ -58,22 +80,13 @@ func deserialize(config []byte) (Manifest, error) {
 	return man, nil
 }
 
-// Loads reads the file located at the given path, and stores its contents in a new Manifest struct.
+// Load reads the file located at the given path, and stores its contents in a new Manifest struct.
 func Load(path string) (Manifest, error) {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		return Manifest{}, err
 	}
-	m, err := deserialize(data)
-	if err != nil {
-		return Manifest{}, err
-	}
-
-	//if m.CustomCMake != nil && !m.Files.IsEmpty() {
-	//	return Manifest{}, fmt.Errorf("cannot specify custom_cmake and source files")
-	//}
-
-	return m, nil
+	return deserialize(data)
 }
 
 func (m *Manifest) serialize() ([]byte, error) {
@@ -90,9 +103,7 @@ func (m *Manifest) Save(destination string) error {
 }
 
 // Targets returns the CMake targets to use.
+// TODO: delete this
 func (m *Manifest) Targets() []string {
-	if m.CustomCMake != nil {
-		return m.CustomCMake.Targets
-	}
 	return []string{m.Name}
 }

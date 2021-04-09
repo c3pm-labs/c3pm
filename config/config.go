@@ -42,17 +42,9 @@ func (pc *ProjectConfig) Save() error {
 	return pc.Manifest.Save(filepath.Join(pc.ProjectRoot, "c3pm.yml"))
 }
 
-//BuildDir returns the path to the build directory used for CMake build files.
-func (pc *ProjectConfig) BuildDir() string {
-	return filepath.Join(pc.ProjectRoot, ".c3pm", "build")
-}
-
-//CMakeDir returns the path to the CMake files to use for the project.
-func (pc *ProjectConfig) CMakeDir() string {
-	if pc.UseCustomCMake() {
-		return filepath.Join(pc.ProjectRoot, pc.Manifest.CustomCMake.Path)
-	}
-	return filepath.Join(pc.ProjectRoot, ".c3pm", "cmake")
+// LocalC3PMDirPath returns the path to the local C3PM directory.
+func (pc *ProjectConfig) LocalC3PMDirPath() string {
+	return filepath.Join(pc.ProjectRoot, ".c3pm")
 }
 
 //GlobalC3PMDirPath finds the path to the global C3PM directory.
@@ -67,11 +59,6 @@ func GlobalC3PMDirPath() string {
 		homeDir = os.Getenv("HOME")
 	}
 	return path.Join(homeDir, ".c3pm")
-}
-
-//UseCustomCMake checks if a custom CMake configuration is to be used for the project.
-func (pc *ProjectConfig) UseCustomCMake() bool {
-	return pc.Manifest.CustomCMake != nil
 }
 
 //LibCachePath returns the path to the global C3PM cache
