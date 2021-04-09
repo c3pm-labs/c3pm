@@ -9,16 +9,14 @@ repository: ""
 contributors: ""
 standard: "20"
 license: ISC
-files:
-  sources:
-    - '**/*.cpp'
-  includes:
-    - '**/*.hpp'
-  include_dirs:
-    - include
-  exported_dir: ""
-  exported_include_dirs: []
-include: []
-exclude: []
+publish:
+  include:
+    - test-include
+  exclude:
+    - test-exclude
+build:
+  adapter:
+    name: c3pm
+    version: 0.0.1
 dependencies:
   hello: 1.0.5

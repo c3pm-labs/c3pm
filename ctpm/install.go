@@ -1,47 +1,89 @@
 package ctpm
 
 import (
+	"archive/tar"
 	"fmt"
-	"github.com/c3pm-labs/c3pm/cmake"
-	"github.com/c3pm-labs/c3pm/cmakegen"
+	"github.com/Masterminds/semver/v3"
 	"github.com/c3pm-labs/c3pm/config"
-	"github.com/c3pm-labs/c3pm/config/manifest"
+	"github.com/c3pm-labs/c3pm/env"
+	"github.com/c3pm-labs/c3pm/registry"
+	"io"
+	"os"
 	"path/filepath"
 )
 
-// TODO: unused
-func Install(pc *config.ProjectConfig) error {
-	libDir := filepath.Join(config.GlobalC3PMDirPath(), "cache", pc.Manifest.Name, pc.Manifest.Version.String())
-
-	cmakeVariables := map[string]string{
-		"CMAKE_INSTALL_BINDIR": filepath.Join(config.GlobalC3PMDirPath(), "bin"),
-		"CMAKE_INSTALL_PREFIX": libDir,
+// Install fetches the package, unpacks it in the c3pm cache and builds it. If the lib already is
+// in the cache, we don't do anything
+func Install(name string, version *semver.Version) error {
+	libPath := config.LibCachePath(name, version.String())
+	// return early if lib is already in cache
+	if _, err := os.Stat(libPath); !os.IsNotExist(err) {
+		return nil
 	}
-
-	if pc.UseCustomCMake() {
-		for key, value := range pc.Manifest.CustomCMake.Variables {
-			cmakeVariables[key] = value
-		}
-	} else {
-		err := cmakegen.Generate(pc)
-		if err != nil {
-			return fmt.Errorf("error generating config files: %w", err)
-		}
-	}
-
-	err := cmake.GenerateBuildFiles(pc.CMakeDir(), pc.BuildDir(), cmakeVariables)
+	// fetch the tarball
+	tarball, err := registry.FetchPackage(name, version, registry.Options{
+		RegistryURL: env.REGISTRY_ENDPOINT,
+	})
 	if err != nil {
-		return fmt.Errorf("cmake build failed: %w", err)
+		return fmt.Errorf("error fetching package: %w", err)
 	}
-
-	err = cmake.Install(pc.BuildDir())
+	// unpack the tarball
+	err = unpackTarball(tarball, libPath)
 	if err != nil {
-		return fmt.Errorf("install failed: %w", err)
+		return err
 	}
-
-	if pc.Manifest.Type == manifest.Library {
-		return pc.Manifest.Save(filepath.Join(libDir, "c3pm.yml"))
+	// load the lib c3pm.yml
+	pc, err := config.Load(libPath)
+	if err != nil {
+		return fmt.Errorf("failed to read c3pm.yml: %w", err)
 	}
+	// build the lib
+	return Build(pc)
+}
 
-	return nil
+func unpackTarball(pkg *os.File, dest string) error {
+	tr := tar.NewReader(pkg)
+	err := os.MkdirAll(dest, os.ModePerm)
+	if err != nil {
+		return fmt.Errorf("error creating package directory: %w", err)
+	}
+	for {
+		header, err := tr.Next()
+		switch {
+		case err == io.EOF:
+			_ = os.Remove(pkg.Name())
+			return nil
+		case err != nil:
+			return err
+		case header == nil:
+			continue
+		}
+		target := filepath.Join(dest, header.Name)
+		switch header.Typeflag {
+		case tar.TypeDir:
+			if _, err := os.Stat(target); err != nil {
+				if err := os.MkdirAll(target, os.ModePerm); err != nil {
+					return err
+				}
+			}
+		case tar.TypeReg:
+			_ = os.MkdirAll(filepath.Dir(target), os.ModePerm)
+			f, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
+			if err != nil {
+				return err
+			}
+			if _, err := io.Copy(f, tr); err != nil {
+				return err
+			}
+			_ = f.Close()
+		case tar.TypeSymlink:
+			err = os.MkdirAll(filepath.Dir(target), os.ModePerm)
+			if err != nil {
+				return err
+			}
+			if err = os.Symlink(header.Linkname, target); err != nil {
+				return err
+			}
+		}
+	}
 }

@@ -13,7 +13,6 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
-	"sort"
 )
 
 var _ = Describe("Publish", func() {
@@ -45,18 +44,6 @@ var _ = Describe("Publish", func() {
 		rw.WriteHeader(http.StatusOK)
 	}))
 	projectsFolder := "../test_helpers/projects/publishProjects/"
-	areEquals := func(a, b []string) bool {
-		if len(a) != len(b) {
-			return false
-		}
-		for _, value := range a {
-			index := sort.SearchStrings(b, value)
-			if b[index] != value {
-				return false
-			}
-		}
-		return true
-	}
 	moveToProjectDirectory := func(project string) {
 		err := os.Chdir(projectsFolder + project)
 		Ω(err).ShouldNot(HaveOccurred())
@@ -71,6 +58,17 @@ var _ = Describe("Publish", func() {
 		return pc
 	}
 
+	runPublishWithMockServer := func() {
+		apiClient := api.New(server.Client(), "")
+
+		err := os.Setenv("C3PM_API_ENDPOINT", server.URL)
+		Ω(err).ShouldNot(HaveOccurred())
+		defer os.Unsetenv("C3PM_API_ENDPOINT")
+
+		err = ctpm.Publish(getPc(), apiClient)
+		Ω(err).ShouldNot(HaveOccurred())
+	}
+
 	BeforeEach(func() {
 		var err error
 		wd, err = os.Getwd()
@@ -82,63 +80,31 @@ var _ = Describe("Publish", func() {
 		Ω(err).ShouldNot(HaveOccurred())
 	})
 
-	It("basic publish without config: should have sources, includes and c3pm.yml", func() {
+	It("should have correct default include and exclude rules", func() {
 		moveToProjectDirectory("basic")
-		expectedFiles := []string{"src/main.cpp", "c3pm.yml"}
-
-		apiClient := api.New(server.Client(), "")
-
-		err := os.Setenv("C3PM_API_ENDPOINT", server.URL)
-		Ω(err).ShouldNot(HaveOccurred())
-		defer os.Unsetenv("C3PM_API_ENDPOINT")
-
-		err = ctpm.Publish(getPc(), apiClient)
-		Ω(err).ShouldNot(HaveOccurred())
-		Ω(areEquals(expectedFiles, filesFound)).Should(BeTrue())
+		expectedFiles := []string{"README.md", "c3pm.yml", "src/main.cpp", "toto.txt"}
+		runPublishWithMockServer()
+		Ω(filesFound).Should(Equal(expectedFiles))
 	})
 
-	It("Include and Exclude files: should have toto.txt but not README.md in tarball", func() {
+	It("should succeed with mixed include and exclude rules", func() {
 		moveToProjectDirectory("includeExclude")
-		expectedFiles := []string{"toto.txt", "src/main.cpp", "c3pm.yml"}
-
-		apiClient := api.New(server.Client(), "")
-
-		err := os.Setenv("C3PM_API_ENDPOINT", server.URL)
-		Ω(err).ShouldNot(HaveOccurred())
-		defer os.Unsetenv("C3PM_API_ENDPOINT")
-
-		err = ctpm.Publish(getPc(), apiClient)
-		Ω(err).ShouldNot(HaveOccurred())
-		Ω(areEquals(expectedFiles, filesFound)).Should(BeTrue())
+		expectedFiles := []string{"c3pm.yml", "src/main.cpp", "toto.txt"}
+		runPublishWithMockServer()
+		Ω(filesFound).Should(Equal(expectedFiles))
 	})
 
-	It("file in Include and Exclude: shouldn't have README.md in tarball", func() {
+	It("should exclude a file that is both included and excluded", func() {
 		moveToProjectDirectory("includeAndExcludeFile")
-		expectedFiles := []string{"src/main.cpp", "c3pm.yml"}
-
-		apiClient := api.New(server.Client(), "")
-
-		err := os.Setenv("C3PM_API_ENDPOINT", server.URL)
-		Ω(err).ShouldNot(HaveOccurred())
-		defer os.Unsetenv("C3PM_API_ENDPOINT")
-
-		err = ctpm.Publish(getPc(), apiClient)
-		Ω(err).ShouldNot(HaveOccurred())
-		Ω(areEquals(expectedFiles, filesFound)).Should(BeTrue())
+		expectedFiles := []string{"c3pm.yml", "toto.txt"}
+		runPublishWithMockServer()
+		Ω(filesFound).Should(Equal(expectedFiles))
 	})
 
 	It("overwrite default include: shouldn't have c3pm.yml in tarball", func() {
 		moveToProjectDirectory("excludeManifest")
-		expectedFiles := []string{"src/main.cpp"}
-
-		apiClient := api.New(server.Client(), "")
-
-		err := os.Setenv("C3PM_API_ENDPOINT", server.URL)
-		Ω(err).ShouldNot(HaveOccurred())
-		defer os.Unsetenv("C3PM_API_ENDPOINT")
-
-		err = ctpm.Publish(getPc(), apiClient)
-		Ω(err).ShouldNot(HaveOccurred())
-		Ω(areEquals(expectedFiles, filesFound)).Should(BeTrue())
+		expectedFiles := []string{"README.md", "src/main.cpp", "toto.txt"}
+		runPublishWithMockServer()
+		Ω(filesFound).Should(Equal(expectedFiles))
 	})
 })

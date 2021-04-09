@@ -1,8 +1,7 @@
-package cmake_test
+package defaultadapter
 
 import (
 	"bufio"
-	"github.com/c3pm-labs/c3pm/cmake"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"os"
@@ -20,13 +19,13 @@ var _ = Describe("CMake interaction", func() {
 			_ = os.RemoveAll(BUILD_DIR)
 		})
 		It("does generate the build directory", func() {
-			err := cmake.GenerateBuildFiles("../test_helpers/projects/cmakeProject", BUILD_DIR, map[string]string{})
+			err := cmakeGenerateBuildFiles("../../test_helpers/projects/cmakeProject", BUILD_DIR, map[string]string{})
 			Ω(err).ShouldNot(HaveOccurred())
 			_, err = os.Stat(BUILD_DIR)
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 		It("uses the variables added", func() {
-			err := cmake.GenerateBuildFiles("../test_helpers/projects/cmakeProject", BUILD_DIR, map[string]string{"CMAKE_AR:FILEPATH": "/bin/ls"})
+			err := cmakeGenerateBuildFiles("../../test_helpers/projects/cmakeProject", BUILD_DIR, map[string]string{"CMAKE_AR:FILEPATH": "/bin/ls"})
 			Ω(err).ShouldNot(HaveOccurred())
 			_, err = os.Stat(BUILD_DIR)
 			Ω(err).ShouldNot(HaveOccurred())
@@ -46,7 +45,7 @@ var _ = Describe("CMake interaction", func() {
 		})
 	})
 
-	Describe("CMake Build", func() {
+	Describe("CMake cmakeBuild", func() {
 		const (
 			BUILD_DIR = "/tmp/c3pm_cmake_test2"
 		)
@@ -56,42 +55,15 @@ var _ = Describe("CMake interaction", func() {
 		})
 		It("builds the project", func() {
 			// Generate files
-			err := cmake.GenerateBuildFiles("../test_helpers/projects/cmakeProject", BUILD_DIR, map[string]string{})
+			err := cmakeGenerateBuildFiles("../../test_helpers/projects/cmakeProject", BUILD_DIR, map[string]string{})
 			Ω(err).ShouldNot(HaveOccurred())
 			_, err = os.Stat(BUILD_DIR)
 			Ω(err).ShouldNot(HaveOccurred())
 
 			// Build the project
-			err = cmake.Build(BUILD_DIR)
+			err = cmakeBuild(BUILD_DIR)
 			Ω(err).ShouldNot(HaveOccurred())
 			_, err = os.Stat(filepath.Join(BUILD_DIR, "test1"))
-			Ω(err).ShouldNot(HaveOccurred())
-		})
-	})
-
-	Describe("CMake Install", func() {
-		const (
-			BUILD_DIR = "/tmp/c3pm_cmake_test3"
-		)
-
-		AfterEach(func() {
-			_ = os.RemoveAll(BUILD_DIR)
-		})
-		It("installs the project", func() {
-			// Generate files
-			err := cmake.GenerateBuildFiles("../test_helpers/projects/cmakeProject", BUILD_DIR, map[string]string{})
-			Ω(err).ShouldNot(HaveOccurred())
-			_, err = os.Stat(BUILD_DIR)
-			Ω(err).ShouldNot(HaveOccurred())
-
-			// Build the project
-			err = cmake.Build(BUILD_DIR)
-			Ω(err).ShouldNot(HaveOccurred())
-			_, err = os.Stat(filepath.Join(BUILD_DIR, "test1"))
-			Ω(err).ShouldNot(HaveOccurred())
-
-			// Install the project
-			err = cmake.Install(BUILD_DIR)
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 	})

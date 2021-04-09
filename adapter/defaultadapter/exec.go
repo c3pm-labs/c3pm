@@ -1,4 +1,4 @@
-package cmakegen
+package defaultadapter
 
 import (
 	"bytes"
@@ -16,7 +16,7 @@ add_executable({{.ProjectName}})
 
 target_sources({{.ProjectName}} PRIVATE
 	{{.Sources -}}
-	{{.Includes}}
+	{{.Headers}}
 )
 {{$c3pmGlobalDir:=.C3PMGlobalDir}}
 
@@ -25,25 +25,25 @@ target_include_directories(
 	{{- range .Dependencies }}
 		{{- $name:=.Name }}
 		{{- $version:=.Version}}
-		{{- range .ExportedIncludeDirs }}
-	{{ $c3pmGlobalDir }}/cache/{{$name}}/{{$version}}/{{.}}
+		{{- range .IncludeDirs }}
+			{{ $c3pmGlobalDir }}/cache/{{$name}}/{{$version}}/{{.}}
 		{{- end }}
 	{{- end }}
 )
 {{range .Dependencies}}
-find_library({{ .Name | ToUpper}} {{.Name}} "{{$c3pmGlobalDir}}/cache/{{.Name}}/{{.Version}}/lib")
+find_library({{ .Name | ToUpper}} {{.Name}} "{{$c3pmGlobalDir}}/cache/{{.Name}}/{{.Version}}/")
 {{end}}
 
 target_link_libraries(
 	{{.ProjectName}}
 	PUBLIC
 	{{range .Dependencies}}
-	{{"${"}}{{.Name|ToUpper}}{{"}"}}
+	$<$<NOT:$<STREQUAL:"{{"${"}}{{.Name|ToUpper}}{{"}"}}","{{.Name|ToUpper}}-NOTFOUND">>:{{"${"}}{{.Name|ToUpper}}{{"}"}}>
 	{{- end}}
 )
 `
 
-func executable(v CMakeVars) (string, error) {
+func executable(v cmakeVars) (string, error) {
 	funcMap := template.FuncMap{
 		"ToUpper": strings.ToUpper,
 	}
