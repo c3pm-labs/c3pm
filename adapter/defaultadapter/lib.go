@@ -1,4 +1,4 @@
-package cmakegen
+package defaultadapter
 
 import (
 	"bufio"
@@ -15,14 +15,8 @@ set(CMAKE_CXX_STANDARD {{.LanguageStandard}})
 
 add_library({{.ProjectName}} STATIC)
 
-target_sources({{.ProjectName}} PRIVATE {{.Sources}} {{.Includes}})
+target_sources({{.ProjectName}} PRIVATE {{.Sources}} {{.Headers}})
 target_include_directories({{.ProjectName}} PRIVATE {{.IncludeDirs}})
-
-install(
-	DIRECTORY {{ .ExportedDir | AddTrailingSlash }}
-	DESTINATION ${CMAKE_INSTALL_PREFIX}
-)
-install(TARGETS {{.ProjectName}} ARCHIVE)
 `
 
 func removeCommand(cmake string, command string) string {
@@ -36,7 +30,7 @@ func removeCommand(cmake string, command string) string {
 	return cmakeClean
 }
 
-func library(v CMakeVars) (string, error) {
+func library(v cmakeVars) (string, error) {
 	funcMap := template.FuncMap{
 		"AddTrailingSlash": func(text string) string {
 			if !strings.HasSuffix(text, "/") {
@@ -46,7 +40,7 @@ func library(v CMakeVars) (string, error) {
 		},
 	}
 	cmake := bytes.NewBuffer([]byte{})
-	tmpl, err := template.New("cmakeExecutable").Funcs(funcMap).Parse(addPlatformSpecificCMake(libraryTemplate, v))
+	tmpl, err := template.New("cmakeLibrary").Funcs(funcMap).Parse(addPlatformSpecificCMake(libraryTemplate, v))
 	if err != nil {
 		return "", fmt.Errorf("could not parse cmake template: %w", err)
 	}

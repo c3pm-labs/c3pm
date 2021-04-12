@@ -1,5 +1,5 @@
 // Package cmakegen handles the templating and generation of CMake configuration files.
-package cmakegen
+package defaultadapter
 
 import (
 	"fmt"
@@ -12,8 +12,8 @@ import (
 	"strings"
 )
 
-//Dependency is holds metadata about a dependency of a project.
-type Dependency struct {
+//dependency is holds metadata about a dependency of a project.
+type dependency struct {
 	// Name is the package name of the dependency
 	Name string
 	// Version is the version of the dependency to depend on
@@ -22,66 +22,52 @@ type Dependency struct {
 	// In most cases this will only contain one entry, but there are cases of packages containing several libraries, for
 	// separation of concerns reasons.
 	Targets []string
-	//TODO: Unused
-	ExportedDir string
-	// ExportedIncludeDirs is the list of the directories in which header files for the library can be found.
-	ExportedIncludeDirs []string
+	// IncludeDirs is the list of the directories in which header files for the library can be found.
+	IncludeDirs []string
 }
 
-//CMakeVars is the structure passed to the templates used for generating CMake config files.
-type CMakeVars struct {
+//cmakeVars is the structure passed to the templates used for generating CMake config files.
+type cmakeVars struct {
 	//ProjectName is the name of the current project
 	ProjectName string
 	//ProjectVersion is the current version of the project
 	ProjectVersion string
 	//Sources is a string containing the list of all of the project's sources, space-separated.
 	Sources string
-	//Includes is string containing the list of all of the project's header files, space-separated.
-	Includes string
+	//Headers is string containing the list of all of the project's header files, space-separated.
+	Headers string
 	//IncludeDirs is a string containing the list of all of the project's additional header directories, space-separated.
 	IncludeDirs string
 	//ExportedDir is the path to the directory containing export headers for the project.
 	ExportedDir string
 	//C3PMGlobalDir is the path to the current $HOME user directory.
 	C3PMGlobalDir string
-	//Dependencies is a list of all the data for each Dependency of the project
-	Dependencies []Dependency
+	//Dependencies is a list of all the data for each dependency of the project
+	Dependencies []dependency
 	//TODO: Unused
 	PublicIncludeDir string
 	//LinuxConfig holds linux-specific configuration information
-	LinuxConfig *manifest.LinuxConfig
+	LinuxConfig *LinuxConfig
 	//LanguageStandard is the C++ language standard version to use.
 	LanguageStandard string
 }
 
-func dependenciesToCMake(dependencies map[string]string) ([]Dependency, error) {
-	deps := make([]Dependency, len(dependencies))
+func dependenciesToCMake(dependencies map[string]string) ([]dependency, error) {
+	deps := make([]dependency, len(dependencies))
 	i := 0
 	for n, v := range dependencies {
 		m, err := manifest.Load(filepath.Join(config.LibCachePath(n, v), "c3pm.yml"))
 		if err != nil {
 			return nil, err
 		}
-		deps[i] = Dependency{
-			Name:                n,
-			Version:             v,
-			Targets:             m.Targets(),
-			ExportedDir:         m.Files.ExportedDir,
-			ExportedIncludeDirs: m.Files.ExportedIncludeDirs,
-		}
-		if m.CustomCMake != nil {
-			deps[i].ExportedIncludeDirs = []string{"include"}
+		deps[i] = dependency{
+			Name:        n,
+			Version:     v,
+			Targets:     m.Targets(),
+			IncludeDirs: m.Publish.IncludeDirs,
 		}
 	}
 	return deps, nil
-}
-
-func filesSliceToCMake(files []string) string {
-	fileString := ""
-	for _, file := range files {
-		fileString += " " + filepath.ToSlash(file)
-	}
-	return fileString
 }
 
 func globbingExprToFiles(globStr string) ([]string, error) {
@@ -108,56 +94,66 @@ func globbingExprsToCMakeVar(globs []string, projectRoot string) (string, error)
 		files = append(files, globFiles...)
 	}
 	files = filterInternalSources(files, projectRoot)
-	return filesSliceToCMake(files), nil
+	return strings.Join(files, " "), nil
 }
 
-func varsFromProjectConfig(pc *config.ProjectConfig) (CMakeVars, error) {
+func pathListToCmakeVar(paths []string, projectRoot string) string {
+	res := ""
+	for _, path := range paths {
+		res += " "
+		res += filepath.Join(projectRoot, path)
+	}
+	return res
+}
+
+func varsFromProjectConfig(pc *config.ProjectConfig) (cmakeVars, error) {
 	dependencies, err := dependenciesToCMake(pc.Manifest.Dependencies)
 	if err != nil {
-		return CMakeVars{}, err
+		return cmakeVars{}, err
 	}
 
-	vars := CMakeVars{
+	adapterCfg, err := Parse(pc.Manifest.Build.Config)
+	if err != nil {
+		return cmakeVars{}, err
+	}
+
+	sources, err := globbingExprsToCMakeVar(adapterCfg.Sources, pc.ProjectRoot)
+	if err != nil {
+		return cmakeVars{}, fmt.Errorf("could not parse Sources: %w", err)
+	}
+	headers, err := globbingExprsToCMakeVar(adapterCfg.Headers, pc.ProjectRoot)
+	if err != nil {
+		return cmakeVars{}, fmt.Errorf("could not parse Includes: %w", err)
+	}
+
+	vars := cmakeVars{
 		ProjectName:      pc.Manifest.Name,
 		ProjectVersion:   pc.Manifest.Version.String(),
-		Sources:          filesSliceToCMake(pc.Manifest.Files.Sources),
-		Includes:         filesSliceToCMake(pc.Manifest.Files.Includes),
-		IncludeDirs:      filesSliceToCMake(pc.Manifest.Files.IncludeDirs),
-		ExportedDir:      filepath.ToSlash(filepath.Join(pc.ProjectRoot, pc.Manifest.Files.ExportedDir)),
+		Sources:          sources,
+		Headers:          headers,
+		IncludeDirs:      pathListToCmakeVar(adapterCfg.IncludeDirs, pc.ProjectRoot),
 		C3PMGlobalDir:    filepath.ToSlash(config.GlobalC3PMDirPath()),
 		Dependencies:     dependencies,
-		LinuxConfig:      pc.Manifest.LinuxConfig,
+		LinuxConfig:      adapterCfg.LinuxConfig,
 		LanguageStandard: pc.Manifest.Standard,
 	}
 
-	vars.Sources, err = globbingExprsToCMakeVar(pc.Manifest.Files.Sources, pc.ProjectRoot)
-	if err != nil {
-		return CMakeVars{}, fmt.Errorf("could not parse Sources: %w", err)
-	}
-	vars.Includes, err = globbingExprsToCMakeVar(pc.Manifest.Files.Includes, pc.ProjectRoot)
-	if err != nil {
-		return CMakeVars{}, fmt.Errorf("could not parse Includes: %w", err)
-	}
-	vars.IncludeDirs, err = globbingExprsToCMakeVar(pc.Manifest.Files.IncludeDirs, pc.ProjectRoot)
-	if err != nil {
-		return CMakeVars{}, fmt.Errorf("could not parse IncludeDirs: %w", err)
-	}
 	return vars, nil
 }
 
 func fromProjectConfig(pc *config.ProjectConfig) (string, error) {
 	var cmake string
-	var cmakeVars CMakeVars
+	var vars cmakeVars
 
-	cmakeVars, err := varsFromProjectConfig(pc)
+	vars, err := varsFromProjectConfig(pc)
 	if err != nil {
 		return "", fmt.Errorf("failed to generate cmake variables: %w", err)
 	}
 	switch pc.Manifest.Type {
 	case manifest.Executable:
-		cmake, err = executable(cmakeVars)
+		cmake, err = (func() (string, error) { return executable(vars) })()
 	case manifest.Library:
-		cmake, err = library(cmakeVars)
+		cmake, err = (func() (string, error) { return library(vars) })()
 	}
 	if err != nil {
 		return "", fmt.Errorf("failed to generate cmake: %w", err)
@@ -165,17 +161,17 @@ func fromProjectConfig(pc *config.ProjectConfig) (string, error) {
 	return cmake, nil
 }
 
-//Generate takes a config.ProjectConfig and creates CMake configuration files based on the project config.
-func Generate(pc *config.ProjectConfig) error {
+//generateCMakeScripts takes a config.ProjectConfig and creates CMake configuration files based on the project config.
+func generateCMakeScripts(targetDir string, pc *config.ProjectConfig) error {
 	cmakeContent, err := fromProjectConfig(pc)
 	if err != nil {
 		return fmt.Errorf("failed to generate cmake scripts: %w", err)
 	}
-	err = os.MkdirAll(pc.CMakeDir(), os.ModePerm)
+	err = os.MkdirAll(targetDir, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("failed to create c3pm cmake directory: %w", err)
 	}
-	err = ioutil.WriteFile(filepath.Join(pc.CMakeDir(), "CMakeLists.txt"), []byte(cmakeContent), 0644)
+	err = ioutil.WriteFile(filepath.Join(targetDir, "CMakeLists.txt"), []byte(cmakeContent), 0644)
 	if err != nil {
 		return fmt.Errorf("failed to create CMakeLists.txt: %w", err)
 	}

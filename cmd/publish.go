@@ -10,7 +10,6 @@ import (
 
 //PublishCmd defines the parameters of the publish command.
 type PublishCmd struct {
-	Ignore []string `kong:"optional,name='ignore',short='i',help='Ignore file'"`
 }
 
 //Run handles the behavior of the publish command.
@@ -24,7 +23,5 @@ func (p *PublishCmd) Run() error {
 	if err != nil {
 		return fmt.Errorf("failed to read c3pm.yml: %w", err)
 	}
-	return ctpm.Publish(pc, client, ctpm.PublishOptions{
-		Ignore: p.Ignore,
-	})
+	return ctpm.Publish(pc, client)
 }
