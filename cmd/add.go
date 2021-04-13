@@ -4,25 +4,30 @@ import (
 	"fmt"
 	"github.com/c3pm-labs/c3pm/config"
 	"github.com/c3pm-labs/c3pm/ctpm"
+	"github.com/spf13/cobra"
 )
 
-//AddCmd defines the parameters of the add command.
-type AddCmd struct {
-	Force       bool   `kong:"optional,name='force',help='Ignore cache.'"`
-	RegistryURL string `kong:"optional,name='registry-url',help='Select specific registry to use.'"`
+var addCmdFlags = ctpm.AddOptions{}
 
-	Dependencies []string `kong:"arg,help='List of dependencies to add.'"`
+var addCmd = &cobra.Command{
+	Use:   "add [dependencies...]",
+	Short: "Add one or more new dependency",
+	Args:  cobra.MinimumNArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		pc, err := config.Load(".")
+		if err != nil {
+			return fmt.Errorf("failed to read c3pm.yml: %w", err)
+		}
+		addCmdFlags.Dependencies = args
+		err = ctpm.Add(pc, addCmdFlags)
+		if err != nil {
+			return fmt.Errorf("failed to add dependencies: %w", err)
+		}
+		return nil
+	},
 }
 
-//Run handles the behavior of the add command.
-func (a *AddCmd) Run() error {
-	pc, err := config.Load(".")
-	if err != nil {
-		return fmt.Errorf("failed to read c3pm.yml: %w", err)
-	}
-	err = ctpm.Add(pc, ctpm.AddOptions{Force: a.Force, RegistryURL: a.RegistryURL, Dependencies: a.Dependencies})
-	if err != nil {
-		return fmt.Errorf("failed to add dependencies: %w", err)
-	}
-	return nil
+func init() {
+	addCmd.Flags().BoolVarP(&addCmdFlags.Force, "force", "f", false, "Ignore cache.")
+	addCmd.Flags().StringVarP(&addCmdFlags.RegistryURL, "registry-url", "r", "", "Select specific registry to use.")
 }
