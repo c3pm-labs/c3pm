@@ -40,15 +40,15 @@ func executeXcodeCli(args ...string) error {
 	cmd.Stderr = os.Stderr
 	err := cmd.Start()
 	if err != nil {
-		return fmt.Errorf("failed to start cmake: %w", err)
+		return fmt.Errorf("failed to start xcodebuild: %w", err)
 	}
 	if err = cmd.Wait(); err != nil {
-		return fmt.Errorf("cmake process failed: %w", err)
+		return fmt.Errorf("xcodebuild process failed: %w", err)
 	}
 	return nil
 }
 
-func buildMacOS(pc *config.ProjectConfig) error {
+func buildOnMacOS(pc *config.ProjectConfig) error {
 	err := visit(pc.ProjectRoot+"/src/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm",
 		"[NSApp setDelegate:(id<NSFileManagerDelegate>)",
 		"[NSApp setDelegate:(id<NSApplicationDelegate>)",
@@ -67,12 +67,42 @@ func buildMacOS(pc *config.ProjectConfig) error {
 	return executeXcodeCli("-project", path, "-target", "libIrrlicht.a", "SYSMROOT=build")
 }
 
+func executeMakeCli(args ...string) error {
+	cmd := exec.Command("make", args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err := cmd.Start()
+	if err != nil {
+		return fmt.Errorf("failed to start make: %w", err)
+	}
+	if err = cmd.Wait(); err != nil {
+		return fmt.Errorf("make process failed: %w", err)
+	}
+	return nil
+}
+
+func buildOnLinux(pc *config.ProjectConfig) error {
+	var path = pc.ProjectRoot + "/src/Irrlicht"
+	return executeMakeCli("-C", path)
+}
+
 func (a *IrrlichtAdapter) Build(pc *config.ProjectConfig) error {
-	if runtime.GOOS == "darwin" {
-		err := buildMacOS(pc)
+	fmt.Println(runtime.GOOS)
+	switch runtime.GOOS {
+	case "darwin":
+		err := buildOnMacOS(pc)
 		if err != nil {
 			return err
 		}
+		break
+	case "linux":
+		err := buildOnLinux(pc)
+		if err != nil {
+			return err
+		}
+		break
+	case "windows":
+		return nil
 	}
 	return nil
 }

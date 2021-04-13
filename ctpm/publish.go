@@ -55,14 +55,10 @@ func getFilesFromRules(included []string, excluded []string) ([]string, error) {
 // We enforce the exclusion of the .git and .c3pm directories and we enforce
 // the inclusion of the c3pm.yml file
 func Publish(pc *config.ProjectConfig, client api.API) error {
-	fmt.Println("Manifest Include:", pc.Manifest.Publish.Include)
 	included := append(pc.Manifest.Publish.Include, "c3pm.yml")
 	excluded := append(pc.Manifest.Publish.Exclude, ".git/**", ".c3pm/**")
 
-	fmt.Println("included:", included)
-	fmt.Println("excluded:", excluded)
 	files, err := getFilesFromRules(included, excluded)
-	fmt.Println("files:", files)
 	if err != nil {
 		return fmt.Errorf("failed to list files to publish: %w", err)
 	}

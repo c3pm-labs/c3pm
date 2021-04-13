@@ -51,8 +51,5 @@ func library(v cmakeVars) (string, error) {
 	if len(v.IncludeDirs) == 0 {
 		cmakeClean = removeCommand(cmakeClean, "target_include_directories")
 	}
-	if len(v.ExportedDir) == 0 {
-		cmakeClean = removeCommand(cmakeClean, "install(DIRECTORY")
-	}
 	return cmakeClean, nil
 }
