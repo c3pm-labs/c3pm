@@ -3,6 +3,7 @@ package adapter
 import (
 	"errors"
 	"github.com/c3pm-labs/c3pm/adapter/defaultadapter"
+	"github.com/c3pm-labs/c3pm/adapter/irrlichtadapter"
 	"github.com/c3pm-labs/c3pm/config"
 )
 
@@ -19,6 +20,8 @@ func FromPC(pc *config.ProjectConfig) (Adapter, error) {
 	switch {
 	case adp.Name == "c3pm" && adp.Version.String() == "0.0.1":
 		return defaultadapter.New(), nil
+	case adp.Name == "irrlicht" && adp.Version.String() == "0.0.1":
+		return irrlichtadapter.New(), nil
 	default:
 		return nil, errors.New("only default adapter is supported")
 	}
