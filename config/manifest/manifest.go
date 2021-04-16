@@ -23,6 +23,7 @@ type Manifest struct {
 	Standard      string         `yaml:"standard"`
 	License       string         `yaml:"license"`
 	Dependencies  Dependencies   `yaml:"dependencies"`
+	Tags          []string       `yaml:"tags"`
 }
 
 type BuildConfig struct {
