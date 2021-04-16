@@ -23,7 +23,7 @@ type Manifest struct {
 	Standard      string         `yaml:"standard"`
 	License       string         `yaml:"license"`
 	Dependencies  Dependencies   `yaml:"dependencies"`
-	Tags          []string       `yaml:"tags"`
+	Tags          []string       `yaml:"tags,omitempty"`
 }
 
 type BuildConfig struct {
@@ -38,8 +38,8 @@ type AdapterConfig struct {
 
 type PublishConfig struct {
 	IncludeDirs []string `yaml:"include_dirs,omitempty"`
-	Include     []string `yaml:"include"`
-	Exclude     []string `yaml:"exclude"`
+	Include     []string `yaml:"include,omitempty"`
+	Exclude     []string `yaml:"exclude,omitempty"`
 }
 
 // New returns the default manifest values.
