@@ -34,7 +34,7 @@ type ListRegistryResponse struct {
 //The version returned by GetLastVersion will be 3.3.0, because it is the highest SemVer version number.
 func GetLastVersion(dependency string, options Options) (*semver.Version, error) {
 	client := http.Client{}
-	req, err := http.NewRequest("GET", options.RegistryURL, nil)
+	req, err := http.NewRequest("GET", options.RegistryURL+"/registry-c3pm-io", nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating version query: %w", err)
 	}
@@ -42,6 +42,8 @@ func GetLastVersion(dependency string, options Options) (*semver.Version, error)
 	q.Add("typeList", "2")
 	q.Add("prefix", dependency)
 	req.URL.RawQuery = q.Encode()
+	req.Header.Add("Host", "registry-c3pm-io")
+	req.Header.Add("Authorization", "AWS4-HMAC-SHA256 Credential=A/20210315/eu-west-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=a")
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching versions: %w", err)
@@ -74,14 +76,14 @@ func GetLastVersion(dependency string, options Options) (*semver.Version, error)
 }
 
 //FetchPackage downloads a package given it's name and version number.
-func FetchPackage(dependency string, version *semver.Version, options Options) (*os.File, error) {
+func FetchPackage(dependency string, version string, options Options) (*os.File, error) {
 	client := http.Client{}
-	resp, err := client.Get(fmt.Sprintf("%s/%s/%s", options.RegistryURL, dependency, version.String()))
+	resp, err := client.Get(fmt.Sprintf("%s/%s/%s", options.RegistryURL+"/registry-c3pm-io", dependency, version))
 	if err != nil {
 		return nil, fmt.Errorf("error fetching package %s: %w", dependency, err)
 	}
 	defer resp.Body.Close()
-	file, err := ioutil.TempFile("", fmt.Sprintf("%s.%s.*.tar", dependency, version.String()))
+	file, err := ioutil.TempFile("", fmt.Sprintf("%s.%s.*.tar", dependency, version))
 	if err != nil {
 		return nil, fmt.Errorf("error creating temporary package file: %w", err)
 	}

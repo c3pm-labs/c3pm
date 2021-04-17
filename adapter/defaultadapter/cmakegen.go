@@ -66,6 +66,7 @@ func dependenciesToCMake(dependencies map[string]string) ([]dependency, error) {
 			Targets:     m.Targets(),
 			IncludeDirs: m.Publish.IncludeDirs,
 		}
+		i++
 	}
 	return deps, nil
 }

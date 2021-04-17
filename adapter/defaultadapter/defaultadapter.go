@@ -20,6 +20,7 @@ func New() *DefaultAdapter {
 var CurrentVersion, _ = manifest.VersionFromString("0.0.1")
 
 func (a *DefaultAdapter) Build(pc *config.ProjectConfig) error {
+	fmt.Println(pc.Manifest.Dependencies)
 	cmakeVariables := map[string]string{
 		"CMAKE_LIBRARY_OUTPUT_DIRECTORY":         pc.ProjectRoot,
 		"CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE": pc.ProjectRoot,

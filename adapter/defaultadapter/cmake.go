@@ -5,14 +5,16 @@
 package defaultadapter
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
 )
 
 func executeCMakeCLI(args ...string) error {
+	buf := new(bytes.Buffer)
 	cmd := exec.Command("cmake", args...)
-	cmd.Stdout = os.Stdout
+	cmd.Stdout = buf
 	cmd.Stderr = os.Stderr
 	err := cmd.Start()
 	if err != nil {

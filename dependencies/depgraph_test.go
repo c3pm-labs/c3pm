@@ -53,7 +53,10 @@ func (TestDependencyHandler) FetchDeps(request dependencies.PackageRequest) (dep
 	return nil, errors.New("version not found")
 }
 
-func (TestDependencyHandler) Act(request dependencies.PackageRequest) error {
+func (TestDependencyHandler) PreAct(request dependencies.PackageRequest) error {
+	return nil
+}
+func (TestDependencyHandler) PostAct(request dependencies.PackageRequest) error {
 	return nil
 }
 

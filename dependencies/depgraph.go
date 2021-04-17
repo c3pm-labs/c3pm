@@ -1,6 +1,9 @@
 package dependencies
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 // Packages is a map from names to the list of versions.
 // The versions are represented as a map of string over struct{} to use the speed and uniqueness of map keys.
@@ -67,14 +70,14 @@ func install(r PackageRequest, depHandler DependencyHandler, installedPackages *
 	if installedPackages.Find(r.Name, r.Version) {
 		return nil
 	}
-	err := depHandler.Act(r)
+	err := depHandler.PreAct(r)
 	if err != nil {
-		return err
+		return fmt.Errorf("error during prefetch action for %s/%s: %w", r.Name, r.Version, err)
 	}
 	installedPackages.add(r.Name, r.Version)
 	deps, err := depHandler.FetchDeps(r)
 	if err != nil {
-		return err
+		return fmt.Errorf("error fetching dependencies of %s/%s: %w", r.Name, r.Version, err)
 	}
 	if deps == nil {
 		return nil
@@ -87,6 +90,10 @@ func install(r PackageRequest, depHandler DependencyHandler, installedPackages *
 		if err != nil {
 			return err
 		}
+	}
+	err = depHandler.PostAct(r)
+	if err != nil {
+		return fmt.Errorf("error during postfetch action for %s/%s: %w", r.Name, r.Version, err)
 	}
 	return nil
 }

@@ -44,6 +44,7 @@ target_link_libraries(
 `
 
 func executable(v cmakeVars) (string, error) {
+	fmt.Println(v.Dependencies)
 	funcMap := template.FuncMap{
 		"ToUpper": strings.ToUpper,
 	}
