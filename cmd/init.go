@@ -19,13 +19,16 @@ var initCmd = &cobra.Command{
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) > 1 {
 			return fmt.Errorf("requires one or no arguments")
-		} else if len(args) == 0 {
-			cmd.SetArgs([]string{"."})
 		}
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		path := args[0]
+		var path string
+		if (len(args) == 1) {
+			path = args[0]
+		} else {
+			path = "."
+		}
 		manifest, err := input.Init()
 		if err != nil {
 			return fmt.Errorf("failed to init project config: %w", err)
