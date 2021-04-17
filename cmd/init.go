@@ -24,7 +24,7 @@ var initCmd = &cobra.Command{
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var path string
-		if (len(args) == 1) {
+		if len(args) == 1 {
 			path = args[0]
 		} else {
 			path = "."
