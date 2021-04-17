@@ -35,7 +35,7 @@ func getAllDependencies(pc *config.ProjectConfig) error {
 			return err
 		}
 		for dname, dversions := range deps {
-			for dversion, _ := range dversions {
+			for dversion := range dversions {
 				allDeps[dname] = dversion
 			}
 		}

@@ -27,14 +27,6 @@ func (ps Packages) add(name, version string) {
 	}
 }
 
-func (ps Packages) merge(other Packages) {
-	for name, versions := range other {
-		for version, _ := range versions {
-			ps.add(name, version)
-		}
-	}
-}
-
 func (ps Packages) String() string {
 	sb := strings.Builder{}
 	i := 0
@@ -42,7 +34,7 @@ func (ps Packages) String() string {
 		sb.WriteString(name + "@")
 		sb.WriteString("[")
 		j := 0
-		for version, _ := range versions {
+		for version := range versions {
 			sb.WriteString(version)
 			if j != len(versions)-1 && len(versions) >= 1 {
 				sb.WriteString(",")
