@@ -35,7 +35,7 @@ var initCmd = &cobra.Command{
 		} else {
 			path = "."
 		}
-    
+
 		var man manifest.Manifest
 		var err error
 		if len(initCmdFlags.Name) == 0 {
@@ -44,7 +44,6 @@ var initCmd = &cobra.Command{
 			man, err = input.InitNonInteractive(initCmdFlags.InitValues)
 		}
 
-    
 		if err != nil {
 			return fmt.Errorf("failed to init project config: %w", err)
 		}
