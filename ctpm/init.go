@@ -2,11 +2,12 @@ package ctpm
 
 import (
 	"fmt"
-	"github.com/mitchellh/go-spdx"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"text/template"
+
+	"github.com/mitchellh/go-spdx"
 
 	"github.com/c3pm-labs/c3pm/config"
 )
@@ -46,12 +47,12 @@ func Init(pc *config.ProjectConfig, opt InitOptions) error {
 				return err
 			}
 		}
+		err = Build(pc)
+		if err != nil {
+			return err
+		}
 	}
 
-	err = Build(pc)
-	if err != nil {
-		return err
-	}
 	return pc.Save()
 }
 
