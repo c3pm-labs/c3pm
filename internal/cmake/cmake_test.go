@@ -1,4 +1,4 @@
-package defaultadapter
+package cmake
 
 import (
 	"bufio"
