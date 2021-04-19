@@ -4,12 +4,18 @@ import (
 	"fmt"
 	"github.com/c3pm-labs/c3pm/cmd/input"
 	"github.com/c3pm-labs/c3pm/config"
+	"github.com/c3pm-labs/c3pm/config/manifest"
 	"github.com/c3pm-labs/c3pm/ctpm"
 	"github.com/spf13/cobra"
 	"path/filepath"
 )
 
-var initCmdFlags = ctpm.InitOptions{}
+type InitCmdFlags struct {
+	ctpm.InitOptions
+	input.InitValues
+}
+
+var initCmdFlags = InitCmdFlags{}
 
 var initCmd = &cobra.Command{
 	Use:   "init [path]",
@@ -29,7 +35,15 @@ var initCmd = &cobra.Command{
 		} else {
 			path = "."
 		}
-		manifest, err := input.Init()
+
+		var man manifest.Manifest
+		var err error
+		if len(initCmdFlags.Name) == 0 {
+			man, err = input.Init()
+		} else {
+			man, err = input.InitNonInteractive(initCmdFlags.InitValues)
+		}
+
 		if err != nil {
 			return fmt.Errorf("failed to init project config: %w", err)
 		}
@@ -37,8 +51,8 @@ var initCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		pc := &config.ProjectConfig{Manifest: manifest, ProjectRoot: projectRoot}
-		err = ctpm.Init(pc, initCmdFlags)
+		pc := &config.ProjectConfig{Manifest: man, ProjectRoot: projectRoot}
+		err = ctpm.Init(pc, initCmdFlags.InitOptions)
 		if err != nil {
 			return fmt.Errorf("failed to init project: %w", err)
 		}
@@ -48,4 +62,11 @@ var initCmd = &cobra.Command{
 
 func init() {
 	initCmd.Flags().BoolVar(&initCmdFlags.NoTemplate, "no-template", ctpm.InitDefaultOptions.NoTemplate, "Prevents the creation of CMake files")
+
+	// Non Interactive Mode
+	initCmd.Flags().StringVar(&initCmdFlags.InitValues.Name, "name", "", "Give project name to skip interactive entry and enter non-interactive mode")
+	initCmd.Flags().StringVar(&initCmdFlags.InitValues.Type, "type", "", "Project's type when using non-interactive mode")
+	initCmd.Flags().StringVar(&initCmdFlags.InitValues.Description, "desc", "", "Project description when using non-interactive mode")
+	initCmd.Flags().StringVar(&initCmdFlags.InitValues.Version, "version", "1.0.0", "Project version when using non-interactive mode")
+	initCmd.Flags().StringVar(&initCmdFlags.InitValues.License, "license", "UNLICENSED", "Project license when using non-interactive mode")
 }

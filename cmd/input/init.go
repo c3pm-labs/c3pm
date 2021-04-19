@@ -1,6 +1,7 @@
 package input
 
 import (
+	"fmt"
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/Masterminds/semver/v3"
 	"github.com/c3pm-labs/c3pm/config/manifest"
@@ -51,9 +52,35 @@ var InitSurvey = []*survey.Question{
 	},
 }
 
+type InitValues = struct {
+	Name        string
+	Type        string
+	Description string
+	Version     string
+	License     string
+}
+
 //Init handles the user interaction happening during the init command
 func Init() (manifest.Manifest, error) {
 	man := manifest.New()
 	err := survey.Ask(InitSurvey, &man, SurveyOptions...)
 	return man, err
+}
+
+func InitNonInteractive(val InitValues) (manifest.Manifest, error) {
+	var err error
+	man := manifest.New()
+	man.Name = val.Name
+	man.Type, err = manifest.TypeFromString(val.Type)
+	if err != nil {
+		return manifest.Manifest{}, fmt.Errorf("failed to parse project type: %w", err)
+	}
+	man.Description = val.Description
+	v, err := manifest.VersionFromString(val.Version)
+	if err != nil {
+		return man, fmt.Errorf("invalid version given: %w", err)
+	}
+	man.Version = v
+	man.License = val.License
+	return man, nil
 }
