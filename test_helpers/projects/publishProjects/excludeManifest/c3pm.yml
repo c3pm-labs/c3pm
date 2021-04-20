@@ -5,14 +5,10 @@ description: includeAndExcludeFile for publish tests
 version: 1.0.0
 standard: "20"
 license: UNLICENSED
-files:
-  sources:
-  - '**/*.cpp'
-  includes:
-  - '**/*.hpp'
-  include_dirs: []
-  exported_dir: ""
-  exported_include_dirs: []
+build:
+  adaper:
+    name: c3pm
+    version: 0.0.1
 publish:
   exclude:
     - 'c3pm.yml'

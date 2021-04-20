@@ -5,6 +5,7 @@ import (
 	"github.com/bmatcuk/doublestar"
 	"github.com/c3pm-labs/c3pm/config"
 	"github.com/c3pm-labs/c3pm/config/manifest"
+	"github.com/c3pm-labs/c3pm/internal/cmake"
 	"path/filepath"
 )
 
@@ -50,12 +51,12 @@ func (a *DefaultAdapter) Build(pc *config.ProjectConfig) error {
 		return fmt.Errorf("error generating config files: %w", err)
 	}
 
-	err = cmakeGenerateBuildFiles(cmakeDirFromPc(pc), buildDirFromPc(pc), cmakeVariables)
+	err = cmake.GenerateBuildFiles(cmakeDirFromPc(pc), buildDirFromPc(pc), cmakeVariables)
 	if err != nil {
 		return fmt.Errorf("cmake build failed: %w", err)
 	}
 
-	err = cmakeBuild(buildDirFromPc(pc))
+	err = cmake.Build(buildDirFromPc(pc))
 	if err != nil {
 		return fmt.Errorf("build failed: %w", err)
 	}
