@@ -2,50 +2,49 @@ before:
   hooks:
     - go mod download
 builds:
-- env:
-  - CGO_ENABLED=0
-  binary: ctpm
-  goos:
-    - darwin
-    - linux
-    - windows
-  goarch:
-    - amd64
-    - 386
+  - env:
+      - CGO_ENABLED=0
+    binary: ctpm
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - 386
 archives:
-- replacements:
-    darwin: Darwin
-    linux: Linux
-    windows: Windows
-    386: i386
-    amd64: x86_64
+  - replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
 brews:
-- name: c3pm
-  tap:
-    owner: c3pm-labs
-    name: homebrew-c3pm
+  - name: c3pm
+    tap:
+      owner: c3pm-labs
+      name: homebrew-c3pm
     install: |
-        bin.install "ctpm"
-
+      bin.install "ctpm"
 nfpms:
-- homepage: c3pm.io
-  maintainer: Codelax <Codelax@protonmail.com>
-  formats:
-    - deb
-    - rpm
-  bindir: /usr/local/bin
-  dependencies:
-    - cmake
-  description: c3pm is a C++ package manager that abstracts your build system and eases the management of your dependencies.
-  vendor: c3pm-labs
+  - homepage: c3pm.io
+    maintainer: Codelax <Codelax@protonmail.com>
+    formats:
+      - deb
+      - rpm
+    bindir: /usr/local/bin
+    dependencies:
+      - cmake
+    description: c3pm is a C++ package manager that abstracts your build system and eases the management of your dependencies.
+    vendor: c3pm-labs
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
 snapshot:
   name_template: "{{ .Tag }}-SNAPSHOT"
 changelog:
   sort: asc
   filters:
     exclude:
-    - '^docs:'
-    - '^test:'
-    - '^meta:'
+      - "^docs:"
+      - "^test:"
+      - "^meta:"
