@@ -2,7 +2,9 @@ package adapter
 
 import (
 	"errors"
+
 	"github.com/c3pm-labs/c3pm/adapter/defaultadapter"
+	"github.com/c3pm-labs/c3pm/adapter/qt"
 	"github.com/c3pm-labs/c3pm/adapter/sfml"
 	"github.com/c3pm-labs/c3pm/config"
 )
@@ -22,6 +24,8 @@ func FromPC(pc *config.ProjectConfig) (Adapter, error) {
 		return defaultadapter.New(), nil
 	case adp.Name == "sfml" && adp.Version.String() == "0.0.1":
 		return sfml.NewAdapter(), nil
+	case adp.Name == "qt" && adp.Version.String() == "0.0.1":
+		return qt.NewAdapter(), nil
 	default:
 		return nil, errors.New("only default adapter is supported")
 	}
