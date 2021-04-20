@@ -101,7 +101,7 @@ func pathListToCmakeVar(paths []string, projectRoot string) string {
 	res := ""
 	for _, path := range paths {
 		res += " "
-		res += filepath.Join(projectRoot, path)
+		res += filepath.ToSlash(filepath.Join(projectRoot, path))
 	}
 	return res
 }
@@ -129,8 +129,8 @@ func varsFromProjectConfig(pc *config.ProjectConfig) (cmakeVars, error) {
 	vars := cmakeVars{
 		ProjectName:      pc.Manifest.Name,
 		ProjectVersion:   pc.Manifest.Version.String(),
-		Sources:          sources,
-		Headers:          headers,
+		Sources:          filepath.ToSlash(sources),
+		Headers:          filepath.ToSlash(headers),
 		IncludeDirs:      pathListToCmakeVar(adapterCfg.IncludeDirs, pc.ProjectRoot),
 		C3PMGlobalDir:    filepath.ToSlash(config.GlobalC3PMDirPath()),
 		Dependencies:     dependencies,
