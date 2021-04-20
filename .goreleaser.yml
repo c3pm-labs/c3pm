@@ -24,6 +24,9 @@ brews:
   tap:
     owner: c3pm-labs
     name: homebrew-c3pm
+    install: |
+        bin.install "ctpm"
+
 nfpms:
 - homepage: c3pm.io
   maintainer: Codelax <Codelax@protonmail.com>
