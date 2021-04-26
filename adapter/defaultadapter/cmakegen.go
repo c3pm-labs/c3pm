@@ -2,8 +2,10 @@
 package defaultadapter
 
 import (
+	"errors"
 	"fmt"
 	"github.com/bmatcuk/doublestar"
+	"github.com/c3pm-labs/c3pm/adapter/irrlichtadapter"
 	"github.com/c3pm-labs/c3pm/config"
 	"github.com/c3pm-labs/c3pm/config/manifest"
 	"io/ioutil"
@@ -50,15 +52,39 @@ type cmakeVars struct {
 	LinuxConfig *LinuxConfig
 	//LanguageStandard is the C++ language standard version to use.
 	LanguageStandard string
+	//DependenciesConfig is a string containing all the cmake command needed by dependencies
+	DependenciesConfig string
 }
 
-func dependenciesToCMake(dependencies map[string]string) ([]dependency, error) {
-	deps := make([]dependency, len(dependencies))
+type Adapter interface {
+	// Build builds the targets
+	Build(pc *config.ProjectConfig) error
+	// Targets return the paths of the targets built by the Build function
+	Targets(pc *config.ProjectConfig) (targets []string, err error)
+	CmakeConfig(pc *config.ProjectConfig) (string, error)
+}
+
+func fromPC(adp *manifest.AdapterConfig) (Adapter, error) {
+
+	fmt.Println("irrlicht", adp.Name, adp.Version)
+	switch {
+	case adp.Name == "c3pm" && adp.Version.String() == "0.0.1":
+		return New(), nil
+	case adp.Name == "irrlicht" && adp.Version.String() == "0.0.1":
+		return irrlichtadapter.New(), nil
+	default:
+		return nil, errors.New("only default adapter is supported")
+	}
+}
+
+func dependenciesToCMake(pc *config.ProjectConfig) ([]dependency, string, error) {
+	deps := make([]dependency, len(pc.Manifest.Dependencies))
+	var depsConfig = ""
 	i := 0
-	for n, v := range dependencies {
+	for n, v := range pc.Manifest.Dependencies {
 		m, err := manifest.Load(filepath.Join(config.LibCachePath(n, v), "c3pm.yml"))
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
 		deps[i] = dependency{
 			Name:        n,
@@ -66,8 +92,18 @@ func dependenciesToCMake(dependencies map[string]string) ([]dependency, error) {
 			Targets:     m.Targets(),
 			IncludeDirs: m.Publish.IncludeDirs,
 		}
+		adp, err := fromPC(m.Build.Adapter)
+		fmt.Println("wesh", adp, err)
+		if err != nil {
+			return nil, "", err
+		}
+		dependencyConfig, err := adp.CmakeConfig(pc)
+		if err != nil {
+			return nil, "", err
+		}
+		depsConfig = depsConfig + dependencyConfig
 	}
-	return deps, nil
+	return deps, depsConfig, nil
 }
 
 func globbingExprToFiles(globStr string) ([]string, error) {
@@ -107,7 +143,7 @@ func pathListToCmakeVar(paths []string, projectRoot string) string {
 }
 
 func varsFromProjectConfig(pc *config.ProjectConfig) (cmakeVars, error) {
-	dependencies, err := dependenciesToCMake(pc.Manifest.Dependencies)
+	dependencies, dependenciesConfig, err := dependenciesToCMake(pc)
 	if err != nil {
 		return cmakeVars{}, err
 	}
@@ -127,15 +163,16 @@ func varsFromProjectConfig(pc *config.ProjectConfig) (cmakeVars, error) {
 	}
 
 	vars := cmakeVars{
-		ProjectName:      pc.Manifest.Name,
-		ProjectVersion:   pc.Manifest.Version.String(),
-		Sources:          sources,
-		Headers:          headers,
-		IncludeDirs:      pathListToCmakeVar(adapterCfg.IncludeDirs, pc.ProjectRoot),
-		C3PMGlobalDir:    filepath.ToSlash(config.GlobalC3PMDirPath()),
-		Dependencies:     dependencies,
-		LinuxConfig:      adapterCfg.LinuxConfig,
-		LanguageStandard: pc.Manifest.Standard,
+		ProjectName:        pc.Manifest.Name,
+		ProjectVersion:     pc.Manifest.Version.String(),
+		Sources:            sources,
+		Headers:            headers,
+		IncludeDirs:        pathListToCmakeVar(adapterCfg.IncludeDirs, pc.ProjectRoot),
+		C3PMGlobalDir:      filepath.ToSlash(config.GlobalC3PMDirPath()),
+		Dependencies:       dependencies,
+		LinuxConfig:        adapterCfg.LinuxConfig,
+		LanguageStandard:   pc.Manifest.Standard,
+		DependenciesConfig: dependenciesConfig,
 	}
 
 	return vars, nil

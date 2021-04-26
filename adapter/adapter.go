@@ -12,6 +12,8 @@ type Adapter interface {
 	Build(pc *config.ProjectConfig) error
 	// Targets return the paths of the targets built by the Build function
 	Targets(pc *config.ProjectConfig) (targets []string, err error)
+	//CmakeConfig return a string to add in the cmake of the project who use the library
+	CmakeConfig(pc *config.ProjectConfig) (string, error)
 }
 
 func FromPC(pc *config.ProjectConfig) (Adapter, error) {

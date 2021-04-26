@@ -34,16 +34,16 @@ func visit(path string, old string, new string) error {
 	return nil
 }
 
-func executeXcodeCli(args ...string) error {
-	cmd := exec.Command("xcodebuild", args...)
+func executeCli(command string, args ...string) error {
+	cmd := exec.Command(command, args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err := cmd.Start()
 	if err != nil {
-		return fmt.Errorf("failed to start xcodebuild: %w", err)
+		return fmt.Errorf("failed to start %s: %w", command, err)
 	}
 	if err = cmd.Wait(); err != nil {
-		return fmt.Errorf("xcodebuild process failed: %w", err)
+		return fmt.Errorf("%s process failed: %w", command, err)
 	}
 	return nil
 }
@@ -64,33 +64,22 @@ func buildOnMacOS(pc *config.ProjectConfig) error {
 		return err
 	}
 	var path = pc.ProjectRoot + "/src/Irrlicht/MacOSX/MacOSX.xcodeproj"
-	return executeXcodeCli("-project", path, "-target", "libIrrlicht.a", "SYSMROOT=build")
-}
-
-func executeMakeCli(args ...string) error {
-	cmd := exec.Command("make", args...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	err := cmd.Start()
-	if err != nil {
-		return fmt.Errorf("failed to start make: %w", err)
-	}
-	if err = cmd.Wait(); err != nil {
-		return fmt.Errorf("make process failed: %w", err)
-	}
-	return nil
+	return executeCli("xcodebuild", "-project", path, "-target", "libIrrlicht.a", "SYSMROOT=build")
 }
 
 func buildOnLinux(pc *config.ProjectConfig) error {
-	var path = pc.ProjectRoot + "/src/Irrlicht"
-	return executeMakeCli("-C", path)
+	return executeCli("make", "-C", pc.ProjectRoot+"/src/Irrlicht")
 }
 
 func (a *IrrlichtAdapter) Build(pc *config.ProjectConfig) error {
-	fmt.Println(runtime.GOOS)
 	switch runtime.GOOS {
 	case "darwin":
 		err := buildOnMacOS(pc)
+		if err != nil {
+			return err
+		}
+		oldLocation := pc.ProjectRoot + "/src/Irrlicht/MacOSX/build/Release/libIrrlicht.a"
+		err = os.Rename(oldLocation, pc.ProjectRoot+"/libIrrlicht.a")
 		if err != nil {
 			return err
 		}
@@ -105,6 +94,10 @@ func (a *IrrlichtAdapter) Build(pc *config.ProjectConfig) error {
 		return nil
 	}
 	return nil
+}
+
+func (a *IrrlichtAdapter) CmakeConfig(pc *config.ProjectConfig) (string, error) {
+	return CmakeConfig, nil
 }
 
 func (a *IrrlichtAdapter) Targets(_ *config.ProjectConfig) ([]string, error) {

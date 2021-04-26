@@ -89,6 +89,10 @@ func (a *DefaultAdapter) Targets(_ *config.ProjectConfig) ([]string, error) {
 	return nil, nil
 }
 
+func (a *DefaultAdapter) CmakeConfig(_ *config.ProjectConfig) (string, error) {
+	return "", nil
+}
+
 func cmakeDirFromPc(pc *config.ProjectConfig) string {
 	return filepath.Join(pc.LocalC3PMDirPath(), "cmake")
 }
