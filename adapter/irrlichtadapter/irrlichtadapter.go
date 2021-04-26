@@ -89,6 +89,11 @@ func (a *IrrlichtAdapter) Build(pc *config.ProjectConfig) error {
 		if err != nil {
 			return err
 		}
+		oldLocation := pc.ProjectRoot + "/lib/Linux/libIrrlicht.a"
+		err = os.Rename(oldLocation, pc.ProjectRoot+"/libIrrlicht.a")
+		if err != nil {
+			return err
+		}
 		break
 	case "windows":
 		return nil
