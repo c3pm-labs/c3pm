@@ -56,6 +56,7 @@ type cmakeVars struct {
 	DependenciesConfig string
 }
 
+// FIXME find a way to use adapter file
 type Adapter interface {
 	// Build builds the targets
 	Build(pc *config.ProjectConfig) error
@@ -64,9 +65,9 @@ type Adapter interface {
 	CmakeConfig(pc *config.ProjectConfig) (string, error)
 }
 
+// FIXME find a way to use adapter file
 func fromPC(adp *manifest.AdapterConfig) (Adapter, error) {
 
-	fmt.Println("irrlicht", adp.Name, adp.Version)
 	switch {
 	case adp.Name == "c3pm" && adp.Version.String() == "0.0.1":
 		return New(), nil
@@ -93,7 +94,6 @@ func dependenciesToCMake(pc *config.ProjectConfig) ([]dependency, string, error)
 			IncludeDirs: m.Publish.IncludeDirs,
 		}
 		adp, err := fromPC(m.Build.Adapter)
-		fmt.Println("wesh", adp, err)
 		if err != nil {
 			return nil, "", err
 		}

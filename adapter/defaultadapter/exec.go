@@ -12,6 +12,7 @@ project({{.ProjectName}} VERSION {{.ProjectVersion}})
 
 set(CMAKE_CXX_STANDARD {{.LanguageStandard}})
 set(C3PM_PROJECT_NAME {{.ProjectName}})
+set(C3PM_GLOBAL_DIR {{.C3PMGlobalDir}})
 
 add_executable({{.ProjectName}})
 
