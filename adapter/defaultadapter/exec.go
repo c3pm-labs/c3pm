@@ -17,7 +17,7 @@ set(C3PM_GLOBAL_DIR {{.C3PMGlobalDir}})
 add_executable({{.ProjectName}})
 
 target_sources({{.ProjectName}} PRIVATE
-	{{.Sources -}}
+	{{.Sources}}
 	{{.Headers}}
 )
 {{$c3pmGlobalDir:=.C3PMGlobalDir}}
