@@ -163,15 +163,15 @@ func varsFromProjectConfig(pc *config.ProjectConfig) (cmakeVars, error) {
 	}
 
 	vars := cmakeVars{
-		ProjectName:      pc.Manifest.Name,
-		ProjectVersion:   pc.Manifest.Version.String(),
-		Sources:          filepath.ToSlash(sources),
-		Headers:          filepath.ToSlash(headers),
-		IncludeDirs:      pathListToCmakeVar(adapterCfg.IncludeDirs, pc.ProjectRoot),
-		C3PMGlobalDir:    filepath.ToSlash(config.GlobalC3PMDirPath()),
-		Dependencies:     dependencies,
-		LinuxConfig:      adapterCfg.LinuxConfig,
-		LanguageStandard: pc.Manifest.Standard,
+		ProjectName:        pc.Manifest.Name,
+		ProjectVersion:     pc.Manifest.Version.String(),
+		Sources:            filepath.ToSlash(sources),
+		Headers:            filepath.ToSlash(headers),
+		IncludeDirs:        pathListToCmakeVar(adapterCfg.IncludeDirs, pc.ProjectRoot),
+		C3PMGlobalDir:      filepath.ToSlash(config.GlobalC3PMDirPath()),
+		Dependencies:       dependencies,
+		LinuxConfig:        adapterCfg.LinuxConfig,
+		LanguageStandard:   pc.Manifest.Standard,
 		DependenciesConfig: dependenciesConfig,
 	}
 
