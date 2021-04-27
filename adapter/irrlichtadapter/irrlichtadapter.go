@@ -83,7 +83,6 @@ func (a *IrrlichtAdapter) Build(pc *config.ProjectConfig) error {
 		if err != nil {
 			return err
 		}
-		break
 	case "linux":
 		err := buildOnLinux(pc)
 		if err != nil {
@@ -94,7 +93,6 @@ func (a *IrrlichtAdapter) Build(pc *config.ProjectConfig) error {
 		if err != nil {
 			return err
 		}
-		break
 	case "windows":
 		return nil
 	}
