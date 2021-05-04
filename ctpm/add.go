@@ -1,7 +1,6 @@
 package ctpm
 
 import (
-	"errors"
 	"fmt"
 	"github.com/Masterminds/semver/v3"
 	"github.com/c3pm-labs/c3pm/config"
@@ -49,7 +48,7 @@ func buildOptions(opts AddOptions) AddOptions {
 	return opts
 }
 
-const depRegexString = `^[\-a-z0-9_]*(@.*)?$`
+const depRegexString = `^[\-a-z0-9_\/]*(@.*)?$`
 
 var depRegex *regexp.Regexp
 
@@ -69,7 +68,7 @@ func validateDependency(dep string) error {
 	if regex.MatchString(dep) {
 		return nil
 	}
-	return errors.New("%s is not a valid dependency string")
+	return fmt.Errorf("%s is not a valid dependency string", dep)
 }
 
 func getRequiredVersion(dep string, options AddOptions) (name string, version *semver.Version, err error) {

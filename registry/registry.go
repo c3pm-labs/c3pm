@@ -34,7 +34,7 @@ type ListRegistryResponse struct {
 //The version returned by GetLastVersion will be 3.3.0, because it is the highest SemVer version number.
 func GetLastVersion(dependency string, options Options) (*semver.Version, error) {
 	client := http.Client{}
-	req, err := http.NewRequest("GET", options.RegistryURL+"/registry-c3pm-io", nil)
+	req, err := http.NewRequest("GET", options.RegistryURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating version query: %w", err)
 	}
@@ -42,8 +42,6 @@ func GetLastVersion(dependency string, options Options) (*semver.Version, error)
 	q.Add("typeList", "2")
 	q.Add("prefix", dependency)
 	req.URL.RawQuery = q.Encode()
-	req.Header.Add("Host", "registry-c3pm-io")
-	req.Header.Add("Authorization", "AWS4-HMAC-SHA256 Credential=A/20210315/eu-west-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=a")
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching versions: %w", err)
