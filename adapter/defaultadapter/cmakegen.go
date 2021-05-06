@@ -2,10 +2,9 @@
 package defaultadapter
 
 import (
-	"errors"
 	"fmt"
 	"github.com/bmatcuk/doublestar"
-	"github.com/c3pm-labs/c3pm/adapter/irrlichtadapter"
+	"github.com/c3pm-labs/c3pm/adapter_interface"
 	"github.com/c3pm-labs/c3pm/config"
 	"github.com/c3pm-labs/c3pm/config/manifest"
 	"io/ioutil"
@@ -56,29 +55,7 @@ type cmakeVars struct {
 	DependenciesConfig string
 }
 
-// FIXME find a way to use adapter file
-type Adapter interface {
-	// Build builds the targets
-	Build(pc *config.ProjectConfig) error
-	// Targets return the paths of the targets built by the Build function
-	Targets(pc *config.ProjectConfig) (targets []string, err error)
-	CmakeConfig(pc *config.ProjectConfig) (string, error)
-}
-
-// FIXME find a way to use adapter file
-func fromPC(adp *manifest.AdapterConfig) (Adapter, error) {
-
-	switch {
-	case adp.Name == "c3pm" && adp.Version.String() == "0.0.1":
-		return New(), nil
-	case adp.Name == "irrlicht" && adp.Version.String() == "0.0.1":
-		return irrlichtadapter.New(), nil
-	default:
-		return nil, errors.New("only default adapter is supported")
-	}
-}
-
-func dependenciesToCMake(pc *config.ProjectConfig) ([]dependency, string, error) {
+func dependenciesToCMake(pc *config.ProjectConfig, adapterGetter adapter_interface.AdapterGetter) ([]dependency, string, error) {
 	deps := make([]dependency, len(pc.Manifest.Dependencies))
 	var depsConfig = ""
 	i := 0
@@ -93,7 +70,7 @@ func dependenciesToCMake(pc *config.ProjectConfig) ([]dependency, string, error)
 			Targets:     m.Targets(),
 			IncludeDirs: m.Publish.IncludeDirs,
 		}
-		adp, err := fromPC(m.Build.Adapter)
+		adp, err := adapterGetter.FromPC(m.Build.Adapter)
 		if err != nil {
 			return nil, "", err
 		}
@@ -142,8 +119,8 @@ func pathListToCmakeVar(paths []string, projectRoot string) string {
 	return res
 }
 
-func varsFromProjectConfig(pc *config.ProjectConfig) (cmakeVars, error) {
-	dependencies, dependenciesConfig, err := dependenciesToCMake(pc)
+func varsFromProjectConfig(pc *config.ProjectConfig, adapterGetter adapter_interface.AdapterGetter) (cmakeVars, error) {
+	dependencies, dependenciesConfig, err := dependenciesToCMake(pc, adapterGetter)
 	if err != nil {
 		return cmakeVars{}, err
 	}
@@ -178,11 +155,11 @@ func varsFromProjectConfig(pc *config.ProjectConfig) (cmakeVars, error) {
 	return vars, nil
 }
 
-func fromProjectConfig(pc *config.ProjectConfig) (string, error) {
+func fromProjectConfig(pc *config.ProjectConfig, adapterGetter adapter_interface.AdapterGetter) (string, error) {
 	var cmake string
 	var vars cmakeVars
 
-	vars, err := varsFromProjectConfig(pc)
+	vars, err := varsFromProjectConfig(pc, adapterGetter)
 	if err != nil {
 		return "", fmt.Errorf("failed to generate cmake variables: %w", err)
 	}
@@ -199,8 +176,8 @@ func fromProjectConfig(pc *config.ProjectConfig) (string, error) {
 }
 
 //generateCMakeScripts takes a config.ProjectConfig and creates CMake configuration files based on the project config.
-func generateCMakeScripts(targetDir string, pc *config.ProjectConfig) error {
-	cmakeContent, err := fromProjectConfig(pc)
+func generateCMakeScripts(targetDir string, pc *config.ProjectConfig, adapterGetter adapter_interface.AdapterGetter) error {
+	cmakeContent, err := fromProjectConfig(pc, adapterGetter)
 	if err != nil {
 		return fmt.Errorf("failed to generate cmake scripts: %w", err)
 	}
