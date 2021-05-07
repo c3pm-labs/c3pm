@@ -8,7 +8,7 @@ import (
 	"github.com/c3pm-labs/c3pm/config/manifest"
 )
 
-type AdapterGetterImp struct {}
+type AdapterGetterImp struct{}
 
 func (AdapterGetterImp) FromPC(adp *manifest.AdapterConfig) (adapter_interface.Adapter, error) {
 	switch {

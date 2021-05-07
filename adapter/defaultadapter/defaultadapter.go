@@ -16,7 +16,7 @@ type DefaultAdapter struct {
 
 // New creates a new builtin DefaultAdapter
 func New(adapterGetter adapter_interface.AdapterGetter) *DefaultAdapter {
-	return &DefaultAdapter{adapterGetter }
+	return &DefaultAdapter{adapterGetter}
 }
 
 var CurrentVersion, _ = manifest.VersionFromString("0.0.1")
