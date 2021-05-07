@@ -11,6 +11,8 @@ var executableTemplate = `cmake_minimum_required(VERSION 3.16)
 project({{.ProjectName}} VERSION {{.ProjectVersion}})
 
 set(CMAKE_CXX_STANDARD {{.LanguageStandard}})
+set(C3PM_PROJECT_NAME {{.ProjectName}})
+set(C3PM_GLOBAL_DIR {{.C3PMGlobalDir}})
 
 add_executable({{.ProjectName}})
 
@@ -33,6 +35,8 @@ target_include_directories(
 {{range .Dependencies}}
 find_library({{ .Name | ToUpper}} {{.Name}} "{{$c3pmGlobalDir}}/cache/{{.Name}}/{{.Version}}/")
 {{end}}
+
+{{.DependenciesConfig}}
 
 target_link_libraries(
 	{{.ProjectName}}

@@ -3,6 +3,7 @@ package defaultadapter
 import (
 	"fmt"
 	"github.com/bmatcuk/doublestar"
+	"github.com/c3pm-labs/c3pm/adapter_interface"
 	"github.com/c3pm-labs/c3pm/config"
 	"github.com/c3pm-labs/c3pm/config/manifest"
 	"path/filepath"
@@ -10,11 +11,12 @@ import (
 
 // DefaultAdapter is the builtin adapter used by default in c3pm
 type DefaultAdapter struct {
+	adapterGetter adapter_interface.AdapterGetter
 }
 
 // New creates a new builtin DefaultAdapter
-func New() *DefaultAdapter {
-	return &DefaultAdapter{}
+func New(adapterGetter adapter_interface.AdapterGetter) *DefaultAdapter {
+	return &DefaultAdapter{adapterGetter}
 }
 
 var CurrentVersion, _ = manifest.VersionFromString("0.0.1")
@@ -45,7 +47,7 @@ func (a *DefaultAdapter) Build(pc *config.ProjectConfig) error {
 		return nil
 	}
 
-	err = generateCMakeScripts(cmakeDirFromPc(pc), pc)
+	err = generateCMakeScripts(cmakeDirFromPc(pc), pc, a.adapterGetter)
 	if err != nil {
 		return fmt.Errorf("error generating config files: %w", err)
 	}
@@ -87,6 +89,10 @@ func hasFileMatchingRule(rules []string, projectRoot string) (bool, error) {
 
 func (a *DefaultAdapter) Targets(_ *config.ProjectConfig) ([]string, error) {
 	return nil, nil
+}
+
+func (a *DefaultAdapter) CmakeConfig(_ *config.ProjectConfig) (string, error) {
+	return "", nil
 }
 
 func cmakeDirFromPc(pc *config.ProjectConfig) string {

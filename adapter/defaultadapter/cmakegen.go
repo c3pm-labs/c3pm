@@ -4,6 +4,7 @@ package defaultadapter
 import (
 	"fmt"
 	"github.com/bmatcuk/doublestar"
+	"github.com/c3pm-labs/c3pm/adapter_interface"
 	"github.com/c3pm-labs/c3pm/config"
 	"github.com/c3pm-labs/c3pm/config/manifest"
 	"io/ioutil"
@@ -50,15 +51,18 @@ type cmakeVars struct {
 	LinuxConfig *LinuxConfig
 	//LanguageStandard is the C++ language standard version to use.
 	LanguageStandard string
+	//DependenciesConfig is a string containing all the cmake command needed by dependencies
+	DependenciesConfig string
 }
 
-func dependenciesToCMake(dependencies map[string]string) ([]dependency, error) {
-	deps := make([]dependency, len(dependencies))
+func dependenciesToCMake(pc *config.ProjectConfig, adapterGetter adapter_interface.AdapterGetter) ([]dependency, string, error) {
+	deps := make([]dependency, len(pc.Manifest.Dependencies))
+	var depsConfig = ""
 	i := 0
-	for n, v := range dependencies {
+	for n, v := range pc.Manifest.Dependencies {
 		m, err := manifest.Load(filepath.Join(config.LibCachePath(n, v), "c3pm.yml"))
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
 		deps[i] = dependency{
 			Name:        n,
@@ -66,8 +70,17 @@ func dependenciesToCMake(dependencies map[string]string) ([]dependency, error) {
 			Targets:     m.Targets(),
 			IncludeDirs: m.Publish.IncludeDirs,
 		}
+		adp, err := adapterGetter.FromPC(m.Build.Adapter)
+		if err != nil {
+			return nil, "", err
+		}
+		dependencyConfig, err := adp.CmakeConfig(pc)
+		if err != nil {
+			return nil, "", err
+		}
+		depsConfig = depsConfig + dependencyConfig
 	}
-	return deps, nil
+	return deps, depsConfig, nil
 }
 
 func globbingExprToFiles(globStr string) ([]string, error) {
@@ -106,8 +119,8 @@ func pathListToCmakeVar(paths []string, projectRoot string) string {
 	return res
 }
 
-func varsFromProjectConfig(pc *config.ProjectConfig) (cmakeVars, error) {
-	dependencies, err := dependenciesToCMake(pc.Manifest.Dependencies)
+func varsFromProjectConfig(pc *config.ProjectConfig, adapterGetter adapter_interface.AdapterGetter) (cmakeVars, error) {
+	dependencies, dependenciesConfig, err := dependenciesToCMake(pc, adapterGetter)
 	if err != nil {
 		return cmakeVars{}, err
 	}
@@ -127,25 +140,26 @@ func varsFromProjectConfig(pc *config.ProjectConfig) (cmakeVars, error) {
 	}
 
 	vars := cmakeVars{
-		ProjectName:      pc.Manifest.Name,
-		ProjectVersion:   pc.Manifest.Version.String(),
-		Sources:          filepath.ToSlash(sources),
-		Headers:          filepath.ToSlash(headers),
-		IncludeDirs:      pathListToCmakeVar(adapterCfg.IncludeDirs, pc.ProjectRoot),
-		C3PMGlobalDir:    filepath.ToSlash(config.GlobalC3PMDirPath()),
-		Dependencies:     dependencies,
-		LinuxConfig:      adapterCfg.LinuxConfig,
-		LanguageStandard: pc.Manifest.Standard,
+		ProjectName:        pc.Manifest.Name,
+		ProjectVersion:     pc.Manifest.Version.String(),
+		Sources:            filepath.ToSlash(sources),
+		Headers:            filepath.ToSlash(headers),
+		IncludeDirs:        pathListToCmakeVar(adapterCfg.IncludeDirs, pc.ProjectRoot),
+		C3PMGlobalDir:      filepath.ToSlash(config.GlobalC3PMDirPath()),
+		Dependencies:       dependencies,
+		LinuxConfig:        adapterCfg.LinuxConfig,
+		LanguageStandard:   pc.Manifest.Standard,
+		DependenciesConfig: dependenciesConfig,
 	}
 
 	return vars, nil
 }
 
-func fromProjectConfig(pc *config.ProjectConfig) (string, error) {
+func fromProjectConfig(pc *config.ProjectConfig, adapterGetter adapter_interface.AdapterGetter) (string, error) {
 	var cmake string
 	var vars cmakeVars
 
-	vars, err := varsFromProjectConfig(pc)
+	vars, err := varsFromProjectConfig(pc, adapterGetter)
 	if err != nil {
 		return "", fmt.Errorf("failed to generate cmake variables: %w", err)
 	}
@@ -162,8 +176,8 @@ func fromProjectConfig(pc *config.ProjectConfig) (string, error) {
 }
 
 //generateCMakeScripts takes a config.ProjectConfig and creates CMake configuration files based on the project config.
-func generateCMakeScripts(targetDir string, pc *config.ProjectConfig) error {
-	cmakeContent, err := fromProjectConfig(pc)
+func generateCMakeScripts(targetDir string, pc *config.ProjectConfig, adapterGetter adapter_interface.AdapterGetter) error {
+	cmakeContent, err := fromProjectConfig(pc, adapterGetter)
 	if err != nil {
 		return fmt.Errorf("failed to generate cmake scripts: %w", err)
 	}
