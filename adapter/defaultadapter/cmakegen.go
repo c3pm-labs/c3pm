@@ -69,6 +69,9 @@ func dependenciesToCMake(pc *config.ProjectConfig, adapterGetter adapter_interfa
 			return nil, "", err
 		}
 		targets, err := adp.Targets(pc)
+		if err != nil {
+			return nil, "", err
+		}
 		deps[i] = dependency{
 			Name:        n,
 			Version:     v,
