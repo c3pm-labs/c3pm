@@ -104,5 +104,5 @@ func (a *IrrlichtAdapter) CmakeConfig(pc *config.ProjectConfig) (string, error) 
 }
 
 func (a *IrrlichtAdapter) Targets(_ *config.ProjectConfig) ([]string, error) {
-	return nil, nil
+	return []string{"Irrlicht"}, nil
 }

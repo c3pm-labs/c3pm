@@ -37,8 +37,14 @@ func (a *Adapter) Build(pc *config.ProjectConfig) error {
 	return nil
 }
 
-func (a *Adapter) Targets(_ *config.ProjectConfig) (targets []string, err error) {
-	return
+func (a *Adapter) Targets(_ *config.ProjectConfig) ([]string, error) {
+	return []string{
+		"sfml-system",
+		"sfml-window",
+		"sfml-graphics",
+		"sfml-network",
+		"sfml-audio",
+	}, nil
 }
 
 func (a *Adapter) CmakeConfig(_ *config.ProjectConfig) (string, error) {

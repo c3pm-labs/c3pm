@@ -88,8 +88,8 @@ func hasFileMatchingRule(rules []string, projectRoot string) (bool, error) {
 	return false, nil
 }
 
-func (a *DefaultAdapter) Targets(_ *config.ProjectConfig) ([]string, error) {
-	return nil, nil
+func (a *DefaultAdapter) Targets(pc *config.ProjectConfig) ([]string, error) {
+	return []string{pc.Manifest.Name}, nil
 }
 
 func (a *DefaultAdapter) CmakeConfig(_ *config.ProjectConfig) (string, error) {

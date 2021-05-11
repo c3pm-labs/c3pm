@@ -60,19 +60,20 @@ func dependenciesToCMake(pc *config.ProjectConfig, adapterGetter adapter_interfa
 	var depsConfig = ""
 	i := 0
 	for n, v := range pc.Manifest.Dependencies {
-		m, err := manifest.Load(filepath.Join(config.LibCachePath(n, v), "c3pm.yml"))
+		p, err := config.Load(config.LibCachePath(n, v))
 		if err != nil {
 			return nil, "", err
 		}
+		adp, err := adapterGetter.FromPC(p.Manifest.Build.Adapter)
+		if err != nil {
+			return nil, "", err
+		}
+		targets, err := adp.Targets(pc)
 		deps[i] = dependency{
 			Name:        n,
 			Version:     v,
-			Targets:     m.Targets(),
-			IncludeDirs: m.Publish.IncludeDirs,
-		}
-		adp, err := adapterGetter.FromPC(m.Build.Adapter)
-		if err != nil {
-			return nil, "", err
+			Targets:     targets,
+			IncludeDirs: p.Manifest.Publish.IncludeDirs,
 		}
 		dependencyConfig, err := adp.CmakeConfig(pc)
 		if err != nil {
