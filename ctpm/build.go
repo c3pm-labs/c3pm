@@ -45,7 +45,8 @@ func getAllDependencies(pc *config.ProjectConfig) error {
 }
 
 func Build(pc *config.ProjectConfig) error {
-	adp, err := adapter.FromPC(pc)
+	getter := adapter.AdapterGetterImp{}
+	adp, err := getter.FromPC(pc.Manifest.Build.Adapter)
 	if err != nil {
 		return err
 	}

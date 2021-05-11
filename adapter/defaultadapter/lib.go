@@ -59,9 +59,6 @@ func library(v cmakeVars) (string, error) {
 		return "", fmt.Errorf("could not template cmake: %w", err)
 	}
 	cmakeClean := cmake.String()
-	//if len(v.IncludeDirs) == 0 {
-	//	cmakeClean = removeCommand(cmakeClean, "target_include_directories")
-	//}
 	if len(v.ExportedDir) == 0 {
 		cmakeClean = removeCommand(cmakeClean, "install(DIRECTORY")
 	}
