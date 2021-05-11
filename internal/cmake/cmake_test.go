@@ -19,13 +19,13 @@ var _ = Describe("CMake interaction", func() {
 			_ = os.RemoveAll(BUILD_DIR)
 		})
 		It("does generate the build directory", func() {
-			err := cmakeGenerateBuildFiles("../../test_helpers/projects/cmakeProject", BUILD_DIR, map[string]string{})
+			err := GenerateBuildFiles("../../test_helpers/projects/cmakeProject", BUILD_DIR, map[string]string{})
 			Ω(err).ShouldNot(HaveOccurred())
 			_, err = os.Stat(BUILD_DIR)
 			Ω(err).ShouldNot(HaveOccurred())
 		})
 		It("uses the variables added", func() {
-			err := cmakeGenerateBuildFiles("../../test_helpers/projects/cmakeProject", BUILD_DIR, map[string]string{"CMAKE_AR:FILEPATH": "/bin/ls"})
+			err := GenerateBuildFiles("../../test_helpers/projects/cmakeProject", BUILD_DIR, map[string]string{"CMAKE_AR:FILEPATH": "/bin/ls"})
 			Ω(err).ShouldNot(HaveOccurred())
 			_, err = os.Stat(BUILD_DIR)
 			Ω(err).ShouldNot(HaveOccurred())
@@ -55,13 +55,13 @@ var _ = Describe("CMake interaction", func() {
 		})
 		It("builds the project", func() {
 			// Generate files
-			err := cmakeGenerateBuildFiles("../../test_helpers/projects/cmakeProject", BUILD_DIR, map[string]string{})
+			err := GenerateBuildFiles("../../test_helpers/projects/cmakeProject", BUILD_DIR, map[string]string{})
 			Ω(err).ShouldNot(HaveOccurred())
 			_, err = os.Stat(BUILD_DIR)
 			Ω(err).ShouldNot(HaveOccurred())
 
 			// Build the project
-			err = cmakeBuild(BUILD_DIR)
+			err = Build(BUILD_DIR)
 			Ω(err).ShouldNot(HaveOccurred())
 			_, err = os.Stat(filepath.Join(BUILD_DIR, "test1"))
 			Ω(err).ShouldNot(HaveOccurred())
