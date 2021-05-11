@@ -37,10 +37,14 @@ func (a *Adapter) Build(pc *config.ProjectConfig) error {
 	return nil
 }
 
-func (a *Adapter) Targets(pc *config.ProjectConfig) (targets []string, err error) {
+func (a *Adapter) Targets(_ *config.ProjectConfig) (targets []string, err error) {
 	return
 }
 
-func NewAdapter() *Adapter {
+func (a *Adapter) CmakeConfig(_ *config.ProjectConfig) (string, error) {
+	return "", nil
+}
+
+func New() *Adapter {
 	return &Adapter{}
 }
