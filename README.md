@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://c3pm.io/">
-    <img alt="c3pm" src="https://dev.c3pm.io/assets/c3pm.png" width="546"/>
+    <img alt="c3pm" src="https://c3pm.io/assets/c3pm.png" width="546"/>
   </a>
 </p>
 
