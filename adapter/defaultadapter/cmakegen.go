@@ -79,6 +79,7 @@ func dependenciesToCMake(pc *config.ProjectConfig, adapterGetter adapter_interfa
 			return nil, "", err
 		}
 		depsConfig = depsConfig + dependencyConfig
+		i++
 	}
 	return deps, depsConfig, nil
 }

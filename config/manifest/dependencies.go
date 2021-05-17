@@ -2,6 +2,8 @@ package manifest
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 )
 
 // Dependencies holds the list of the dependencies of a project.
@@ -21,4 +23,17 @@ func DependenciesFromMap(dependencies map[string]string) (Dependencies, error) {
 // MarshalYAML is used to write dependencies as YAML.
 func (d Dependencies) MarshalYAML() (interface{}, error) {
 	return d, nil
+}
+
+func (d Dependencies) String() string {
+	sb := strings.Builder{}
+	i := 0
+	for n, v := range d {
+		if i != 0 {
+			sb.WriteString(",")
+			i = 1
+		}
+		sb.WriteString(fmt.Sprintf("[%s/%s]", n, v))
+	}
+	return sb.String()
 }

@@ -15,8 +15,19 @@ set(CMAKE_CXX_STANDARD {{.LanguageStandard}})
 
 add_library({{.ProjectName}} STATIC)
 
+{{- $c3pmGlobalDir:=.C3PMGlobalDir}}
+
 target_sources({{.ProjectName}} PRIVATE {{.Sources}} {{.Headers}})
-target_include_directories({{.ProjectName}} PRIVATE {{.IncludeDirs}})
+target_include_directories(
+	{{- .ProjectName}} PRIVATE {{.IncludeDirs}}
+	{{- range .Dependencies }}
+		{{- $name:=.Name }}
+		{{- $version:=.Version}}
+		{{- range .IncludeDirs }}
+			{{ $c3pmGlobalDir }}/cache/{{$name}}/{{$version}}/{{.}}
+		{{- end }}
+	{{- end }}
+)
 `
 
 func removeCommand(cmake string, command string) string {
@@ -48,8 +59,8 @@ func library(v cmakeVars) (string, error) {
 		return "", fmt.Errorf("could not template cmake: %w", err)
 	}
 	cmakeClean := cmake.String()
-	if len(v.IncludeDirs) == 0 {
-		cmakeClean = removeCommand(cmakeClean, "target_include_directories")
+	if len(v.ExportedDir) == 0 {
+		cmakeClean = removeCommand(cmakeClean, "install(DIRECTORY")
 	}
 	return cmakeClean, nil
 }
