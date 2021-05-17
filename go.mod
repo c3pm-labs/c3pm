@@ -3,7 +3,7 @@ module github.com/c3pm-labs/c3pm
 go 1.14
 
 require (
-	github.com/AlecAivazis/survey/v2 v2.2.5
+	github.com/AlecAivazis/survey/v2 v2.2.12
 	github.com/Masterminds/semver/v3 v3.1.1
 	github.com/bmatcuk/doublestar v1.3.4
 	github.com/mattn/go-colorable v0.1.8 // indirect
