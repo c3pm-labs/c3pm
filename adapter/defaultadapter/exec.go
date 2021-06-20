@@ -32,17 +32,24 @@ target_include_directories(
 		{{- end }}
 	{{- end }}
 )
-{{range .Dependencies}}
-find_library({{ .Name | ToUpper}} {{.Name}} "{{$c3pmGlobalDir}}/cache/{{.Name}}/{{.Version}}/")
-{{end}}
+
+{{- range $dep := .Dependencies}}
+{{- range $target := $dep.Targets }}
+find_library({{ $dep.Name | ToUpper}}-{{$target}} {{$target}} "{{$c3pmGlobalDir}}/cache/{{$dep.Name}}/{{$dep.Version}}/")
+{{- end }}
+{{- end}}
 
 {{.DependenciesConfig}}
 
 target_link_libraries(
 	{{.ProjectName}}
 	PUBLIC
-	{{range .Dependencies}}
-	$<$<NOT:$<STREQUAL:"{{"${"}}{{.Name|ToUpper}}{{"}"}}","{{.Name|ToUpper}}-NOTFOUND">>:{{"${"}}{{.Name|ToUpper}}{{"}"}}>
+	{{- range $dep := .Dependencies}}
+	{{- range $target := $dep.Targets }}
+	{{- $lib := $dep.Name|ToUpper}}
+	{{- $libname := printf "%v-%v" $lib $target }}
+	$<$<NOT:$<STREQUAL:"{{"${"}}{{$libname}}{{"}"}}","{{$libname}}-NOTFOUND">>:{{"${"}}{{$libname}}{{"}"}}>
+	{{- end }}
 	{{- end}}
 )
 `
