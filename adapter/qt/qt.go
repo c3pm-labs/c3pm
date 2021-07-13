@@ -149,6 +149,10 @@ func (a *QtAdapter) Build(pc *config.ProjectConfig) error {
 	return nil
 }
 
+func (a *QtAdapter) CmakeConfig(_ *config.ProjectConfig) (string, error) {
+	return "", nil
+}
+
 func (a *QtAdapter) Targets(pc *config.ProjectConfig) (targets []string, err error) {
 	return nil, nil
 }

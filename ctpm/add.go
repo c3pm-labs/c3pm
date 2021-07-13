@@ -48,7 +48,7 @@ func buildOptions(opts AddOptions) AddOptions {
 	return opts
 }
 
-const depRegexString = `^[\-a-z0-9_]*(@.*)?$`
+const depRegexString = `^[\-a-zA-Z0-9_]*(@.*)?$`
 
 var depRegex *regexp.Regexp
 

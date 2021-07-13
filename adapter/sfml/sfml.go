@@ -41,6 +41,10 @@ func (a *Adapter) Targets(pc *config.ProjectConfig) (targets []string, err error
 	return
 }
 
+func (a *Adapter) CmakeConfig(_ *config.ProjectConfig) (string, error) {
+	return "", nil
+}
+
 func NewAdapter() *Adapter {
 	return &Adapter{}
 }

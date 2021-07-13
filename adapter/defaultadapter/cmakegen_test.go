@@ -79,7 +79,7 @@ var _ = Describe("Gen Test", func() {
 		Ω(err).ShouldNot(HaveOccurred())
 	})
 	Context("generates a cmake file without dependencies", func() {
-		err := generateCMakeScripts(cmakeDirFromPc(simpleProject), simpleProject)
+		err := generateCMakeScripts(cmakeDirFromPc(simpleProject), simpleProject, nil)
 		fmt.Println(err)
 		Ω(err).ShouldNot(HaveOccurred())
 		data, err := ioutil.ReadFile(filepath.Join(cmakeDirFromPc(simpleProject), "CMakeLists.txt"))
