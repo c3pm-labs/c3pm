@@ -2,13 +2,12 @@ package qt
 
 import (
 	"fmt"
+	"github.com/c3pm-labs/c3pm/config"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
-
-	"github.com/c3pm-labs/c3pm/config"
 )
 
 type QtAdapter struct{}
@@ -18,7 +17,8 @@ func New() *QtAdapter {
 }
 
 // Working
-func execConfigure(pc *config.ProjectConfig, execPath string, path string) error {
+// TODO can't see the log with this configuration / maybe we should use executeCli for every command?
+func execConfigure(execPath string, path string, args ...string) error {
 	cmd := exec.Command("/bin/sh", filepath.Join(execPath, "configure"))
 	cmd.Dir = path
 	out, err := cmd.CombinedOutput()
@@ -30,9 +30,20 @@ func execConfigure(pc *config.ProjectConfig, execPath string, path string) error
 	return err
 }
 
+
+// FIXME we should not make the build fail when the repository is already initialize
 func initRepository(pc *config.ProjectConfig, path string) error {
 	fmt.Println("PATH: " + filepath.Join(path, "init-repository"))
 	cmd := exec.Command("perl", filepath.Join(path, "init-repository"))
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err := cmd.Start()
+	if err != nil {
+		return fmt.Errorf("failed to start %s: %w", cmd, err)
+	}
+	if err = cmd.Wait(); err != nil {
+		return fmt.Errorf("%s process failed: %w", cmd, err)
+	}
 	cmd.Dir = path
 	out, err := cmd.Output()
 	if err != nil {
@@ -131,11 +142,111 @@ func execCmake(path string) error {
 	// return nil
 }
 
+func executeCli(command string, dirPath string, args ...string) error {
+	cmd := exec.Command(command, args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Dir = dirPath
+	err := cmd.Start()
+	if err != nil {
+		return fmt.Errorf("failed to start %s: %w", command, err)
+	}
+	if err = cmd.Wait(); err != nil {
+		return fmt.Errorf("%s process failed: %w", command, err)
+	}
+	return nil
+}
+
+func getCliOutput(command string, args ...string) (string, error) {
+	cmd := exec.Command(command, args...)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return string(out), nil
+}
+
+func buildOnMacOS(pc *config.ProjectConfig) error {
+	pathBuild := filepath.Join(pc.ProjectRoot, "qt6-build")
+	fmt.Println(pathBuild)
+
+	err := executeCli("perl", "", filepath.Join(pc.ProjectRoot, "init-repository"))
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+
+	if _, err = os.Stat(pathBuild); os.IsNotExist(err) {
+		err = os.Mkdir(pathBuild, 0755)
+		if err != nil {
+			log.Fatal(err)
+			return err
+		}
+	}
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+
+	macOSSdk, err := getCliOutput("xcrun", "-sdk", "macosx", "--show-sdk-path")
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	fmt.Println(macOSSdk)
+
+	args := []string{
+		//configure args
+		"-release",
+		"-prefix",  pc.ProjectRoot + "/lib",
+		"-extprefix", pc.ProjectRoot + "/lib",
+		"-sysroot", macOSSdk,
+		"-cmake-generator", "Ninja",
+		"-archdatadir", "share/qt",
+		"-examplesdir", "share/qt/example",
+		"-testsdir", "share/qt/tests",
+		"-libproxy",
+		"-no-feature-relocatable",
+		"-system-sqlite",
+		"-no-sql-mysql",
+		"-no-sql-odbc",
+		"-no-sql-psql",
+
+		"--",
+
+		// cmake args
+		"-DCMAKE_FIND_FRAMEWORK=FIRST",
+		"-DINSTALL_MKSPECSDIR=share/qt/mkspecs",
+		"-DFEATURE_pkg_config=ON",
+	}
+
+	err = executeCli(filepath.Join(pc.ProjectRoot, "configure"), pathBuild, args...)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	err = executeCli("cmake", pathBuild, "--build", ".", "--parallel", "4")
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	err = executeCli("cmake", pathBuild, "--install", ".")
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	return err
+}
+
 func (a *QtAdapter) Build(pc *config.ProjectConfig) error {
 	fmt.Println(runtime.GOOS)
 	switch runtime.GOOS {
 	case "darwin":
-		return nil
+		err := buildOnMacOS(pc)
+		if err != nil {
+			return err
+		}
+		return err
 	case "linux":
 		err := buildOnLinux(pc)
 		if err != nil {
@@ -155,8 +266,4 @@ func (a *QtAdapter) CmakeConfig(_ *config.ProjectConfig) (string, error) {
 
 func (a *QtAdapter) Targets(pc *config.ProjectConfig) (targets []string, err error) {
 	return nil, nil
-}
-
-func NewAdapter() *QtAdapter {
-	return &QtAdapter{}
 }

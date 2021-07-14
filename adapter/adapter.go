@@ -4,10 +4,10 @@ import (
 	"errors"
 
 	"github.com/c3pm-labs/c3pm/adapter/defaultadapter"
-	"github.com/c3pm-labs/c3pm/adapter/sfml"
 	"github.com/c3pm-labs/c3pm/adapter/irrlichtadapter"
-	"github.com/c3pm-labs/c3pm/adapter_interface"
 	"github.com/c3pm-labs/c3pm/adapter/qt"
+	"github.com/c3pm-labs/c3pm/adapter/sfml"
+	"github.com/c3pm-labs/c3pm/adapter_interface"
 	"github.com/c3pm-labs/c3pm/config/manifest"
 )
 
@@ -20,7 +20,7 @@ func (AdapterGetterImp) FromPC(adp *manifest.AdapterConfig) (adapter_interface.A
 	case adp.Name == "sfml" && adp.Version.String() == "0.0.1":
 		return sfml.NewAdapter(), nil
 	case adp.Name == "qt" && adp.Version.String() == "0.0.1":
-		return qt.NewAdapter(), nil
+		return qt.New(), nil
 	case adp.Name == "irrlicht" && adp.Version.String() == "0.0.1":
 		return irrlichtadapter.New(), nil
 	default:
