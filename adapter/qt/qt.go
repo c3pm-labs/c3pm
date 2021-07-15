@@ -151,9 +151,10 @@ func executeCli(command string, dirPath string, args ...string) error {
 	if err != nil {
 		return fmt.Errorf("failed to start %s: %w", command, err)
 	}
-	if err = cmd.Wait(); err != nil {
-		return fmt.Errorf("%s process failed: %w", command, err)
-	}
+	cmd.Wait()
+	//if err = cmd.Wait(); err != nil {
+	//	return fmt.Errorf("%s process failed: %w", command, err)
+	//}
 	return nil
 }
 
@@ -167,10 +168,21 @@ func getCliOutput(command string, args ...string) (string, error) {
 }
 
 func buildOnMacOS(pc *config.ProjectConfig) error {
-	pathBuild := filepath.Join(pc.ProjectRoot, "qt6-build")
-	fmt.Println(pathBuild)
+	err := executeCli("git", pc.ProjectRoot, "clone", "https://github.com/qt/qt5.git")
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	path := filepath.Join(pc.ProjectRoot, "qt5")
+	err = executeCli("git", path, "checkout", "6.0")
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	fmt.Println(path)
+	pathBuild := filepath.Join(path, "qt6-build")
 
-	err := executeCli("perl", "", filepath.Join(pc.ProjectRoot, "init-repository"))
+	err = executeCli("perl", path, filepath.Join(path, "init-repository"))
 	if err != nil {
 		log.Fatal(err)
 		return err
@@ -198,8 +210,8 @@ func buildOnMacOS(pc *config.ProjectConfig) error {
 	args := []string{
 		//configure args
 		"-release",
-		"-prefix",  pc.ProjectRoot + "/lib",
-		"-extprefix", pc.ProjectRoot + "/lib",
+		"-prefix",  pc.ProjectRoot,
+		"-extprefix", pc.ProjectRoot,
 		"-sysroot", macOSSdk,
 		"-cmake-generator", "Ninja",
 		"-archdatadir", "share/qt",
@@ -220,7 +232,7 @@ func buildOnMacOS(pc *config.ProjectConfig) error {
 		"-DFEATURE_pkg_config=ON",
 	}
 
-	err = executeCli(filepath.Join(pc.ProjectRoot, "configure"), pathBuild, args...)
+	err = executeCli(filepath.Join(path, "configure"), pathBuild, args...)
 	if err != nil {
 		log.Fatal(err)
 		return err
@@ -261,7 +273,7 @@ func (a *QtAdapter) Build(pc *config.ProjectConfig) error {
 }
 
 func (a *QtAdapter) CmakeConfig(_ *config.ProjectConfig) (string, error) {
-	return "", nil
+	return CmakeConfig, nil
 }
 
 func (a *QtAdapter) Targets(pc *config.ProjectConfig) (targets []string, err error) {

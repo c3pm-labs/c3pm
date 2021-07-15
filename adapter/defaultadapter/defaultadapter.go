@@ -32,6 +32,8 @@ func (a *DefaultAdapter) Build(pc *config.ProjectConfig) error {
 		"CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE": pc.ProjectRoot,
 		"CMAKE_INSTALL_PREFIX":                   filepath.ToSlash(filepath.Join(config.GlobalC3PMDirPath(), "cache", pc.Manifest.Name, pc.Manifest.Version.String())),
 		"CMAKE_BUILD_TYPE":                       "Release",
+		// Useful for find_package
+		"CMAKE_PREFIX_PATH":					  filepath.ToSlash(filepath.Join(config.GlobalC3PMDirPath(), "cache", pc.Manifest.Name, pc.Manifest.Version.String())),
 		// Useful for Windows build
 		//"MSVC_TOOLSET_VERSION":           "141",
 		//"MSVC_VERSION":                   "1916",
