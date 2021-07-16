@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/c3pm-labs/c3pm/adapter/defaultadapter"
 	"github.com/c3pm-labs/c3pm/adapter/irrlichtadapter"
+	"github.com/c3pm-labs/c3pm/adapter/raylibadapter"
 	"github.com/c3pm-labs/c3pm/adapter_interface"
 	"github.com/c3pm-labs/c3pm/config/manifest"
 )
@@ -16,6 +17,8 @@ func (AdapterGetterImp) FromPC(adp *manifest.AdapterConfig) (adapter_interface.A
 		return defaultadapter.New(AdapterGetterImp{}), nil
 	case adp.Name == "irrlicht" && adp.Version.String() == "0.0.1":
 		return irrlichtadapter.New(), nil
+	case adp.Name == "raylib" && adp.Version.String() == "0.0.1":
+		return raylibadapter.New(), nil
 	default:
 		return nil, errors.New("only default adapter is supported")
 	}
