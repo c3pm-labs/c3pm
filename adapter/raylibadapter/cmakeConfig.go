@@ -18,12 +18,15 @@ if ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
 endif ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
 
 if (APPLE)
-        find_library(CARBON_LIBRARY Carbon)
+        find_library(CARBON_LIBRARY CoreVideo)
         find_library(COCOA_LIBRARY Cocoa)
         find_library(IOKIT_LIBRARY IOKit)
-        set(OSX_LIBRARIES ${CARBON_LIBRARY} ${COCOA_LIBRARY} ${IOKIT_LIBRARY})
+        find_library(GLUT_LIBRARY GLUT)
+        find_library(OPENGL_LIBRARY OpenGL)
+        set(OSX_LIBRARIES ${COREVIDEO_LIBRARY} ${COCOA_LIBRARY} ${IOKIT_LIBRARY} ${GLUT_LIBRARY} ${OPENGL_LIBRARY})
+        set(MACOSX_DEPLOYMENT_TARGET ${10.9})
 endif (APPLE)
 
-target_include_directories(${C3PM_PROJECT_NAME} PRIVATE src ${IRRLICHT_INCLUDE_DIR})
+target_include_directories(${C3PM_PROJECT_NAME} PRIVITE src ${RAYLIB_INCLUDE_DIR})
 target_link_libraries(${C3PM_PROJECT_NAME} PUBLIC ${OSX_LIBRARIES} ${LIBRARIES})
 `
