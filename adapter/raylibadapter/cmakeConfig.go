@@ -1,15 +1,14 @@
 package raylibadapter
 
-// if ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
-//     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -lXxf86vm -lXext -lX11 -lGL -lGLU")
-//     find_package(OpenGL REQUIRED)
-//     find_package(X11 REQUIRED)
-//     find_package(GLUT REQUIRED)
-//     find_package(ZLIB REQUIRED)
-//     set(LIBRARIES ${RAYLIB_LIBRARY} ${OPENGL_LIBRARIES} ${X11_X11_LIB} ${GLUT_LIBRARY} ${ZLIB_LIBRARIES})
-// endif ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
 var CmakeConfig = `
-
+if ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -lXxf86vm -lXext -lX11 -lGL -lGLU")
+    find_package(OpenGL REQUIRED)
+    find_package(X11 REQUIRED)
+    find_package(GLUT REQUIRED)
+    find_package(ZLIB REQUIRED)
+    set(LIBRARIES ${RAYLIB_LIBRARY} ${OPENGL_LIBRARIES} ${X11_X11_LIB} ${GLUT_LIBRARY} ${ZLIB_LIBRARIES})
+endif ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
 if (APPLE)
         find_library(CARBON_LIBRARY CoreVideo)
         find_library(COCOA_LIBRARY Cocoa)
