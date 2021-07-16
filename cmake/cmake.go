@@ -2,7 +2,7 @@
 // CMake is used internally by C3PM to manage the build and installation phases of using a C3PM project.
 //
 // More information about what the CMake CLI does can be found on CMake's website: https://cmake.org/cmake/help/latest/manual/cmake.1.html
-package defaultadapter
+package cmake
 
 import (
 	"fmt"
@@ -28,7 +28,7 @@ func executeCMakeCLI(args ...string) error {
 //C3PM uses CMake's -S option for setting the source directory, the -B option for the build directory, and the -D option for setting build variables.
 //
 //See CMake's documentation for more information: https://cmake.org/cmake/help/latest/manual/cmake.1.html#generate-a-project-buildsystem
-func cmakeGenerateBuildFiles(sourceDir, buildDir string, variables map[string]string) error {
+func GenerateBuildFiles(sourceDir, buildDir string, variables map[string]string) error {
 	args := []string{
 		"-S", sourceDir,
 		"-B", buildDir,
@@ -42,6 +42,6 @@ func cmakeGenerateBuildFiles(sourceDir, buildDir string, variables map[string]st
 //cmakeBuild runs the CMake CLI to build a C3PM project
 //
 //See CMake's documentation for more information: https://cmake.org/cmake/help/latest/manual/cmake.1.html#build-a-project
-func cmakeBuild(buildDir string) error {
+func Build(buildDir string, target string) error {
 	return executeCMakeCLI("--build", buildDir, "--config", "Release")
 }
