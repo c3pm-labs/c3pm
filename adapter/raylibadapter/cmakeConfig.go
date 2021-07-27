@@ -9,6 +9,7 @@ if ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
         find_package(X11 REQUIRED)
         find_package(OpenGL REQUIRED)
         set(LIBRARIES ${X11_X11_LIB} ${CMAKE_DL_LIBS} m Threads::Threads ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES})
+        target_include_directories(${C3PM_PROJECT_NAME} PRIVITE src ${RAYLIB_INCLUDE_DIR})
 endif ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
 
 if (APPLE)
@@ -23,4 +24,3 @@ endif (APPLE)
 
 target_link_libraries(${C3PM_PROJECT_NAME} PUBLIC ${OSX_LIBRARIES} ${LIBRARIES})
 `
-// target_include_directories(${C3PM_PROJECT_NAME} PRIVITE src ${RAYLIB_INCLUDE_DIR})
