@@ -39,7 +39,7 @@ func buildOnMacOS(pc *config.ProjectConfig) error {
 }
 
 func buildOnLinux(pc *config.ProjectConfig) error {
-	return executeCli("make USE_EXTERNAL_GLFW=TRUE", "-C", pc.ProjectRoot+"/src")
+	return executeCli("make", "-C", pc.ProjectRoot+"/src")
 }
 
 func (a *RaylibAdapter) Build(pc *config.ProjectConfig) error {
