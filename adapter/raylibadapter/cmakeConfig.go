@@ -20,5 +20,6 @@ if (APPLE)
         set(MACOSX_DEPLOYMENT_TARGET ${10.9})
 endif (APPLE)
 
+target_include_directories(${C3PM_PROJECT_NAME} PRIVATE src ${RAYLIB_INCLUDE_DIR})
 target_link_libraries(${C3PM_PROJECT_NAME} PUBLIC ${OSX_LIBRARIES} ${LIBRARIES})
 `
