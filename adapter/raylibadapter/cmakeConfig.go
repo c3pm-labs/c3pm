@@ -8,7 +8,7 @@ if ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
         set(USE_EXTERNAL_GLFW ON)
         find_package(Threads REQUIRED)
         find_package(OpenGL REQUIRED)
-        set(LIBRARIES ${CMAKE_DL_LIBS} m Threads::Threads ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW_LIBRARIES})
+        set(LIBRARIES ${CMAKE_DL_LIBS} m Threads::Threads ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW3_LIBRARY} glfw)
 endif ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
 
 if (APPLE)
