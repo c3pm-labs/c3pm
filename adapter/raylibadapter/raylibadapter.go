@@ -39,7 +39,7 @@ func buildOnMacOS(pc *config.ProjectConfig) error {
 }
 
 func buildOnLinux(pc *config.ProjectConfig) error {
-	return executeCli("make", "-C", pc.ProjectRoot+"/src")
+	return executeCli("mkdir build && cd build && cmake -DBUILD_SHARED_LIBS=ON .. && make", "-C", pc.ProjectRoot+"/src")
 }
 
 func (a *RaylibAdapter) Build(pc *config.ProjectConfig) error {
