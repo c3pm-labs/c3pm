@@ -9,7 +9,6 @@ if ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
         find_package(Threads REQUIRED)
         find_package(OpenGL REQUIRED)
         find_package (glfw3 REQUIRED)
-        find_package (raylib REQUIRED)
         set(LIBRARIES ${CMAKE_DL_LIBS} m Threads::Threads ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW3_LIBRARY} glfw raylib)
 endif ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
 
