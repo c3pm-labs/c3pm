@@ -20,8 +20,9 @@ func New() *RaylibAdapter {
 
 var CurrentVersion, _ = manifest.VersionFromString("0.0.1")
 
-func executeCli(command string, args ...string) error {
+func executeCli(command string, dir string, args ...string) error {
 	cmd := exec.Command(command, args...)
+	cmd.Dir = dir;
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err := cmd.Start()
@@ -35,13 +36,13 @@ func executeCli(command string, args ...string) error {
 }
 
 func buildOnMacOS(pc *config.ProjectConfig) error {
-	return executeCli("make", "-C", pc.ProjectRoot+"/src")
+	return executeCli("make", "-C", pc.ProjectRoot, pc.ProjectRoot+"/src")
 }
 
 func buildOnLinux(pc *config.ProjectConfig) error {
-	executeCli("mkdir", pc.ProjectRoot+"/build")
-	executeCli("cd " + pc.ProjectRoot + " && cmake", "-DBUILD_SHARED_LIBS=ON", pc.ProjectRoot)
-	return executeCli("make", pc.ProjectRoot+"/build")
+	executeCli("mkdir", pc.ProjectRoot , pc.ProjectRoot + "/build")
+	executeCli("cd " + pc.ProjectRoot + " && cmake", pc.ProjectRoot, "-DBUILD_SHARED_LIBS=ON", pc.ProjectRoot)
+	return executeCli("make", pc.ProjectRoot, pc.ProjectRoot + "/build")
 }
 
 func (a *RaylibAdapter) Build(pc *config.ProjectConfig) error {
