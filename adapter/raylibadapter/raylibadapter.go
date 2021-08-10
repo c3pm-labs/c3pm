@@ -41,7 +41,7 @@ func buildOnMacOS(pc *config.ProjectConfig) error {
 
 func buildOnLinux(pc *config.ProjectConfig) error {
 	executeCli("mkdir", pc.ProjectRoot , pc.ProjectRoot + "/build")
-	executeCli("cmake", pc.ProjectRoot + "/build", "-DBUILD_SHARED_LIBS=ON", "..")
+	executeCli("cmake", pc.ProjectRoot + "/build", "-DBUILD_SHARED_LIBS=ON", pc.ProjectRoot)
 	return executeCli("make", pc.ProjectRoot + "/build", ".")
 }
 
