@@ -5,6 +5,7 @@ var CmakeConfig = `
 if ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lGL -lm -lpthread -ldl -lrt -lX11 -lglfw")
         set(THREADS_PREFER_PTHREAD_FLAG ON)
+        set(OpenGL_GL_PREFERENCE LEGACY)
         set(USE_EXTERNAL_GLFW ON)
         find_package(Threads REQUIRED)
         find_package(OpenGL REQUIRED)
