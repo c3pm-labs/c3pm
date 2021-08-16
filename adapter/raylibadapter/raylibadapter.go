@@ -40,7 +40,9 @@ func buildOnMacOS(pc *config.ProjectConfig) error {
 }
 
 func buildOnLinux(pc *config.ProjectConfig) error {
-	return executeCli("make", pc.ProjectRoot + "/src", "PLATFORM=PLATFORM_DESKTOP")
+	executeCli("mkdir", pc.ProjectRoot , pc.ProjectRoot + "/build")
+	executeCli("cmake", pc.ProjectRoot + "/build", "-DBUILD_SHARED_LIBS=ON", pc.ProjectRoot)
+	return executeCli("make", pc.ProjectRoot + "/build", ".")
 }
 
 func (a *RaylibAdapter) Build(pc *config.ProjectConfig) error {
@@ -57,6 +59,11 @@ func (a *RaylibAdapter) Build(pc *config.ProjectConfig) error {
 		}
 	case "linux":
 		err := buildOnLinux(pc)
+		if err != nil {
+			return err
+		}
+		oldLocation := pc.ProjectRoot + "/build/raylib/libraylib.so"
+		err = os.Rename(oldLocation, pc.ProjectRoot+"/libraylib.so")
 		if err != nil {
 			return err
 		}
