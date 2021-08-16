@@ -62,11 +62,11 @@ func (a *RaylibAdapter) Build(pc *config.ProjectConfig) error {
 		if err != nil {
 			return err
 		}
-		oldLocation := pc.ProjectRoot + "/build/raylib/libraylib.so"
-		err = os.Rename(oldLocation, pc.ProjectRoot+"/libraylib.so")
-		if err != nil {
-			return err
-		}
+		// oldLocation := pc.ProjectRoot + "/build/raylib/libraylib.so"
+		// err = os.Rename(oldLocation, pc.ProjectRoot+"/libraylib.so")
+		// if err != nil {
+		// 	return err
+		// }
 	// case "windows":
 	// 	return nil
 	}
