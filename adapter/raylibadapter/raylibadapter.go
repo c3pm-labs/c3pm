@@ -40,9 +40,8 @@ func buildOnMacOS(pc *config.ProjectConfig) error {
 }
 
 func buildOnLinux(pc *config.ProjectConfig) error {
-	executeCli("mkdir", pc.ProjectRoot , pc.ProjectRoot + "/build")
-	executeCli("cmake", pc.ProjectRoot + "/build", "-DBUILD_SHARED_LIBS=ON", pc.ProjectRoot)
-	return executeCli("make", pc.ProjectRoot + "/build", ".")
+	executeCli("make", pc.ProjectRoot + "/src", "RAYLIB_LIBTYPE=SHARED", "GRAPHICS=GRAPHICS_API_OPENGL_21", "-B")
+	return executeCli("sudo make", pc.ProjectRoot + "/src", "install", "RAYLIB_LIBTYPE=SHARED")
 }
 
 func (a *RaylibAdapter) Build(pc *config.ProjectConfig) error {
