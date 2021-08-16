@@ -41,7 +41,7 @@ func buildOnMacOS(pc *config.ProjectConfig) error {
 
 func buildOnLinux(pc *config.ProjectConfig) error {
 	executeCli("make", pc.ProjectRoot + "/src", "RAYLIB_LIBTYPE=SHARED", "GRAPHICS=GRAPHICS_API_OPENGL_21", "-B")
-	return executeCli("/bin/sh", "-c", "make", pc.ProjectRoot + "/src", "install", "RAYLIB_LIBTYPE=SHARED")
+	return executeCli("/bin/sh", "make", "-C", pc.ProjectRoot + "/src", "install", "RAYLIB_LIBTYPE=SHARED")
 }
 
 func (a *RaylibAdapter) Build(pc *config.ProjectConfig) error {
