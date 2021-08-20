@@ -76,7 +76,7 @@ func GetLastVersion(dependency string, options Options) (*semver.Version, error)
 //FetchPackage downloads a package given it's name and version number.
 func FetchPackage(dependency string, version string, options Options) (*os.File, error) {
 	client := http.Client{}
-	resp, err := client.Get(fmt.Sprintf("%s/%s/%s", options.RegistryURL+"/registry-c3pm-io", dependency, version))
+	resp, err := client.Get(fmt.Sprintf("%s/%s/%s", options.RegistryURL, dependency, version))
 	if err != nil {
 		return nil, fmt.Errorf("error fetching package %s: %w", dependency, err)
 	}

@@ -76,7 +76,7 @@ func unpackTarball(pkg *os.File, dest string) error {
 			_ = os.Remove(pkg.Name())
 			return nil
 		case err != nil:
-			return err
+			return fmt.Errorf("error unpacking tarball: %w", err)
 		case header == nil:
 			continue
 		}
