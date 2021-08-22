@@ -6,7 +6,6 @@ require (
 	github.com/AlecAivazis/survey/v2 v2.2.12
 	github.com/Masterminds/semver/v3 v3.1.1
 	github.com/bmatcuk/doublestar v1.3.4
-	github.com/google/martian v2.1.0+incompatible
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect
 	github.com/mitchellh/go-spdx v0.1.0
