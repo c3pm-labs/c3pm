@@ -42,7 +42,7 @@ Feel free to explore the available packages on our [platform](https://c3pm.io).
 
 ## Installing c3pm
 
-TBD
+You can check [our documentation](https://docs.c3pm.io/docs/getting_started/install) to see how to install c3pm
 
 ## Usage
 
@@ -75,10 +75,6 @@ $ ctpm publish
 
 You can find a more complete list of the available commands [here](https://github.com/gabrielcolson/c3pm/tree/master/specs/cli) !
 
-## Releases
-
-TBD
-
 ## Contributing
 
 Contributions are welcomed!
@@ -94,12 +90,4 @@ You also may need the documentation of the different stacks:
 
 ### Ask a question
 
-TBD
-
-### Create a bug report
-
-TBD
-
-### Submit a feature request
-
-TBD
+You can email us at: contact@c3pm.io or join our [discord](https://discord.gg/CU8Qbex3wP)
