@@ -14,6 +14,7 @@ project({{.ProjectName}} VERSION {{.ProjectVersion}})
 set(CMAKE_CXX_STANDARD {{.LanguageStandard}})
 
 add_library({{.ProjectName}} STATIC)
+add_library({{.ProjectName}} SHARED)
 
 target_sources({{.ProjectName}} PRIVATE {{.Sources}} {{.Headers}})
 target_include_directories({{.ProjectName}} PRIVATE {{.IncludeDirs}})
