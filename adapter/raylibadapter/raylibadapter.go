@@ -40,8 +40,8 @@ func buildOnMacOS(pc *config.ProjectConfig) error {
 }
 
 func buildOnLinux(pc *config.ProjectConfig) error {
-	executeCli("make", pc.ProjectRoot + "/src", "PLATFORM=PLATFORM_DESKTOP", "USE_EXTERNAL_GLFW=ON", "GRAPHICS=GRAPHICS_API_OPENGL_21", "-B")
-	return executeCli("/bin/sh", pc.ProjectRoot + "/src", "-c", "sudo make install")
+	executeCli("make", pc.ProjectRoot + "/src", "RAYLIB_LIBTYPE=SHARED", "GRAPHICS=GRAPHICS_API_OPENGL_21", "-B")
+	return executeCli("/bin/sh", pc.ProjectRoot + "/src", "-c", "sudo make install RAYLIB_LIBTYPE=SHARED")
 }
 
 func (a *RaylibAdapter) Build(pc *config.ProjectConfig) error {
