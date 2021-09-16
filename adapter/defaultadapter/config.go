@@ -10,6 +10,10 @@ type Config struct {
 	Sources []string `yaml:"sources"`
 	// Headers lists the project's header files.
 	Headers []string `yaml:"headers"`
+	// TestSources lists the project's tests source files
+	TestSources []string `yaml:"test_sources"`
+	// TestHeaders list the tests' header files
+	TestHeaders []string `yaml:"test_headers"`
 	// IncludeDirs lists the projects additional header directories.
 	IncludeDirs []string `yaml:"include_dirs"`
 	// LinuxConfig holds Linux specific configuration
