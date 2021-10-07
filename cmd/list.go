@@ -7,8 +7,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var listCmdFlags = ctpm.AddOptions{}
-
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "list all project dependencies",
@@ -24,7 +22,4 @@ var listCmd = &cobra.Command{
 		}
 		return nil
 	},
-}
-
-func init() {
 }
