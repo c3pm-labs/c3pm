@@ -6,6 +6,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"github.com/Masterminds/semver/v3"
+	"github.com/schollz/progressbar/v3"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -85,7 +86,11 @@ func FetchPackage(dependency string, version string, options Options) (*os.File,
 	if err != nil {
 		return nil, fmt.Errorf("error creating temporary package file: %w", err)
 	}
-	_, err = io.Copy(file, resp.Body)
+	bar := progressbar.DefaultBytes(
+		resp.ContentLength,
+		"Downloading " + fmt.Sprintf("%s:%s", dependency, version),
+	)
+	_, err = io.Copy(io.MultiWriter(file, bar), resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("error downloading package: %w", err)
 	}

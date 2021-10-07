@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/c3pm-labs/c3pm/env"
+	"github.com/schollz/progressbar/v3"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -94,8 +95,13 @@ func (c API) send(method string, path string, buf io.Reader) error {
 	if err != nil {
 		return err
 	}
+	bar := progressbar.DefaultBytes(
+		int64(body.Len()),
+		"Uploading package",
+	)
+	barReader := progressbar.NewReader(body, bar)
 	w.Close()
-	req, err := c.newRequest(method, path, body)
+	req, err := c.newRequest(method, path, &barReader)
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
 	}
