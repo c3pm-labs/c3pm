@@ -88,7 +88,7 @@ func FetchPackage(dependency string, version string, options Options) (*os.File,
 	}
 	bar := progressbar.DefaultBytes(
 		resp.ContentLength,
-		"Downloading " + fmt.Sprintf("%s:%s", dependency, version),
+		"Downloading "+fmt.Sprintf("%s:%s", dependency, version),
 	)
 	_, err = io.Copy(io.MultiWriter(file, bar), resp.Body)
 	if err != nil {
