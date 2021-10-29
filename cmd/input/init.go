@@ -5,7 +5,11 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/Masterminds/semver/v3"
 	"github.com/c3pm-labs/c3pm/config/manifest"
+	"github.com/mitchellh/go-spdx"
+	"strings"
 )
+
+var initLicenses []string = nil
 
 //InitSurvey is the definition of the user interaction happening in the init command to choose project parameters.
 var InitSurvey = []*survey.Question{
@@ -48,6 +52,22 @@ var InitSurvey = []*survey.Question{
 			Message: "Project license",
 			Default: "UNLICENSED",
 			Help:    "You can read about code licenses on https://choosealicense.com/",
+			Suggest: func(toComplete string) []string {
+				if initLicenses == nil {
+					var err error
+					initLicenses, err = listLicences()
+					if err != nil {
+						return nil
+					}
+				}
+				filteredLicences := []string{}
+				for _, l := range initLicenses {
+					if strings.HasPrefix(l, toComplete) {
+						filteredLicences = append(filteredLicences, l)
+					}
+				}
+				return filteredLicences
+			},
 		},
 	},
 }
@@ -58,6 +78,18 @@ type InitValues = struct {
 	Description string
 	Version     string
 	License     string
+}
+
+func listLicences() ([]string, error) {
+	licenseList, err := spdx.List()
+	if err != nil {
+		return nil, fmt.Errorf("failed to list licenses: %w", err)
+	}
+	licenses := []string{}
+	for _, li := range licenseList.Licenses {
+		licenses = append(licenses, li.ID)
+	}
+	return licenses, nil
 }
 
 //Init handles the user interaction happening during the init command
