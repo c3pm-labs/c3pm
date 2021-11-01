@@ -74,14 +74,14 @@ func GetLastVersion(dependency string, options Options) (*semver.Version, error)
 }
 
 //FetchPackage downloads a package given it's name and version number.
-func FetchPackage(dependency string, version *semver.Version, options Options) (*os.File, error) {
+func FetchPackage(dependency string, version string, options Options) (*os.File, error) {
 	client := http.Client{}
-	resp, err := client.Get(fmt.Sprintf("%s/%s/%s", options.RegistryURL, dependency, version.String()))
+	resp, err := client.Get(fmt.Sprintf("%s/%s/%s", options.RegistryURL, dependency, version))
 	if err != nil {
 		return nil, fmt.Errorf("error fetching package %s: %w", dependency, err)
 	}
 	defer resp.Body.Close()
-	file, err := ioutil.TempFile("", fmt.Sprintf("%s.%s.*.tar", dependency, version.String()))
+	file, err := ioutil.TempFile("", fmt.Sprintf("%s.%s.*.tar", dependency, version))
 	if err != nil {
 		return nil, fmt.Errorf("error creating temporary package file: %w", err)
 	}
