@@ -1,10 +1,12 @@
 package ctpm
 
 import (
+	"bufio"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	"github.com/mitchellh/go-spdx"
@@ -121,7 +123,41 @@ func generateLicenseFile(pc *config.ProjectConfig) error {
 	return ioutil.WriteFile(filepath.Join(pc.ProjectRoot, "LICENSE"), []byte(lic.Text), 0644)
 }
 
+func yesOrNo(label string) string {
+	choices := "y/n"
+
+	r := bufio.NewReader(os.Stdin)
+	var s string
+
+	for {
+		_, err := fmt.Fprintf(os.Stderr, "%s (%s) ", label, choices)
+		if err != nil {
+			return ""
+		}
+		s, _ = r.ReadString('\n')
+		s = strings.TrimSpace(s)
+		if s == "" {
+			return "n"
+		}
+		s = strings.ToLower(s)
+		return s
+	}
+}
+
 func saveExecutableTemplate(pc *config.ProjectConfig) error {
+	answer := ""
+	if _, err := os.Stat(filepath.Join(pc.ProjectRoot, "src")); !os.IsNotExist(err) {
+		answer = yesOrNo("You already have a src directory, do you want to override it?")
+	}
+	if answer == "n" || answer == "no" {
+		return nil
+	}
+	if answer == "y" || answer == "yes" {
+		srcPath := filepath.Join(pc.ProjectRoot, "src")
+		if err := os.RemoveAll(srcPath); err != nil {
+			return nil
+		}
+	}
 	if err := os.Mkdir(filepath.Join(pc.ProjectRoot, "src"), os.ModePerm); err != nil {
 		return err
 	}
