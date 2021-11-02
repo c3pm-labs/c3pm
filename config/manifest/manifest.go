@@ -3,6 +3,7 @@
 package manifest
 
 import (
+	"errors"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 )
@@ -74,11 +75,24 @@ func New() Manifest {
 
 func deserialize(config []byte) (Manifest, error) {
 	man := New()
-	err := yaml.Unmarshal(config, &man)
+	err := yaml.UnmarshalStrict(config, &man)
 	if err != nil {
 		return man, err
 	}
 	return man, nil
+}
+
+func checkManifest(man Manifest) error {
+	if man.Name == "" {
+		return errors.New("Field \"name\" is missing")
+	}
+	if man.Type != "executable" && man.Type != "library" {
+		return errors.New("Field \"type\" is missing or incorrect [executable | library]")
+	}
+	if man.Version.Version == nil {
+		return errors.New("Field \"version\" is missing")
+	}
+	return nil
 }
 
 // Load reads the file located at the given path, and stores its contents in a new Manifest struct.
@@ -87,7 +101,14 @@ func Load(path string) (Manifest, error) {
 	if err != nil {
 		return Manifest{}, err
 	}
-	return deserialize(data)
+	man, err := deserialize(data)
+	if err != nil {
+		return man, err
+	}
+	if err = checkManifest(man); err != nil {
+		return man, err
+	}
+	return man, err
 }
 
 func (m *Manifest) serialize() ([]byte, error) {
