@@ -129,19 +129,17 @@ func yesOrNo(label string) string {
 	r := bufio.NewReader(os.Stdin)
 	var s string
 
-	for {
-		_, err := fmt.Fprintf(os.Stderr, "%s (%s) ", label, choices)
-		if err != nil {
-			return ""
-		}
-		s, _ = r.ReadString('\n')
-		s = strings.TrimSpace(s)
-		if s == "" {
-			return "n"
-		}
-		s = strings.ToLower(s)
-		return s
+	_, err := fmt.Fprintf(os.Stderr, "%s (%s) ", label, choices)
+	if err != nil {
+		return ""
 	}
+	s, _ = r.ReadString('\n')
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return "n"
+	}
+	s = strings.ToLower(s)
+	return s
 }
 
 func overrideDirectory(label string, path string) bool {
@@ -166,10 +164,10 @@ func overrideDirectory(label string, path string) bool {
 func saveExecutableTemplate(pc *config.ProjectConfig) error {
 	if status := overrideDirectory(
 		"You already have a src directory, do you want to override it?",
-		filepath.Join(pc.ProjectRoot, "src")); status == true {
+		filepath.Join(pc.ProjectRoot, "src")); status {
 		return ioutil.WriteFile(filepath.Join(pc.ProjectRoot, "src", "main.cpp"), []byte(execTemplate), 0644)
 	}
-	return  nil
+	return nil
 }
 
 func saveLibraryTemplate(pc *config.ProjectConfig) error {
@@ -178,7 +176,7 @@ func saveLibraryTemplate(pc *config.ProjectConfig) error {
 	var err error = nil
 	if status := overrideDirectory(
 		"You already have a src directory, do you want to override it?",
-		filepath.Join(pc.ProjectRoot, "src")); status == true {
+		filepath.Join(pc.ProjectRoot, "src")); status {
 		f, err = os.Create(filepath.Join(pc.ProjectRoot, "src", pc.Manifest.Name+".cpp"))
 		if err != nil {
 			return err
@@ -192,7 +190,7 @@ func saveLibraryTemplate(pc *config.ProjectConfig) error {
 
 	if status := overrideDirectory(
 		"You already have a include directory, do you want to override it?",
-		filepath.Join(pc.ProjectRoot, "include")); status == true {
+		filepath.Join(pc.ProjectRoot, "include")); status {
 		f, err = os.Create(filepath.Join(pc.ProjectRoot, "include", pc.Manifest.Name+".hpp"))
 		if err != nil {
 			return err
