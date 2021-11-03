@@ -14,6 +14,11 @@ type Adapter interface {
 	CmakeConfig(pc *config.ProjectConfig) (string, error)
 }
 
+type AdapterTestable interface {
+	// Test run tests
+	Test(pc *config.ProjectConfig) error
+}
+
 type AdapterGetter interface {
 	FromPC(adp *manifest.AdapterConfig) (Adapter, error)
 }
