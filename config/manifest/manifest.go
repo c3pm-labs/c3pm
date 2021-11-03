@@ -75,7 +75,7 @@ func New() Manifest {
 
 func deserialize(config []byte) (Manifest, error) {
 	man := New()
-	err := yaml.UnmarshalStrict(config, &man)
+	err := yaml.Unmarshal(config, &man)
 	if err != nil {
 		return man, err
 	}
