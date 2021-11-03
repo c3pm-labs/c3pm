@@ -103,3 +103,23 @@ func cmakeDirFromPc(pc *config.ProjectConfig) string {
 func buildDirFromPc(pc *config.ProjectConfig) string {
 	return filepath.Join(pc.LocalC3PMDirPath(), "build")
 }
+
+func (a *DefaultAdapter) Test(pc *config.ProjectConfig) error {
+	adapterCfg, err := Parse(pc.Manifest.Build.Config)
+	if err != nil {
+		return err
+	}
+	sources := adapterCfg.Sources
+	headers := adapterCfg.Headers
+	name := pc.Manifest.Name
+	adapterCfg.Sources = adapterCfg.TestSources
+	adapterCfg.Headers = adapterCfg.TestHeaders
+	pc.Manifest.Name = pc.Manifest.Name + "_test"
+	pc.Manifest.Build.Config = adapterCfg
+	err = a.Build(pc)
+	adapterCfg.Sources = sources
+	adapterCfg.Headers = headers
+	pc.Manifest.Name = name
+	pc.Manifest.Build.Config = adapterCfg
+	return err
+}

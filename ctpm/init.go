@@ -1,10 +1,12 @@
 package ctpm
 
 import (
+	"bufio"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	"github.com/mitchellh/go-spdx"
@@ -121,36 +123,81 @@ func generateLicenseFile(pc *config.ProjectConfig) error {
 	return ioutil.WriteFile(filepath.Join(pc.ProjectRoot, "LICENSE"), []byte(lic.Text), 0644)
 }
 
-func saveExecutableTemplate(pc *config.ProjectConfig) error {
-	if err := os.Mkdir(filepath.Join(pc.ProjectRoot, "src"), os.ModePerm); err != nil {
-		return err
+func yesOrNo(label string) string {
+	choices := "y/n"
+
+	r := bufio.NewReader(os.Stdin)
+	var s string
+
+	_, err := fmt.Fprintf(os.Stderr, "%s (%s) ", label, choices)
+	if err != nil {
+		return ""
 	}
-	return ioutil.WriteFile(filepath.Join(pc.ProjectRoot, "src", "main.cpp"), []byte(execTemplate), 0644)
+	s, _ = r.ReadString('\n')
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return "n"
+	}
+	s = strings.ToLower(s)
+	return s
+}
+
+func overrideDirectory(label string, path string) bool {
+	answer := ""
+	if _, err := os.Stat(path); !os.IsNotExist(err) {
+		answer = yesOrNo(label)
+	}
+	if answer == "n" || answer == "no" {
+		return false
+	}
+	if answer == "y" || answer == "yes" {
+		if err := os.RemoveAll(path); err != nil {
+			return false
+		}
+	}
+	if err := os.Mkdir(path, os.ModePerm); err != nil {
+		return false
+	}
+	return true
+}
+
+func saveExecutableTemplate(pc *config.ProjectConfig) error {
+	if status := overrideDirectory(
+		"You already have a src directory, do you want to override it?",
+		filepath.Join(pc.ProjectRoot, "src")); status {
+		return ioutil.WriteFile(filepath.Join(pc.ProjectRoot, "src", "main.cpp"), []byte(execTemplate), 0644)
+	}
+	return nil
 }
 
 func saveLibraryTemplate(pc *config.ProjectConfig) error {
 	t := template.Must(template.New("libTemplate").Parse(libTemplate))
-	if err := os.Mkdir(filepath.Join(pc.ProjectRoot, "src"), os.ModePerm); err != nil {
-		return err
-	}
-	f, err := os.Create(filepath.Join(pc.ProjectRoot, "src", pc.Manifest.Name+".cpp"))
-	if err != nil {
-		return err
-	}
-	defer f.Close()
+	var f *os.File = nil
+	var err error = nil
+	if status := overrideDirectory(
+		"You already have a src directory, do you want to override it?",
+		filepath.Join(pc.ProjectRoot, "src")); status {
+		f, err = os.Create(filepath.Join(pc.ProjectRoot, "src", pc.Manifest.Name+".cpp"))
+		if err != nil {
+			return err
+		}
+		defer f.Close()
 
-	if err := t.ExecuteTemplate(f, "libTemplate", pc.Manifest); err != nil {
-		return err
+		if err := t.ExecuteTemplate(f, "libTemplate", pc.Manifest); err != nil {
+			return err
+		}
 	}
-	if err := os.Mkdir(filepath.Join(pc.ProjectRoot, "include"), os.ModePerm); err != nil {
-		return err
-	}
-	f, err = os.Create(filepath.Join(pc.ProjectRoot, "include", pc.Manifest.Name+".hpp"))
-	if err != nil {
-		return err
-	}
-	defer f.Close()
 
-	_, err = f.Write([]byte(includeTemplate))
+	if status := overrideDirectory(
+		"You already have a include directory, do you want to override it?",
+		filepath.Join(pc.ProjectRoot, "include")); status {
+		f, err = os.Create(filepath.Join(pc.ProjectRoot, "include", pc.Manifest.Name+".hpp"))
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+
+		_, err = f.Write([]byte(includeTemplate))
+	}
 	return err
 }
