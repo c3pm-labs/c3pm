@@ -19,5 +19,6 @@ func init() {
 	RootCmd.AddCommand(loginCmd)
 	RootCmd.AddCommand(publishCmd)
 	RootCmd.AddCommand(removeCmd)
+	RootCmd.AddCommand(listCmd)
 	RootCmd.AddCommand(testCmd)
 }
