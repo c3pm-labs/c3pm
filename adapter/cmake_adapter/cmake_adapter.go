@@ -25,7 +25,7 @@ func (a Adapter) Build(pc *config.ProjectConfig) error {
 
 	buildDir := filepath.Join(pc.LocalC3PMDirPath(), "build")
 
-	err = cmake.GenerateBuildFiles(".", buildDir, cfg.Variables)
+	err = cmake.GenerateBuildFiles(pc.ProjectRoot, buildDir, cfg.Variables)
 	if err != nil {
 		return err
 	}
