@@ -12,6 +12,12 @@ import (
 
 type Adapter struct{}
 
+func New() *Adapter {
+	return &Adapter{}
+}
+
+var _ adapter_interface.Adapter = (*Adapter)(nil)
+
 type Config struct {
 	Targets   []string          `yaml:"targets"`
 	Variables map[string]string `yaml:"variables"`
@@ -25,7 +31,7 @@ func (a Adapter) Build(pc *config.ProjectConfig) error {
 
 	buildDir := filepath.Join(pc.LocalC3PMDirPath(), "build")
 
-	err = cmake.GenerateBuildFiles(".", buildDir, cfg.Variables)
+	err = cmake.GenerateBuildFiles(pc.ProjectRoot, buildDir, cfg.Variables)
 	if err != nil {
 		return err
 	}
@@ -57,12 +63,6 @@ func (a Adapter) Targets(pc *config.ProjectConfig) ([]string, error) {
 func (a Adapter) CmakeConfig(*config.ProjectConfig) (string, error) {
 	return "", nil
 }
-
-func New() *Adapter {
-	return &Adapter{}
-}
-
-var _ adapter_interface.Adapter = (*Adapter)(nil)
 
 func parseConfig(c interface{}) (*Config, error) {
 	out, err := yaml.Marshal(c)
