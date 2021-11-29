@@ -22,7 +22,7 @@ func Test(pc *config.ProjectConfig) error {
 }
 
 func AddDependenciesAndTest(pc *config.ProjectConfig) error {
-	err := addAllDependencies(pc)
+	err := getAllDependencies(pc)
 	if err != nil {
 		return fmt.Errorf("error installing dependencies: %w", err)
 	}

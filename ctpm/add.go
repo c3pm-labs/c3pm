@@ -23,6 +23,15 @@ func Add(pc *config.ProjectConfig, opts AddOptions) error {
 		if err != nil {
 			return fmt.Errorf("error adding %s: %w", dep, err)
 		}
+		libPath := config.LibCachePath(name, version.String())
+		libPc, err := config.Load(libPath)
+		if err != nil {
+			return fmt.Errorf("failed to read c3pm.yml: %w", err)
+		}
+		err = Build(libPc)
+		if err != nil {
+			return err
+		}
 		if pc.Manifest.Dependencies == nil {
 			pc.Manifest.Dependencies = make(manifest.Dependencies)
 		}
