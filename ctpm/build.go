@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Masterminds/semver/v3"
 	"github.com/c3pm-labs/c3pm/adapter"
+	"github.com/c3pm-labs/c3pm/adapter_interface"
 	"github.com/c3pm-labs/c3pm/config"
 	"github.com/c3pm-labs/c3pm/config/manifest"
 	"github.com/c3pm-labs/c3pm/dependencies"
@@ -39,7 +40,11 @@ func (d DependencyBuilder) PostAct(request dependencies.PackageRequest) error {
 		return fmt.Errorf("failed to read c3pm.yml: %w", err)
 	}
 	getter := adapter.AdapterGetterImp{}
-	adp, err := getter.FromPC(pc.Manifest.Build.Adapter)
+	var adp adapter_interface.Adapter
+	adp, err = getter.FromPC(pc.Manifest.Build.Adapter)
+	if err != nil {
+		return err
+	}
 	err = adp.Build(pc)
 	if err != nil {
 		return fmt.Errorf("error building: %w", err)

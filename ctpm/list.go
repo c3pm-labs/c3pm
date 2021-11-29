@@ -64,7 +64,7 @@ func (d *DependencyFetcher) FetchDeps(request dependencies.PackageRequest) (depe
 	// Find new current node
 	var currentNode *DependencyNode = nil
 	found := false
-	for found == false {
+	for !found {
 		for _, node := range d.CurrentNode.Children {
 			if node.Name == fmt.Sprintf("%s@%s", request.Name, request.Version) {
 				found = true
@@ -72,7 +72,7 @@ func (d *DependencyFetcher) FetchDeps(request dependencies.PackageRequest) (depe
 				currentNode = node
 			}
 		}
-		if found == false {
+		if !found {
 			// Move up one level
 			d.CurrentBranch = d.CurrentBranch[:len(d.CurrentBranch)-1]
 			d.CurrentNode = d.CurrentBranch[len(d.CurrentBranch)-1]
@@ -129,7 +129,7 @@ func List(pc *config.ProjectConfig, opt ListOptions) error {
 		}
 	}
 
-	if opt.Tree == false {
+	if !opt.Tree {
 		for key, val := range allDeps {
 			fmt.Printf("%s@%s\n", key, val)
 		}
