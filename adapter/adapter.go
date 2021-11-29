@@ -3,9 +3,9 @@ package adapter
 import (
 	"errors"
 	"github.com/c3pm-labs/c3pm/adapter/cmake_adapter"
-	"github.com/c3pm-labs/c3pm/adapter/configure_adapter"
 	"github.com/c3pm-labs/c3pm/adapter/defaultadapter"
 	"github.com/c3pm-labs/c3pm/adapter/irrlichtadapter"
+	"github.com/c3pm-labs/c3pm/adapter/ncurses_adapter"
 	"github.com/c3pm-labs/c3pm/adapter_interface"
 	"github.com/c3pm-labs/c3pm/config/manifest"
 )
@@ -20,8 +20,8 @@ func (AdapterGetterImp) FromPC(adp *manifest.AdapterConfig) (adapter_interface.A
 		return irrlichtadapter.New(), nil
 	case adp.Name == "cmake" && adp.Version.String() == "0.0.1":
 		return cmake_adapter.New(), nil
-	case adp.Name == "configure" && adp.Version.String() == "0.0.1":
-		return configure_adapter.New(), nil
+	case adp.Name == "ncurses" && adp.Version.String() == "0.0.1":
+		return ncurses_adapter.New(), nil
 	default:
 		return nil, errors.New("only default adapter is supported")
 	}
