@@ -37,3 +37,13 @@ func (d Dependencies) String() string {
 	}
 	return sb.String()
 }
+
+func (d Dependencies) Append(d2 Dependencies) Dependencies {
+	if d == nil {
+		d = Dependencies{}
+	}
+	for n, v := range d2 {
+		d[n] = v
+	}
+	return d
+}

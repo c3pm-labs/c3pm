@@ -10,21 +10,22 @@ import (
 
 // Manifest is the main configuration structure for C3PM.
 type Manifest struct {
-	C3PMVersion   C3PMVersion    `yaml:"c3pm_version"`
-	Type          Type           `yaml:"type"`
-	Name          string         `yaml:"name"`
-	Description   string         `yaml:"description"`
-	Version       Version        `yaml:"version"`
-	Publish       *PublishConfig `yaml:"publish,omitempty"`
-	Build         *BuildConfig   `yaml:"build,omitempty"`
-	Documentation string         `yaml:"documentation"`
-	Website       string         `yaml:"website"`
-	Repository    string         `yaml:"repository"`
-	Contributors  string         `yaml:"contributors"`
-	Standard      string         `yaml:"standard"`
-	License       string         `yaml:"license"`
-	Dependencies  Dependencies   `yaml:"dependencies"`
-	Tags          []string       `yaml:"tags,omitempty"`
+	C3PMVersion      C3PMVersion    `yaml:"c3pm_version"`
+	Type             Type           `yaml:"type"`
+	Name             string         `yaml:"name"`
+	Description      string         `yaml:"description"`
+	Version          Version        `yaml:"version"`
+	Publish          *PublishConfig `yaml:"publish,omitempty"`
+	Build            *BuildConfig   `yaml:"build,omitempty"`
+	Documentation    string         `yaml:"documentation"`
+	Website          string         `yaml:"website"`
+	Repository       string         `yaml:"repository"`
+	Contributors     string         `yaml:"contributors"`
+	Standard         string         `yaml:"standard"`
+	License          string         `yaml:"license"`
+	Dependencies     Dependencies   `yaml:"dependencies"`
+	TestDependencies Dependencies   `yaml:"test_dependencies"`
+	Tags             []string       `yaml:"tags,omitempty"`
 }
 
 type BuildConfig struct {
