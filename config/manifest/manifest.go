@@ -48,9 +48,10 @@ type PublishConfig struct {
 func New() Manifest {
 	c3pmAdapterVersion, _ := VersionFromString("0.0.1")
 	defaultManifest := Manifest{
-		C3PMVersion:  C3PMVersion1,
-		Dependencies: make(map[string]string),
-		Standard:     "20",
+		C3PMVersion:      C3PMVersion1,
+		Dependencies:     make(map[string]string),
+		TestDependencies: make(map[string]string),
+		Standard:         "20",
 		Publish: &PublishConfig{
 			Exclude: []string{},
 			Include: []string{"**/**"},
