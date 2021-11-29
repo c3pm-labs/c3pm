@@ -49,6 +49,7 @@ var (
 			Dependencies: manifest.Dependencies{
 				"hello": "1.0.5",
 			},
+			TestDependencies: manifest.Dependencies{},
 		},
 		ProjectRoot: OriginalDirAbs,
 	}
