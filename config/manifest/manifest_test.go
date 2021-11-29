@@ -34,6 +34,8 @@ build:
 dependencies:
     future: 12.2.3
     past: 2.0.0
+test_dependencies:
+    catch: 2.0.0
 `
 
 var _ = Describe("manifest", func() {
