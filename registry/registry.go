@@ -6,6 +6,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"github.com/Masterminds/semver/v3"
+	"github.com/c3pm-labs/c3pm/api"
 	"github.com/schollz/progressbar/v3"
 	"io"
 	"io/ioutil"
@@ -74,6 +75,11 @@ func GetLastVersion(dependency string, options Options) (*semver.Version, error)
 	return vs[len(vs)-1], nil
 }
 
+func SendMetric(dependency string) error {
+	client := api.New(&http.Client{}, "")
+	return client.CountDownload(dependency)
+}
+
 //FetchPackage downloads a package given it's name and version number.
 func FetchPackage(dependency string, version string, options Options) (*os.File, error) {
 	client := http.Client{}
@@ -98,5 +104,6 @@ func FetchPackage(dependency string, version string, options Options) (*os.File,
 	if err != nil {
 		return nil, fmt.Errorf("error returning to file beginning: %w", err)
 	}
+	_ = SendMetric(dependency)
 	return file, nil
 }
