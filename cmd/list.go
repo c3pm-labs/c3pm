@@ -7,6 +7,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type ListCmdFlags struct {
+	ctpm.ListOptions
+}
+
+var listCmdFlags = ListCmdFlags{}
+
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "list all project dependencies",
@@ -16,10 +22,14 @@ var listCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("failed to read c3pm.yml: %w", err)
 		}
-		err = ctpm.List(pc)
+		err = ctpm.List(pc, listCmdFlags.ListOptions)
 		if err != nil {
 			return fmt.Errorf("failed to add dependencies: %w", err)
 		}
 		return nil
 	},
+}
+
+func init() {
+	listCmd.Flags().BoolVar(&listCmdFlags.Tree, "tree", ctpm.ListDefaultOptions.Tree, "List dependencies in indented tree form")
 }

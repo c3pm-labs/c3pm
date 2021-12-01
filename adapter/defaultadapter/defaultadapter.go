@@ -7,7 +7,9 @@ import (
 	"github.com/c3pm-labs/c3pm/cmake"
 	"github.com/c3pm-labs/c3pm/config"
 	"github.com/c3pm-labs/c3pm/config/manifest"
+	"os"
 	"path/filepath"
+	"strings"
 )
 
 // DefaultAdapter is the builtin adapter used by default in c3pm
@@ -21,6 +23,20 @@ func New(adapterGetter adapter_interface.AdapterGetter) *DefaultAdapter {
 }
 
 var CurrentVersion, _ = manifest.VersionFromString("0.0.1")
+
+func isInCache(pc *config.ProjectConfig) bool {
+	root, _ := filepath.Abs(pc.ProjectRoot)
+	c3pmDir, _ := filepath.Abs(config.GlobalC3PMDirPath())
+	if !strings.Contains(root, filepath.Join(c3pmDir, "cache")) {
+		// Project dir not in cache directory, skipping
+		return false
+	}
+	if _, err := os.Stat(filepath.Join(root, fmt.Sprintf("lib%s.a", pc.Manifest.Name))); err != nil {
+		// Lib file does not exist yet
+		return false
+	}
+	return true
+}
 
 func (a *DefaultAdapter) Build(pc *config.ProjectConfig) error {
 	cmakeVariables := map[string]string{
@@ -45,6 +61,11 @@ func (a *DefaultAdapter) Build(pc *config.ProjectConfig) error {
 	// don't build if the lib is header only
 	if headerOnly && pc.Manifest.Type == manifest.Library {
 		// TODO: generate cmake files so we can have IDE integration
+		return nil
+	}
+
+	// dont rebuild if already in cache
+	if pc.Manifest.Type == manifest.Library && isInCache(pc) {
 		return nil
 	}
 

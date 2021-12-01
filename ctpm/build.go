@@ -4,14 +4,20 @@ import (
 	"fmt"
 	"github.com/Masterminds/semver/v3"
 	"github.com/c3pm-labs/c3pm/adapter"
+	"github.com/c3pm-labs/c3pm/adapter_interface"
 	"github.com/c3pm-labs/c3pm/config"
 	"github.com/c3pm-labs/c3pm/config/manifest"
 	"github.com/c3pm-labs/c3pm/dependencies"
 )
 
-type DependencyFetcher struct{}
+type DependencyBuilder struct {
+	Done manifest.Dependencies
+}
 
-func (d DependencyFetcher) FetchDeps(request dependencies.PackageRequest) (dependencies.Dependencies, error) {
+func (d DependencyBuilder) FetchDeps(request dependencies.PackageRequest) (dependencies.Dependencies, error) {
+	if _, ok := d.Done[request.Name]; ok {
+		return dependencies.Dependencies{}, nil
+	}
 	libPath := config.LibCachePath(request.Name, request.Version)
 	pc, err := config.Load(libPath)
 	if err != nil {
@@ -24,22 +30,39 @@ func (d DependencyFetcher) FetchDeps(request dependencies.PackageRequest) (depen
 	return ret, nil
 }
 
-func (d DependencyFetcher) PreAct(_ dependencies.PackageRequest) error  { return nil }
-func (d DependencyFetcher) PostAct(_ dependencies.PackageRequest) error { return nil }
+func (d DependencyBuilder) PreAct(_ dependencies.PackageRequest) error { return nil }
+func (d DependencyBuilder) PostAct(request dependencies.PackageRequest) error {
+	fmt.Printf("Building %s:%s\n", request.Name, request.Version)
+
+	libPath := config.LibCachePath(request.Name, request.Version)
+	pc, err := config.Load(libPath)
+	if err != nil {
+		return fmt.Errorf("failed to read c3pm.yml: %w", err)
+	}
+	getter := adapter.AdapterGetterImp{}
+	var adp adapter_interface.Adapter
+	adp, err = getter.FromPC(pc.Manifest.Build.Adapter)
+	if err != nil {
+		return err
+	}
+	err = adp.Build(pc)
+	if err != nil {
+		return fmt.Errorf("error building: %w", err)
+	}
+	d.Done[fmt.Sprintf(request.Name)] = request.Version
+	return nil
+}
 
 func getAllDependencies(pc *config.ProjectConfig) error {
 	allDeps := make(manifest.Dependencies)
+	allDeps[pc.Manifest.Name] = pc.Manifest.Version.String()
 	for name, version := range pc.Manifest.Dependencies {
-		deps, err := dependencies.Install(dependencies.PackageRequest{Name: name, Version: version}, DependencyFetcher{})
+		_, err := dependencies.Install(dependencies.PackageRequest{Name: name, Version: version}, DependencyBuilder{Done: allDeps})
 		if err != nil {
 			return err
 		}
-		for dname, dversions := range deps {
-			for dversion := range dversions {
-				allDeps[dname] = dversion
-			}
-		}
 	}
+	delete(allDeps, pc.Manifest.Name)
 	pc.Manifest.Dependencies = allDeps
 	return nil
 }

@@ -4,7 +4,7 @@ import (
 	"github.com/c3pm-labs/c3pm/cmd"
 )
 
-var version = "dev"
+var version = "1.0.0"
 
 func main() {
 	cmd.RootCmd.Version = version

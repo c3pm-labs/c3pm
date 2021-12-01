@@ -33,14 +33,13 @@ func (i InstallHandler) PreAct(request dependencies.PackageRequest) error {
 }
 
 func (i InstallHandler) PostAct(request dependencies.PackageRequest) error {
-	fmt.Printf("Building %s:%s\n", request.Name, request.Version)
-	// Build the lib
+	// Check that the lib has correctly been installed
 	libPath := config.LibCachePath(request.Name, request.Version)
-	pc, err := config.Load(libPath)
+	_, err := config.Load(libPath)
 	if err != nil {
 		return fmt.Errorf("failed to read c3pm.yml: %w", err)
 	}
-	return Build(pc)
+	return nil
 }
 
 // Install fetches the package, unpacks it in the c3pm cache and builds it. If the lib already is
