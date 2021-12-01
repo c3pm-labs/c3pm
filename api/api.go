@@ -69,12 +69,14 @@ func (c API) fetch(method string, path string, body io.Reader, data interface{})
 
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to read response body: %w", err)
 	}
 
-	err = json.Unmarshal(b, &data)
-	if err != nil {
-		return err
+	if len(b) > 0 {
+		err = json.Unmarshal(b, &data)
+		if err != nil {
+			return fmt.Errorf("failed to unmarshal response body: %w", err)
+		}
 	}
 
 	return nil
