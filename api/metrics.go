@@ -16,7 +16,7 @@ func (c *API) CountDownload(packageName string) error {
 	if err != nil {
 		return err
 	}
-	err = c.fetch(http.MethodPost, "/auth/login", bytes.NewReader(body), nil)
+	err = c.fetch(http.MethodPost, "/packages/countDownloads", bytes.NewReader(body), nil)
 	if err != nil {
 		return fmt.Errorf("failed to count download: %w", err)
 	}
