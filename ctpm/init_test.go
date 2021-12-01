@@ -48,18 +48,6 @@ var _ = Describe("Init", func() {
 			Ω(pc.Description).To(Equal(projectDesc))
 		})
 		// 		PIt("Project template of either library or an executable")
-		It("A .c3pm directory", func() {
-			fileInfo, err := os.Stat(filepath.Join(projectFolder, ".c3pm"))
-			Ω(err).ShouldNot(HaveOccurred())
-
-			Ω(fileInfo).ShouldNot(BeNil())
-		})
-		It("A CMakeLists.txt", func() {
-			cmake, err := os.Stat(filepath.Join(projectFolder, ".c3pm/cmake/CMakeLists.txt"))
-			Ω(err).ShouldNot(HaveOccurred())
-
-			Ω(cmake).ShouldNot(BeNil())
-		})
 		It("Depending on the user's choice, a LICENSE file", func() {
 			lic, err := os.Stat(filepath.Join(projectFolder, "LICENSE"))
 			Ω(err).ShouldNot(HaveOccurred())
